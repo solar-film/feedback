@@ -348,7 +348,23 @@ function parseUrlParameters() {
     if (filmModel) state.formData.filmModel = filmModel.trim();
 }
 
+// Request Full Screen Helper
+function requestFullScreen() {
+    const doc = window.document;
+    const docEl = doc.documentElement;
+
+    const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+    
+    if(requestFullScreen && !doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        requestFullScreen.call(docEl).catch(err => {
+            console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    }
+}
+
 function startQuest() {
+    SoundFX.playClick();
+    requestFullScreen();
     state.historyStack.push('screen-intro');
     changeScreen('screen-m2'); // Skip directly to film results
 }
