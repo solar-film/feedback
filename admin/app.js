@@ -601,15 +601,16 @@ function renderKanbanBoard() {
         } else {
             footerHtml = `
                 <div class="kanban-card-footer" style="font-size: 0.65rem; color: var(--text-muted);">
-                    <span>📅 ติดตั้ง ${c.installDate}</span>
+                    <span>รอดำเนินการ</span>
                 </div>
             `;
         }
 
         card.innerHTML = `
             <div class="kanban-card-title">${c.name}</div>
-            <div class="kanban-card-meta">ID: ${c.id} | 📞 ${c.phone}</div>
-            <div style="font-size: 0.68rem; color: var(--text-muted);">${c.filmModel}</div>
+            <div class="kanban-card-meta">📞 ${c.phone} | LINE: ${c.lineAt || '-'}</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">📅 ติดตั้ง: ${c.installDate || '-'}</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px;">👤 ฝ่ายขาย: ${c.sales || '-'}</div>
             ${footerHtml}
         `;
 
