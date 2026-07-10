@@ -639,6 +639,7 @@ body {
 
 /* Accordion Expansion style inside Card */
 .touchpoint-accordion-card {
+    flex-shrink: 0;
     border: 1.5px solid #eef3f8;
     border-radius: var(--border-radius-lg);
     background-color: #ffffff;
