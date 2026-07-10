@@ -78,6 +78,11 @@
                             <!-- Populated by JS -->
                         </select>
                         <span style="color: var(--border);">|</span>
+                        <i data-lucide="building" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
+                        <select id="global-filter-company" onchange="applyGlobalFilter()" style="border: none; background: transparent; outline: none; cursor: pointer; color: var(--text-main); font-family: inherit; max-width: 120px;">
+                            <option value="all">ทุกบริษัท</option>
+                        </select>
+                        <span style="color: var(--border);">|</span>
                         <input type="date" id="global-filter-start" onchange="applyGlobalFilter()" style="border: none; background: transparent; outline: none; cursor: pointer; color: var(--text-main); font-family: inherit; font-size: 0.75rem;">
                         <span style="color: var(--text-muted); font-size: 0.75rem;">ถึง</span>
                         <input type="date" id="global-filter-end" onchange="applyGlobalFilter()" style="border: none; background: transparent; outline: none; cursor: pointer; color: var(--text-main); font-family: inherit; font-size: 0.75rem;">
@@ -177,10 +182,7 @@
                             <input type="text" id="search-input" class="search-input" placeholder="ค้นหาชื่อ, เบอร์โทร, หรือ ID ลูกค้า..." oninput="filterCustomerTable()">
                         </div>
                         <div class="filter-group">
-                            <!-- Company and Status Filters (Table Only) -->
-                            <select id="filter-company" class="filter-select" onchange="filterCustomerTable()">
-                                <option value="all">ทุกบริษัท</option>
-                            </select>
+                            <!-- Status Filter (Table Only) -->
 
                             <select id="filter-status" class="filter-select" onchange="filterCustomerTable()">
                                 <option value="all">ทุกสถานะส่งแบบประเมิน</option>

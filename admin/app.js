@@ -427,6 +427,7 @@ function updateDataAndRender(customersData) {
 
 function applyGlobalFilter() {
     const monthVal = document.getElementById('global-filter-month')?.value || 'all';
+    const companyVal = document.getElementById('global-filter-company')?.value || 'all';
     const startVal = document.getElementById('global-filter-start')?.value;
     const endVal = document.getElementById('global-filter-end')?.value;
 
@@ -479,7 +480,13 @@ function applyGlobalFilter() {
             }
         }
 
-        return matchesMonth && matchesDateRange;
+        // Company filter check
+        let matchesCompany = true;
+        if (companyVal !== 'all') {
+            matchesCompany = (c.company === companyVal);
+        }
+
+        return matchesMonth && matchesDateRange && matchesCompany;
     });
 
     processDataAndRender();
@@ -595,7 +602,6 @@ function renderCustomerTable() {
 function filterCustomerTable() {
     const query = document.getElementById('search-input')?.value.toLowerCase().trim() || '';
     const status = document.getElementById('filter-status')?.value || 'all';
-    const companyFilter = document.getElementById('filter-company')?.value || 'all';
 
     const rows = document.querySelectorAll('#customer-table-body tr');
     
@@ -616,10 +622,9 @@ function filterCustomerTable() {
         else if (rowStatusTag.classList.contains('action')) rowStatus = 'Action Required';
 
         const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || lineAt.includes(query) || sales.includes(query) || company.toLowerCase().includes(query);
-        const matchesCompany = companyFilter === 'all' || company === companyFilter;
         const matchesStatus = status === 'all' || rowStatus === status;
 
-        if (matchesQuery && matchesCompany && matchesStatus) {
+        if (matchesQuery && matchesStatus) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
@@ -1272,7 +1277,7 @@ function parseDateObj(dateStr) {
 }
 function populateFilters(init) {
     const monthSelect = document.getElementById('global-filter-month');
-    const companySelect = document.getElementById('filter-company');
+    const companySelect = document.getElementById('global-filter-company');
     
     const monthNames = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
     const uniqueMonths = new Set();
