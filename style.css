@@ -1249,7 +1249,7 @@ body {
 .m5-check-circle {
     position: absolute;
     top: 50%;
-    right: 5%;
+    left: 3%;
     transform: translateY(-50%);
     width: 24px;
     height: 24px;
