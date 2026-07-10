@@ -648,6 +648,10 @@ body {
     transition: var(--transition);
 }
 
+#screen-m3-details.active {
+    display: block;
+}
+
 .tp-acc-header {
     padding: 16px 20px;
     background-color: #ffffff;
