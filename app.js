@@ -692,6 +692,12 @@ function selectOverallMood(moodKey, node) {
         document.getElementById('support-details').value = '';
     } else {
         supportBox.style.display = 'block';
+        
+        // Hide "Thank you" text for normal mood
+        const thankYouText = document.getElementById('care-mission-thankyou');
+        if (thankYouText) {
+            thankYouText.style.display = (moodKey === 'normal') ? 'none' : 'block';
+        }
     }
 
     validateM5();
