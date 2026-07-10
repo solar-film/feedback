@@ -39,7 +39,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 100dvh;
 }
 
 /* App Wrapper */
@@ -47,7 +47,7 @@ body {
     width: 100%;
     max-width: 480px;
     background-color: #ffffff;
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -1079,7 +1079,7 @@ body {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     pointer-events: none;
     z-index: 2000;
 }
