@@ -567,7 +567,7 @@ function renderCustomerTable() {
         else if (c.status === 'Action Required') { statusText = 'ต้องการดูแลด่วน'; statusClass = 'action'; }
 
         // Dynamic LINE Message
-        const surveyLink = `${window.location.origin}/?id=${encodeURIComponent(c.id)}`;
+        const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
         const lineMessage = `สวัสดีครับคุณ${c.name} Goodfilm รบกวนเวลาสั้น ๆ 2 นาที ร่วมทำภารกิจประเมินความพึงพอใจการติดตั้งฟิล์ม ผ่านลิงก์นี้นะครับ: ${surveyLink} ขอบคุณมากครับ 💙`;
         const lineDeepLink = `https://line.me/R/msg/text/?${encodeURIComponent(lineMessage)}`;
 
@@ -768,7 +768,7 @@ function markAsSent(id) {
 
 // Copy link action helper
 function copySurveyLink(id, btn) {
-    const surveyLink = `${window.location.origin}/?id=${encodeURIComponent(id)}`;
+    const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(id)}`;
     navigator.clipboard.writeText(surveyLink).then(() => {
         const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; color: var(--success);"></i>';
@@ -853,7 +853,7 @@ function openCustomerDrawer(id) {
     }
 
     // Dynamic LINE link & copy inside Drawer
-    const surveyLink = `${window.location.origin}/?id=${encodeURIComponent(c.id)}`;
+    const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
     const lineMessage = `สวัสดีครับคุณ${c.name} Goodfilm รบกวนเวลาสั้น ๆ 2 นาที ร่วมทำภารกิจประเมินความพึงพอใจการติดตั้งฟิล์ม ผ่านลิงก์นี้นะครับ: ${surveyLink} ขอบคุณมากครับ 💙`;
     
     document.getElementById('drawer-btn-line').onclick = () => {
