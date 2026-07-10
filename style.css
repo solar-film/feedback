@@ -158,6 +158,12 @@ body {
     display: none;
     background-color: #ffffff;
     animation: fadeIn 0.4s ease forwards;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.game-screen::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
 }
 
 .game-screen.active {
