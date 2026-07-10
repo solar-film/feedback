@@ -202,8 +202,6 @@ function toggleSidebar() {
 
 // LOAD DATABASE
 function loadData() {
-    updateApiBadge('loading', 'กำลังดึงข้อมูล...');
-
     if (localStorage.getItem('google_sheets_apps_script_url') === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec') {
         localStorage.removeItem('google_sheets_apps_script_url');
     }
@@ -214,7 +212,23 @@ function loadData() {
         return;
     }
 
-    // Fetch relational joined customers from Google Sheet Web App
+    // --- 1. Optimistic UI (Stale-While-Revalidate) ---
+    // Check if we have cached data in LocalStorage to render immediately
+    const cachedData = localStorage.getItem('admin_dashboard_cache');
+    if (cachedData) {
+        try {
+            state.customers = JSON.parse(cachedData);
+            processDataAndRender();
+            updateApiBadge('loading', 'กำลังอัปเดตข้อมูลล่าสุด...');
+        } catch(e) {
+            console.error("Cache parsing error", e);
+            updateApiBadge('loading', 'กำลังดึงข้อมูล...');
+        }
+    } else {
+        updateApiBadge('loading', 'กำลังดึงข้อมูล...');
+    }
+
+    // --- 2. Fetch fresh data in the background ---
     fetch(`${state.googleSheetsUrl}?action=getAllCustomersDetailed`)
         .then(res => {
             if (!res.ok) throw new Error("HTTP error " + res.status);
@@ -223,7 +237,7 @@ function loadData() {
         .then(data => {
             if (data.status === 'success' && data.data) {
                 // Parse returned joined rows
-                state.customers = data.data.map(item => {
+                const freshCustomers = data.data.map(item => {
                     let status = item.status || 'Unsent';
                     // Apply local storage status override if it's not completed or action required
                     if (status !== 'Completed' && status !== 'Action Required') {
@@ -248,8 +262,15 @@ function loadData() {
                         feedback: item.feedback || null
                     };
                 });
+                
+                // Compare and update if data changed or cache was empty
+                const freshJson = JSON.stringify(freshCustomers);
+                if (freshJson !== cachedData) {
+                    state.customers = freshCustomers;
+                    localStorage.setItem('admin_dashboard_cache', freshJson);
+                    processDataAndRender();
+                }
                 updateApiBadge('connected', 'เชื่อมต่อฐานข้อมูลแล้ว ✓');
-                processDataAndRender();
             } else {
                 throw new Error(data.message || "Unknown error");
             }
@@ -257,7 +278,10 @@ function loadData() {
         .catch(err => {
             console.error("API error:", err);
             updateApiBadge('error', 'ข้อผิดพลาดการดึงข้อมูล Google Sheet');
-            showToast('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + err.message, 'error');
+            // Only show toast if we didn't have cached data to show
+            if (!cachedData) {
+                showToast('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + err.message, 'error');
+            }
         });
 }
 
