@@ -239,13 +239,24 @@ function loadData() {
                 // Parse returned joined rows
                 const freshCustomers = data.data.map(item => {
                     let status = item.status || 'Unsent';
-                    // Apply local storage status override if it's not completed or action required
-                    if (status !== 'Completed' && status !== 'Action Required') {
-                        const localStatus = localStorage.getItem('local_status_' + item.id);
-                        if (localStatus) {
-                            status = localStatus;
+                    
+                    // Auto-flag poor feedback as "Action Required"
+                    if (status === 'Completed' && item.feedback) {
+                        const isUnhappy = ['😐', '🥺', '😡', '🤬', '😭', '🚨'].includes(item.feedback.overallMood);
+                        const avgRating = ((item.feedback.ratings?.admin || 0) + (item.feedback.ratings?.sales || 0) + (item.feedback.ratings?.tech || 0)) / 3;
+                        const hasLowRating = avgRating <= 3.5; // Trigger if average is 3.5 or below (basically anything with a low score)
+                        
+                        if (isUnhappy || hasLowRating) {
+                            status = 'Action Required';
                         }
                     }
+
+                    // Always allow local manual override via drag & drop
+                    const localStatus = localStorage.getItem('local_status_' + item.id);
+                    if (localStatus) {
+                        status = localStatus;
+                    }
+
                     return {
                         id: item.id,
                         company: item.company || '-',
@@ -333,12 +344,24 @@ function forceRefreshData() {
             if (data.status === 'success' && data.data) {
                 const freshCustomers = data.data.map(item => {
                     let status = item.status || 'Unsent';
-                    if (status !== 'Completed' && status !== 'Action Required') {
-                        const localStatus = localStorage.getItem('local_status_' + item.id);
-                        if (localStatus) {
-                            status = localStatus;
+                    
+                    // Auto-flag poor feedback as "Action Required"
+                    if (status === 'Completed' && item.feedback) {
+                        const isUnhappy = ['😐', '🥺', '😡', '🤬', '😭', '🚨'].includes(item.feedback.overallMood);
+                        const avgRating = ((item.feedback.ratings?.admin || 0) + (item.feedback.ratings?.sales || 0) + (item.feedback.ratings?.tech || 0)) / 3;
+                        const hasLowRating = avgRating <= 3.5; // Trigger if average is 3.5 or below
+                        
+                        if (isUnhappy || hasLowRating) {
+                            status = 'Action Required';
                         }
                     }
+
+                    // Always allow local manual override via drag & drop
+                    const localStatus = localStorage.getItem('local_status_' + item.id);
+                    if (localStatus) {
+                        status = localStatus;
+                    }
+
                     return {
                         id: item.id,
                         company: item.company || '-',
