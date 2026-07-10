@@ -989,14 +989,9 @@ body {
 /* Footer Navigation Bar */
 .footer-nav {
     padding: 16px 20px 24px 20px;
-    background: #ffffff;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    border-top: 1px solid var(--primary-light);
-    position: sticky;
-    bottom: 0;
-    z-index: 90;
 }
 
 .btn-primary {
