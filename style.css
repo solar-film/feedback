@@ -422,8 +422,8 @@ body {
 
 /* Image Overlay Interactive Grid */
 .img-overlay-chip {
-    background: transparent !important;
-    border: 2px solid transparent !important;
+    background: rgba(255, 0, 0, 0.3) !important;
+    border: 2px dashed red !important;
     box-shadow: none !important;
     padding: 0 !important;
     position: relative;
