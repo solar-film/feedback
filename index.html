@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Goodfilm Care Quest - เช็กประสบการณ์หลังติดตั้ง</title>
+    <meta name="description" content="ร่วมทำภารกิจสั้น ๆ 2 นาที เช็กประสบการณ์หลังติดตั้งฟิล์มกรองแสง Goodfilm เพื่อช่วยให้เราพัฒนาบริการและรับสิทธิ์ลุ้นรับของสมนาคุณ">
+    
+    <!-- Google Fonts & Style -->
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Confetti Overlay Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- App Wrapper -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-top">
+                <img src="logo.png" alt="GOODFILM" style="height: 24px; width: auto;">
+                <!-- Menu button removed -->
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </header>
+
+        <!-- Progress Description Tracker -->
+        <section class="progress-section" id="progress-section" style="display: none;">
+            <span class="mission-tag" id="progress-step-text">MISSION 1 / 5</span>
+            <span class="mission-desc" id="progress-desc-text">เริ่มภารกิจเช็กฟิล์ม</span>
+        </section>
+
+        <!-- SCREENS -->
+
+        <!-- Screen 1: Intro Page -->
+        <div class="game-screen active" id="screen-intro" style="padding: 0; display: block; overflow: auto; background-color: #f0f8ff;">
+            <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto; height: 100%;">
+                <img src="images/1-5.png" alt="Welcome to Goodfilm" style="width: 100%; height: auto; display: block;">
+                <!-- Transparent clickable area for the Start Button -->
+                <div onclick="startQuest()" style="position: absolute; bottom: 3%; left: 5%; width: 90%; height: 10%; cursor: pointer; border-radius: 50px;"></div>
+            </div>
+        </div>
+
+        <!-- Screen 2: Mission 1 / 5 - Contact Form (Removed) -->
+
+        <!-- Screen 3: Mission 2 / 5 - Film Results -->
+        <div class="game-screen" id="screen-m2">
+            <div>
+                <h2 class="quest-title" style="margin-top: 10px;">หลังติดตั้งแล้ว<br>ฟิล์มช่วยเรื่องไหนได้บ้าง?</h2>
+                <p class="quest-subtitle">เลือกได้มากกว่า 1 ข้อ ไม่มีคำตอบผิดค่ะ</p>
+                
+                <div class="chips-grid">
+                    <div class="chip-option" onclick="toggleChip(this, 'cool')">
+                        <div class="chip-checkbox-circle"></div>
+                        <span class="chip-emoji">❄️</span>
+                        <span class="chip-text">ห้องเย็นขึ้น</span>
+                    </div>
+                    <div class="chip-option" onclick="toggleChip(this, 'sun')">
+                        <div class="chip-checkbox-circle"></div>
+                        <span class="chip-emoji">☀️</span>
+                        <span class="chip-text">แสงจ้าลดลง</span>
+                    </div>
+                    <div class="chip-option" onclick="toggleChip(this, 'comfort')">
+                        <div class="chip-checkbox-circle"></div>
+                        <span class="chip-emoji">🛋️</span>
+                        <span class="chip-text">ใช้งานพื้นที่สบายขึ้น</span>
+                    </div>
+                    <div class="chip-option" onclick="toggleChip(this, 'privacy')">
+                        <div class="chip-checkbox-circle"></div>
+                        <span class="chip-emoji">👀</span>
+                        <span class="chip-text">ความเป็นส่วนตัวดีขึ้น</span>
+                    </div>
+                    <div class="chip-option" onclick="toggleChip(this, 'aesthetic')">
+                        <div class="chip-checkbox-circle"></div>
+                        <span class="chip-emoji">✨</span>
+                        <span class="chip-text">กระจกดูสวยขึ้น</span>
+                    </div>
+                    <div class="chip-option" onclick="toggleChip(this, 'safe')">
+                        <div class="chip-checkbox-circle"></div>
+                        <span class="chip-emoji">🛡️</span>
+                        <span class="chip-text">รู้สึกปลอดภัยขึ้น</span>
+                    </div>
+                    <div class="chip-option" onclick="toggleChip(this, 'quiet')">
+                        <div class="chip-checkbox-circle"></div>
+                        <span class="chip-emoji">🔇</span>
+                        <span class="chip-text">บรรยากาศภายในสงบขึ้น</span>
+                    </div>
+                    <div class="chip-option" onclick="toggleChip(this, 'unsure')">
+                        <div class="chip-checkbox-circle"></div>
+                        <span class="chip-emoji">🤔</span>
+                        <span class="chip-text">ยังไม่แน่ใจ อยากให้ทีมงานแนะนำเพิ่ม</span>
+                    </div>
+                </div>
+
+                <div class="success-unlock-banner" id="unlock-banner-m2">
+                    เยี่ยมเลย! คุณปลดล็อกภารกิจถัดไปแล้ว 💙
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 4: Mission 3 / 5 - Touchpoints List Menu -->
+        <div class="game-screen" id="screen-m3">
+            <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                <div>
+                    <h2 class="quest-title" style="margin-top: 10px;">ทีม Goodfilm<br>ดูแลคุณดีแค่ไหน?</h2>
+                    <p class="quest-subtitle">ตั้งแต่เริ่มคุย แนะนำฟิล์ม จนถึงวันติดตั้ง ช่วยเช็กให้เรานิดนึงว่าแต่ละช่วงบริการลื่นไหลแค่ไหนค่ะ</p>
+                    
+                    <div class="touchpoint-menu-list" id="touchpoints-list-menu">
+                        <!-- Card 1 -->
+                        <div class="touchpoint-menu-item" id="tp-menu-admin" onclick="openAccordionStep('admin')">
+                            <div class="tp-left">
+                                <span class="tp-icon">💬</span>
+                                <div class="tp-details">
+                                    <span class="tp-title">ด่านต้อนรับ</span>
+                                    <span class="tp-desc">การติดต่อและประสานงาน</span>
+                                </div>
+                            </div>
+                            <i data-lucide="check" class="tp-check-icon"></i>
+                            <i data-lucide="chevron-right" class="tp-arrow-icon"></i>
+                        </div>
+                        
+                        <!-- Card 2 -->
+                        <div class="touchpoint-menu-item" id="tp-menu-sales" onclick="openAccordionStep('sales')">
+                            <div class="tp-left">
+                                <span class="tp-icon">🧭</span>
+                                <div class="tp-details">
+                                    <span class="tp-title">ด่านเลือกฟิล์ม</span>
+                                    <span class="tp-desc">การแนะนำโซลูชัน</span>
+                                </div>
+                            </div>
+                            <i data-lucide="check" class="tp-check-icon"></i>
+                            <i data-lucide="chevron-right" class="tp-arrow-icon"></i>
+                        </div>
+                        
+                        <!-- Card 3 -->
+                        <div class="touchpoint-menu-item" id="tp-menu-tech" onclick="openAccordionStep('tech')">
+                            <div class="tp-left">
+                                <span class="tp-icon">🧰</span>
+                                <div class="tp-details">
+                                    <span class="tp-title">ด่านหน้างาน</span>
+                                    <span class="tp-desc">การติดตั้งและความเรียบร้อย</span>
+                                </div>
+                            </div>
+                            <i data-lucide="check" class="tp-check-icon"></i>
+                            <i data-lucide="chevron-right" class="tp-arrow-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mascot Team illustration -->
+                <div style="position: relative; width: calc(100% + 40px); margin: 10px -20px -24px -20px; display: flex; align-items: flex-end; justify-content: center;">
+                    <img src="goodfilm_team.png" alt="Goodfilm Staff" style="width: 100%; height: auto; object-fit: contain; display: block;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 5: Mission 3 / 5 Detailed accordion sub-pages -->
+        <div class="game-screen" id="screen-m3-details">
+            
+            <!-- 3.1 ด่านต้อนรับ -->
+            <div class="touchpoint-accordion-card" id="acc-card-admin">
+                <div class="tp-acc-header active" onclick="toggleAccordionUI('admin')">
+                    <span style="font-weight: 800; font-size: 0.92rem; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                        <span>💬</span> ด่านต้อนรับ: การติดต่อและประสานงาน
+                    </span>
+                    <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--primary);"></i>
+                </div>
+                <div class="tp-acc-content" style="display: block;">
+                    <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">การตอบกลับ การนัดหมาย และการแจ้งข้อมูล ชัดเจนแค่ไหน?</p>
+                    
+                    <div class="emoji-rating-row">
+                        <div class="emoji-rating-btn" onclick="selectSubMood('admin', 5, this)">
+                            <span class="emoji-rating-face">⚡</span>
+                            <span class="emoji-rating-label">ตอบไว<br>ประสานดีมาก</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('admin', 4, this)">
+                            <span class="emoji-rating-face">😊</span>
+                            <span class="emoji-rating-label">ชัดเจน<br>ช่วยเหลือดี</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('admin', 3, this)">
+                            <span class="emoji-rating-face">😐</span>
+                            <span class="emoji-rating-label">พอใช้<br>มีจุดช้า</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('admin', 2, this)">
+                            <span class="emoji-rating-face">😟</span>
+                            <span class="emoji-rating-label">ข้อมูล<br>ไม่ชัดเจน</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('admin', 1, this)">
+                            <span class="emoji-rating-face">🚨</span>
+                            <span class="emoji-rating-label">อยากปรับปรุง<br>ด่วน</span>
+                        </div>
+                    </div>
+
+                    <!-- Good items helper chips -->
+                    <div id="acc-good-admin">
+                        <h4 class="mini-chips-title">สิ่งที่ควรชื่นชม (เลือกได้มากกว่า 1 ข้อ)</h4>
+                        <div class="mini-chips-grid">
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'ตอบกลับไว')">ตอบกลับไว</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'พูดคุยสุภาพ')">พูดคุยสุภาพ</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'นัดหมายชัดเจน')">นัดหมายชัดเจน</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'แจ้งข้อมูลครบ')">แจ้งข้อมูลครบ</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'ติดตามงานดี')">ติดตามงานดี</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'ติดต่อสะดวก')">ติดต่อสะดวก</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bad items helper chips -->
+                    <div id="acc-bad-admin" style="display: none;">
+                        <h4 class="mini-chips-title" style="color: var(--warning);">สิ่งที่ควรปรับปรุง (เลือกได้มากกว่า 1 ข้อ)</h4>
+                        <div class="mini-chips-grid">
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'ตอบช้า')">ตอบช้า</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'ข้อมูลคลาดเคลื่อน')">ข้อมูลคลาดเคลื่อน</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'ติดตามช้า')">ติดตามช้า</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'admin', 'ติดต่อยาก')">ติดต่อยาก</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 1rem; font-weight: 700;">ข้อเสนอแนะเพิ่มเติม (ถ้ามี)</label>
+                        <textarea id="comment-admin" class="form-control" style="padding: 10px; height: 70px; resize: none; border-radius: 10px;" placeholder="เล่าให้เราฟังได้เลยค่ะ"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3.2 ด่านเลือกฟิล์ม -->
+            <div class="touchpoint-accordion-card" id="acc-card-sales">
+                <div class="tp-acc-header" onclick="toggleAccordionUI('sales')">
+                    <span style="font-weight: 800; font-size: 0.92rem; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                        <span>🧭</span> ด่านเลือกฟิล์ม: การแนะนำโซลูชัน
+                    </span>
+                    <i data-lucide="chevron-right" style="width: 16px; height: 16px; color: var(--primary);"></i>
+                </div>
+                <div class="tp-acc-content">
+                    <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">คำแนะนำเรื่องฟิล์ม ราคา และเงื่อนไข ตรงกับความต้องการแค่ไหน?</p>
+                    
+                    <div class="emoji-rating-row">
+                        <div class="emoji-rating-btn" onclick="selectSubMood('sales', 5, this)">
+                            <span class="emoji-rating-face">🎯</span>
+                            <span class="emoji-rating-label">ตรงโจทย์<br>แนะนำได้ดี</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('sales', 4, this)">
+                            <span class="emoji-rating-face">😊</span>
+                            <span class="emoji-rating-label">เข้าใจง่าย<br>ช่วยตัดสินใจ</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('sales', 3, this)">
+                            <span class="emoji-rating-face">😐</span>
+                            <span class="emoji-rating-label">พอใช้<br>อยากได้ข้อมูลเพิ่ม</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('sales', 2, this)">
+                            <span class="emoji-rating-face">😟</span>
+                            <span class="emoji-rating-label">ไม่ตรงกับ<br>ความต้องการ</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('sales', 1, this)">
+                            <span class="emoji-rating-face">🚨</span>
+                            <span class="emoji-rating-label">อยากให้<br>โทรกลับ</span>
+                        </div>
+                    </div>
+
+                    <!-- Good items -->
+                    <div id="acc-good-sales">
+                        <h4 class="mini-chips-title">สิ่งที่ควรชื่นชม (เลือกได้มากกว่า 1 ข้อ)</h4>
+                        <div class="mini-chips-grid">
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'เข้าใจปัญหาหน้างาน')">เข้าใจปัญหาหน้างาน</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'แนะนำรุ่นฟิล์มเหมาะสม')">แนะนำรุ่นฟิล์มเหมาะสม</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'อธิบายคุณสมบัติเข้าใจง่าย')">อธิบายคุณสมบัติเข้าใจง่าย</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'แจ้งราคาและเงื่อนไขชัดเจน')">แจ้งราคาและเงื่อนไขชัดเจน</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'ไม่กดดันการขาย')">ไม่กดดันการขาย</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'ให้คำแนะนำตรงงบประมาณ')">ให้คำแนะนำตรงงบประมาณ</div>
+                        </div>
+                    </div>
+
+                    <!-- Bad items -->
+                    <div id="acc-bad-sales" style="display: none;">
+                        <h4 class="mini-chips-title" style="color: var(--warning);">สิ่งที่ควรปรับปรุง (เลือกได้มากกว่า 1 ข้อ)</h4>
+                        <div class="mini-chips-grid">
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'อธิบายไม่ชัดเจน')">อธิบายไม่ชัดเจน</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'ราคาไม่ตรงที่คุย')">ราคาไม่ตรงที่คุย</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'กดดันการขาย')">กดดันการขาย</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'sales', 'เสนอสเปกสูงเกินไป')">เสนอสเปกสูงเกินไป</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 1rem; font-weight: 700;">ข้อเสนอแนะเพิ่มเติม (ถ้ามี)</label>
+                        <textarea id="comment-sales" class="form-control" style="padding: 10px; height: 70px; resize: none; border-radius: 10px;" placeholder="เล่าให้เราฟังได้เลยค่ะ"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3.3 ด่านหน้างาน -->
+            <div class="touchpoint-accordion-card" id="acc-card-tech">
+                <div class="tp-acc-header" onclick="toggleAccordionUI('tech')">
+                    <span style="font-weight: 800; font-size: 0.92rem; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                        <span>🧰</span> ด่านหน้างาน: การติดตั้งและความเรียบร้อย
+                    </span>
+                    <i data-lucide="chevron-right" style="width: 16px; height: 16px; color: var(--primary);"></i>
+                </div>
+                <div class="tp-acc-content">
+                    <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">ประสบการณ์ในวันติดตั้งเป็นอย่างไรบ้าง?</p>
+                    
+                    <div class="emoji-rating-row">
+                        <div class="emoji-rating-btn" onclick="selectSubMood('tech', 5, this)">
+                            <span class="emoji-rating-face">🏆</span>
+                            <span class="emoji-rating-label">เรียบร้อย<br>ประทับใจมาก</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('tech', 4, this)">
+                            <span class="emoji-rating-face">😊</span>
+                            <span class="emoji-rating-label">พอใจ<br>ดูแลบริการดี</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('tech', 3, this)">
+                            <span class="emoji-rating-face">😐</span>
+                            <span class="emoji-rating-label">พอใช้<br>อยากให้ปรับ</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('tech', 2, this)">
+                            <span class="emoji-rating-face">😟</span>
+                            <span class="emoji-rating-label">ยังไม่ค่อย<br>พึงพอใจ</span>
+                        </div>
+                        <div class="emoji-rating-btn" onclick="selectSubMood('tech', 1, this)">
+                            <span class="emoji-rating-face">🚨</span>
+                            <span class="emoji-rating-label">ต้องการให้<br>ช่างตรวจเช็ค</span>
+                        </div>
+                    </div>
+
+                    <!-- Good items -->
+                    <div id="acc-good-tech">
+                        <h4 class="mini-chips-title">สิ่งที่ควรชื่นชม (เลือกได้มากกว่า 1 ข้อ)</h4>
+                        <div class="mini-chips-grid">
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'เข้างานตรงเวลา')">เข้างานตรงเวลา</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'ทีมงานสุภาพ')">ทีมงานสุภาพ</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'เตรียมพื้นที่เรียบร้อย')">เตรียมพื้นที่เรียบร้อย</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'ติดตั้งเรียบร้อย')">ติดตั้งเรียบร้อย</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'เก็บงานสะอาด')">เก็บงานสะอาด</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'อธิบายการดูแลหลังติดตั้ง')">อธิบายการดูแลหลังติดตั้ง</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'ระมัดระวังทรัพย์สินลูกค้า')">ระมัดระวังทรัพย์สินลูกค้า</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'ตรวจงานก่อนส่งมอบ')">ตรวจงานก่อนส่งมอบ</div>
+                        </div>
+                    </div>
+
+                    <!-- Bad items -->
+                    <div id="acc-bad-tech" style="display: none;">
+                        <h4 class="mini-chips-title" style="color: var(--warning);">สิ่งที่ควรปรับปรุง (เลือกได้มากกว่า 1 ข้อ)</h4>
+                        <div class="mini-chips-grid">
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'ช่างมาสาย')">ช่างมาสาย</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'กระจกมีรอย/ฝุ่น')">กระจกมีรอย/ฝุ่น</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'ไม่เก็บกวาดขยะ')">ไม่เก็บกวาดขยะ</div>
+                            <div class="mini-chip" onclick="toggleMiniChip(this, 'tech', 'ไม่ระมัดระวังเฟอร์นิเจอร์')">ไม่ระมัดระวังเฟอร์นิเจอร์</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 1rem; font-weight: 700;">ข้อเสนอแนะเพิ่มเติม (ถ้ามี)</label>
+                        <textarea id="comment-tech" class="form-control" style="padding: 10px; height: 70px; resize: none; border-radius: 10px;" placeholder="เล่าให้เราฟังได้เลยค่ะ"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tp-success-banner" style="display: none; background-color: rgba(56, 161, 105, 0.05); border: 1.5px solid rgba(56, 161, 105, 0.2); color: var(--success); padding: 14px; border-radius: 16px; text-align: center; font-size: 0.85rem; font-weight: 700; margin-bottom: 16px;">
+                ⭐ คุณทำภารกิจ Mission 3 สำเร็จแล้ว! ขอบคุณสำหรับทุกความคิดเห็นค่ะ 💙
+            </div>
+
+        </div>
+
+        <!-- Screen 7: Mission 4 / 5 - MVP Selection -->
+        <div class="game-screen" id="screen-m4">
+            <div>
+                <h2 class="quest-title" style="margin-top: 10px;">ทีมไหนคือ MVP<br>ในงานนี้?</h2>
+                <p class="quest-subtitle">ถ้ามีทีมที่ทำให้คุณประทับใจเป็นพิเศษ เลือกให้เราได้เลยค่ะ</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px;">
+                    <div class="mvp-option-card" onclick="selectMVP('admin', this)">
+                        <div class="mvp-radio-circle"></div>
+                        <div style="background-color: #f1f5f9; padding: 8px; border-radius: 12px; color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="headset" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
+                        </div>
+                        <span class="mvp-option-text">ทีมประสานงาน / แอดมิน</span>
+                    </div>
+                    <div class="mvp-option-card" onclick="selectMVP('sales', this)">
+                        <div class="mvp-radio-circle"></div>
+                        <div style="background-color: #fff7ed; padding: 8px; border-radius: 12px; color: #f97316; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="lightbulb" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
+                        </div>
+                        <span class="mvp-option-text">ทีมที่ปรึกษาฟิล์ม / ฝ่ายขาย</span>
+                    </div>
+                    <div class="mvp-option-card" onclick="selectMVP('tech', this)">
+                        <div class="mvp-radio-circle"></div>
+                        <div style="background-color: #fdf2f8; padding: 8px; border-radius: 12px; color: #ec4899; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="wrench" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
+                        </div>
+                        <span class="mvp-option-text">ทีมช่างติดตั้ง</span>
+                    </div>
+                    <div class="mvp-option-card" onclick="selectMVP('all', this)">
+                        <div class="mvp-radio-circle"></div>
+                        <div style="background-color: #eff6ff; padding: 8px; border-radius: 12px; color: #3b82f6; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="heart" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
+                        </div>
+                        <span class="mvp-option-text">ทุกทีมดูแลดีมาก</span>
+                    </div>
+                    <div class="mvp-option-card" onclick="selectMVP('none', this)">
+                        <div class="mvp-radio-circle"></div>
+                        <div style="background-color: #f3f4f6; padding: 8px; border-radius: 12px; color: #6b7280; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="help-circle" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
+                        </div>
+                        <span class="mvp-option-text">ยังไม่แน่ใจ</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 700; font-size: 0.85rem;">อยากฝากคำชม หรือข้อเสนอแนะถึงทีมไหนเป็นพิเศษไหมคะ?</label>
+                    <textarea id="mvp-comment" class="form-control" style="padding: 12px; height: 100px; resize: none; border-radius: 12px;" placeholder="เช่น แอดมินตอบไวมาก / ฝ่ายขายอธิบายเข้าใจง่าย / ทีมช่างทำงานเรียบร้อย / อยากให้ปรับปรุงเรื่องการนัดหมาย"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 8: Mission 5 / 5 - Mood Scale Selection -->
+        <div class="game-screen" id="screen-m5">
+            <div>
+                <h2 class="quest-title" style="margin-top: 10px;">ตอนนี้คุณรู้สึกกับผลงานติดตั้ง<br>อยู่ใน Mood ไหน?</h2>
+                <p class="quest-subtitle">เลือกอารมณ์ความพึงพอใจโดยรวมของคุณค่ะ</p>
+                
+                <div class="horizontal-mood-list">
+                    <div class="horizontal-mood-card" onclick="selectOverallMood('happy_max', this)">
+                        <span class="mood-card-emoji">😍</span>
+                        <div class="mood-card-text">
+                            <span class="mood-card-title">ประทับใจมาก ฟิล์มทำงานดีเกินคาด</span>
+                            <span class="mood-card-desc">ฟิล์มเย็นกว่าเดิมมาก บริการลื่นไหลมีความสุข</span>
+                        </div>
+                    </div>
+                    
+                    <div class="horizontal-mood-card" onclick="selectOverallMood('happy_mid', this)">
+                        <span class="mood-card-emoji">😊</span>
+                        <div class="mood-card-text">
+                            <span class="mood-card-title">พอใจ ใช้งานได้ตามที่ต้องการ</span>
+                            <span class="mood-card-desc">สเปกฟิล์มได้มาตรฐาน บริการคุ้มราคาน่าพอใจ</span>
+                        </div>
+                    </div>
+                    
+                    <div class="horizontal-mood-card" onclick="selectOverallMood('normal', this)">
+                        <span class="mood-card-emoji">😐</span>
+                        <div class="mood-card-text">
+                            <span class="mood-card-title">กลาง ๆ ยังอยากดูผลเพิ่ม</span>
+                            <span class="mood-card-desc">ขอลองสัมผัสการกันแดด/ความเย็นในอนาคตก่อน</span>
+                        </div>
+                    </div>
+                    
+                    <div class="horizontal-mood-card" onclick="selectOverallMood('unhappy', this)">
+                        <span class="mood-card-emoji">😟</span>
+                        <div class="mood-card-text">
+                            <span class="mood-card-title">มีบางจุดที่อยากให้ดูแล</span>
+                            <span class="mood-card-desc">มีฟองอากาศ/ขอบตัดไม่ตรง/หรือต้องการให้แก้ไข</span>
+                        </div>
+                    </div>
+                    
+                    <div class="horizontal-mood-card" onclick="selectOverallMood('danger_alert', this)">
+                        <span class="mood-card-emoji">🚨</span>
+                        <div class="mood-card-text">
+                            <span class="mood-card-title">อยากให้ทีมงานติดต่อกลับด่วน</span>
+                            <span class="mood-card-desc">มีข้อท้วงติง หรือต้องการทีมช่างเข้ามาประเมินเพิ่ม</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC PATH ACTION: Care Follow-up (shown inside Quest 5 card if selected normal/unhappy/alert) -->
+                <div id="care-mission-support" class="followup-container" style="display: none; background-color: rgba(221, 107, 32, 0.03); border: 2px dashed var(--warning); padding: 18px; border-radius: var(--border-radius-lg); margin-top: 20px;">
+                    <div style="text-align: center; margin-bottom: 8px; font-size: 1.5rem;">🛠️</div>
+                    <h4 style="font-size: 1rem; font-weight: 800; color: var(--warning); text-align: center; margin-bottom: 6px;">ขอบคุณที่บอกเราตรง ๆ ค่ะ</h4>
+                    <p style="font-size: 1rem; color: var(--text-main); text-align: center; margin-bottom: 14px; line-height: 1.4;">
+                        ความคิดเห็นของคุณช่วยให้เราปรับปรุงงานจริง รบกวนเลือกเรื่องที่อยากให้ทีม Goodfilm ดูแลเพิ่มเติม เพื่อให้เราติดต่อกลับได้ถูกจุด
+                    </p>
+                    
+                    <div class="chips-grid" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
+                        <div class="chip-option" onclick="toggleSupportChip(this, 'inspect')" style="padding: 10px; min-height: auto; flex-direction: row; gap: 10px; background: #ffffff;">
+                            <span class="chip-emoji" style="font-size: 1.2rem;">🔍</span>
+                            <span class="chip-text" style="font-size: 1rem; flex: 1; text-align: left;">อยากให้ตรวจเช็กงานบางจุด</span>
+                            <div class="chip-checkbox-circle" style="position: static;"></div>
+                        </div>
+                        <div class="chip-option" onclick="toggleSupportChip(this, 'warranty')" style="padding: 10px; min-height: auto; flex-direction: row; gap: 10px; background: #ffffff;">
+                            <span class="chip-emoji" style="font-size: 1.2rem;">📄</span>
+                            <span class="chip-text" style="font-size: 1rem; flex: 1; text-align: left;">สอบถามเรื่องใบรับประกัน</span>
+                            <div class="chip-checkbox-circle" style="position: static;"></div>
+                        </div>
+                        <div class="chip-option" onclick="toggleSupportChip(this, 'care')" style="padding: 10px; min-height: auto; flex-direction: row; gap: 10px; background: #ffffff;">
+                            <span class="chip-emoji" style="font-size: 1.2rem;">🧽</span>
+                            <span class="chip-text" style="font-size: 1rem; flex: 1; text-align: left;">ขอคำแนะนำการดูแลฟิล์ม</span>
+                            <div class="chip-checkbox-circle" style="position: static;"></div>
+                        </div>
+                        <div class="chip-option" onclick="toggleSupportChip(this, 'callback')" style="padding: 10px; min-height: auto; flex-direction: row; gap: 10px; background: #ffffff;">
+                            <span class="chip-emoji" style="font-size: 1.2rem;">📞</span>
+                            <span class="chip-text" style="font-size: 1rem; flex: 1; text-align: left;">ต้องการให้ทีมงานติดต่อกลับ</span>
+                            <div class="chip-checkbox-circle" style="position: static;"></div>
+                        </div>
+                        <div class="chip-option" onclick="toggleSupportChip(this, 'other')" style="padding: 10px; min-height: auto; flex-direction: row; gap: 10px; background: #ffffff;">
+                            <span class="chip-emoji" style="font-size: 1.2rem;">💬</span>
+                            <span class="chip-text" style="font-size: 1rem; flex: 1; text-align: left;">มีข้อเสนอแนะเพิ่มเติม</span>
+                            <div class="chip-checkbox-circle" style="position: static;"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" style="font-size: 1rem; font-weight: 700;">เล่าให้ทีมงานฟังได้เลยค่ะ</label>
+                        <textarea id="support-details" class="form-control" style="padding: 10px; height: 80px; resize: none; border-radius: 10px; background: #ffffff;" placeholder="เช่น จุดที่อยากให้ตรวจสอบ หรือสิ่งที่อยากให้เราปรับปรุง"></textarea>
+                    </div>
+                </div>
+
+                <!-- Submit Button inside step 5 -->
+                <button type="button" class="btn-primary" id="btn-submit-survey" onclick="submitSurvey()" style="margin-top: 24px; width: 100%;" disabled>
+                    <i data-lucide="send" style="width: 20px; height: 20px;"></i>
+                    <span>ส่งต่อให้ทีมดูแล & เสร็จสิ้นภารกิจ 🚀</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 9: Thank You Page / Reward Grid / Review Banner Option -->
+        <div class="game-screen" id="screen-thankyou">
+            
+            <!-- Success check icon -->
+            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 12px; margin-bottom: 24px;">
+                <!-- Blue circle with icon badge -->
+                <div id="thankyou-icon-box" style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(27, 67, 124, 0.2); position: relative; margin-bottom: 16px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                    <i data-lucide="check" style="width: 44px; height: 44px; color: #ffffff; stroke-width: 3;"></i>
+                </div>
+                <h2 id="thankyou-title" style="font-size: 1.45rem; font-weight: 800; color: var(--primary);">การภารกิจสำเร็จ!</h2>
+                <p id="thankyou-desc" style="color: var(--text-main); font-size: 0.82rem; font-weight: 400; line-height: 1.5; margin-top: 6px; padding: 0 10px;">
+                    ขอบคุณที่ช่วยเช็กประสบการณ์ให้ Goodfilm ค่ะ ความคิดเห็นของคุณมีค่ามากสำหรับเรา ทีมงานจะนำทุกคำตอบไปพัฒนาบริการให้ดียิ่งขึ้น
+                </p>
+            </div>
+
+            <!-- DYNAMIC CONTENT: Happy Path (Review & Reward) -->
+            <div id="happy-path-content" style="display: none; margin-bottom: 24px;">
+                
+                <!-- Box 1: Review Card -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px 16px; margin-bottom: 16px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                    <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 12px;">
+                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
+                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
+                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
+                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
+                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
+                    </div>
+                    <h3 style="color: var(--primary); font-size: 1.25rem; font-weight: 800; margin-bottom: 8px;">ชวนรีวิวบน Google Maps</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 20px;">
+                        รีวิวสั้น ๆ ของคุณมีความหมายกับเรา<br>และช่วยให้ลูกค้าท่านอื่นตัดสินใจได้ง่ายขึ้น
+                    </p>
+                    <a href="https://g.page/r/CXyrHfNQMLB8EAI/review" target="_blank" onclick="clickGoogleMaps()" style="background: var(--secondary); color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 1rem; width: 100%;">
+                        <i data-lucide="star" style="width: 20px; height: 20px; fill: #fbbf24; color: #fbbf24;"></i>
+                        <span>รีวิวบน Google Maps <i data-lucide="external-link" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i></span>
+                    </a>
+                </div>
+
+                <!-- Box 2: Reward Image Card -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; margin-bottom: 16px; overflow: hidden; display: flex; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                    <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px 0 16px 16px;">
+                        <img src="reward.png" style="width: 100%; max-width: 140px; height: auto;" alt="ร่ม 3M" onerror="this.src='https://placehold.co/140x140?text=Reward'">
+                    </div>
+                    <div style="flex: 1.2; padding: 20px 16px 20px 0; display: flex; flex-direction: column; justify-content: center; padding-left: 12px;">
+                        <div style="display: flex; align-items: center; gap: 6px; color: var(--secondary); font-size: 0.65rem; font-weight: 700; margin-bottom: 6px;">
+                            <div style="background: #e0f2fe; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="gift" style="width: 12px; height: 12px; color: var(--secondary); fill: var(--secondary);"></i>
+                            </div>
+                            Goodfilm Thank You Reward
+                        </div>
+                        <h3 style="color: var(--primary); font-size: 1.25rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px;">รับร่ม 3M<br>เป็นของขอบคุณ</h3>
+                        <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.4;">
+                            เมื่อรีวิวแล้ว เพียงแคปหน้าจอ<br>และส่งให้ทีมงาน
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Box 3: 3 Steps -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 6px;">
+                    <!-- Step 1 -->
+                    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 4px 12px 4px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
+                        <div style="position: absolute; top: -8px; left: 8px; background: var(--secondary); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; justify-content: center;">1</div>
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/512px-Google_Maps_icon_%282020%29.svg.png" style="width: 24px; height: 24px; object-fit: contain;" alt="Google Maps" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2991/2991231.png'">
+                        </div>
+                        <div style="font-size: 0.65rem; font-weight: 700; color: var(--primary);">รีวิวบน Google Maps</div>
+                    </div>
+                    
+                    <div style="color: var(--primary); font-weight: bold; font-size: 16px;">
+                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 4px 12px 4px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
+                        <div style="position: absolute; top: -8px; left: 8px; background: var(--secondary); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; justify-content: center;">2</div>
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                            <i data-lucide="smartphone" style="color: var(--secondary); width: 24px; height: 24px;"></i>
+                            <div style="position: absolute; margin-top: -4px;">
+                                <i data-lucide="camera" style="color: var(--secondary); width: 12px; height: 12px;"></i>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.65rem; font-weight: 700; color: var(--primary);">แคปหน้าจอรีวิว</div>
+                    </div>
+
+                    <div style="color: var(--primary); font-weight: bold; font-size: 16px;">
+                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 4px 12px 4px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
+                        <div style="position: absolute; top: -8px; left: 8px; background: var(--secondary); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; justify-content: center;">3</div>
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #e6f6ee; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                            <span style="color: #06c755; font-weight: 900; font-size: 1rem; font-family: Arial, sans-serif;">LINE</span>
+                        </div>
+                        <div style="font-size: 0.65rem; font-weight: 700; color: var(--primary);">ส่งให้แอดมินทาง LINE</div>
+                    </div>
+                </div>
+
+                <!-- Line Button -->
+                <a href="#" class="btn-outline-primary" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border: 2px solid var(--primary); background: #ffffff; color: var(--primary); text-decoration: none; border-radius: 50px; font-weight: 700; padding: 14px 20px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="background: var(--primary); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: bold; font-family: Arial, sans-serif;">LINE</div>
+                        <span style="font-size: 0.95rem;">ส่งหลักฐานรับของขวัญทาง LINE</span>
+                    </div>
+                    <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
+                </a>
+
+                <!-- Box 4: Suggestion note -->
+                <div style="background: #f8fafc; border-radius: 12px; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <div style="background: #3b82f6; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="message-circle" style="color: #ffffff; fill: #ffffff; width: 14px; height: 14px;"></i>
+                    </div>
+                    <span style="font-size: 1rem; color: var(--text-main); font-weight: 600;">หากมีข้อเสนอแนะเพิ่มเติม ทีมงานยินดีรับฟังเสมอค่ะ</span>
+                </div>
+
+                <!-- Footer Note -->
+                <div style="display: flex; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px dashed #cbd5e1; align-items: flex-start;">
+                    <i data-lucide="shield" style="color: var(--text-muted); width: 20px; height: 20px; flex-shrink: 0;"></i>
+                    <span style="font-size: 0.65rem; color: var(--text-muted); line-height: 1.5;">
+                        ของตอบแทนนี้เป็นการขอบคุณสำหรับการสละเวลารีวิวประสบการณ์จริง ไม่เกี่ยวข้องกับการให้คะแนนหรือการรับประกันผลลัพธ์ใด ๆ
+                    </span>
+                </div>
+            </div>
+
+            <!-- Thank you buttons -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-primary" onclick="location.reload()" style="width: 100%;">
+                    <span>กลับสู่หน้าหลัก</span>
+                </button>
+                <button class="btn-secondary" onclick="showCareGuideModal()" style="width: 100%;">
+                    <span>ดูวิธีดูแลฟิล์มหลังติดตั้ง</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons (Inside Standard Flow, M1-M4) -->
+        <footer class="footer-nav" id="footer-nav" style="display: none;">
+            <button class="btn-primary" id="btn-next" onclick="nextStep()" disabled style="width: 100%;">
+                <span>ต่อไป</span>
+                <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+            </button>
+            <button class="btn-link" id="btn-back" onclick="prevStep()">ย้อนกลับ</button>
+        </footer>
+
+    </div>
+
+    <!-- Admin Panel Floating Icon (Removed) -->
+
+    <!-- Admin Panel Dashboard Modal -->
+    <div class="dashboard-modal" id="admin-modal">
+        <div class="dashboard-content">
+            <div class="dashboard-header">
+                <h3 class="dashboard-title">
+                    <i data-lucide="bar-chart-2"></i>
+                    <span>แดชบอร์ดสรุปแบบประเมินบริการ</span>
+                </h3>
+                <button class="close-dashboard" onclick="closeDashboard()">&times;</button>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-total">0</div>
+                    <div class="stat-label">จำนวนผู้ประเมิน</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-avg">0/5</div>
+                    <div class="stat-label">คะแนนเฉลี่ยรวม</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-mvp" style="font-size: 0.95rem; font-weight: 700; padding: 4px 0;">-</div>
+                    <div class="stat-label">ทีม MVP อันดับ 1</div>
+                </div>
+            </div>
+
+            <!-- Score averages per team -->
+            <div style="margin-bottom: 20px; background-color: var(--primary-light); padding: 14px; border-radius: 12px;">
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--primary); margin-bottom: 10px;">
+                    คะแนนเจาะลึกแต่ละฝ่าย (เต็ม 5):
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 1rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>💬 ทีมประสานงาน (แอดมิน):</span>
+                        <strong id="avg-admin">0.0</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>🧭 ทีมแนะนำโซลูชัน (ฝ่ายขาย):</span>
+                        <strong id="avg-sales">0.0</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>🧰 ทีมงานติดตั้ง (ทีมช่าง):</span>
+                        <strong id="avg-tech">0.0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google Sheets Connection Settings -->
+            <div style="margin-bottom: 20px; background-color: #fffaf0; border: 1px dashed var(--accent); padding: 14px; border-radius: 12px;">
+                <div style="font-weight: 700; font-size: 0.85rem; color: #975a16; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="database" style="width: 16px; height: 16px;"></i>
+                    <span>ตั้งค่าเชื่อมต่อ Google Sheets 📊</span>
+                </div>
+                <div style="font-size: 0.75rem; margin-bottom: 8px; color: var(--text-main);">
+                    ป้อนลิงก์ Google Apps Script Web App เพื่อบันทึกข้อมูลเข้าชีตอัตโนมัติ:
+                </div>
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <input type="text" id="google-sheets-url" class="form-control" style="padding: 8px 12px; font-size: 0.75rem; height: auto;" placeholder="วางลิงก์ Web App URL ของ Apps Script ที่นี่..." oninput="saveSheetsUrl()">
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.7rem;">
+                    <a href="https://docs.google.com/spreadsheets/d/1IRU1ZjQIUbpBmz_MAzVtXdQQ93eQbJNJO9nC7fGvAKs/edit?gid=0#gid=0" target="_blank" style="color: var(--secondary); font-weight: 700; text-decoration: underline;">
+                        🔗 เปิด Google Sheet ดูผลลัพธ์
+                    </a>
+                    <span style="color: var(--text-muted);">ชีต: GFS_Care_Quest</span>
+                </div>
+            </div>
+
+            <!-- Google Sheets Link Generator -->
+            <div style="margin-bottom: 20px; background-color: var(--primary-light); padding: 14px; border-radius: 12px; border: 1.5px solid rgba(27, 67, 124, 0.1);">
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--primary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="link" style="width: 16px; height: 16px;"></i>
+                    <span>เครื่องมือสร้างลิงก์ส่งลูกค้า (จากชีต Data) 🔗</span>
+                </div>
+                <div style="font-size: 0.75rem; margin-bottom: 10px; color: var(--text-main);">
+                    ดึงรายชื่อลูกค้าจากชีตย่อย Data เพื่อสร้างและคัดลอกลิงก์ย่อสำหรับส่งหาลูกค้าแต่ละท่าน:
+                </div>
+                <button class="btn-primary" style="padding: 8px 16px; font-size: 0.75rem; width: auto; height: auto; border-radius: 8px;" onclick="fetchAndGenerateLinks()">
+                    <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i>
+                    <span>ดึงรายชื่อลูกค้าและสร้างลิงก์</span>
+                </button>
+                <div id="links-generator-container" style="margin-top: 10px; max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="text-align: center; font-size: 0.7rem; color: var(--text-muted); padding: 10px;">กดปุ่มเพื่อเริ่มดึงรายชื่อลูกค้า</div>
+                </div>
+            </div>
+
+            <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 8px;">รายการประเมินล่าสุด</h4>
+            <div class="submissions-list" id="submissions-container">
+                <!-- Submission items rendered here -->
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-primary" style="padding: 10px; font-size: 0.85rem;" onclick="exportData()">
+                    <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+                    <span>ส่งออกข้อมูล (JSON)</span>
+                </button>
+                <button class="btn-secondary" style="padding: 10px; font-size: 0.85rem; border-color: var(--danger); color: var(--danger);" onclick="clearDashboardData()">
+                    <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                    <span>ล้างข้อมูลทั้งหมด</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Care Guide Modal popup -->
+    <div class="dashboard-modal" id="care-guide-modal" onclick="closeCareGuideModal()">
+        <div class="dashboard-content" style="max-width: 400px; text-align: left;" onclick="event.stopPropagation()">
+            <div class="dashboard-header">
+                <h3 class="dashboard-title">
+                    <i data-lucide="book-open"></i>
+                    <span>คู่มือดูแลฟิล์มหลังการติดตั้ง</span>
+                </h3>
+                <button class="close-dashboard" onclick="closeCareGuideModal()">&times;</button>
+            </div>
+            <div style="font-size: 0.85rem; line-height: 1.6; color: var(--text-main);">
+                <ol style="padding-left: 18px; display: flex; flex-direction: column; gap: 8px;">
+                    <li><strong>หลีกเลี่ยงการเช็ดถู 7-14 วันแรก:</strong> เนื่องจากกาวฟิล์มยังอยู่ระหว่างการเซ็ตตัว การสัมผัสรุนแรงอาจทำให้ขอบฟิล์มย่นได้</li>
+                    <li><strong>หากพบละอองน้ำหรือฟองอากาศ:</strong> เป็นอาการแห้งตัวตามปกติ ไม่ต้องเจาะหรือกดไล่ฝอยน้ำ จะค่อยๆ จางหายไปเองเมื่อโดนแดด 2-4 สัปดาห์</li>
+                    <li><strong>การทำความสะอาด:</strong> ใช้ผ้านุ่มชุบน้ำสะอาดเช็ดเบาๆ เท่านั้น หลีกเลี่ยงน้ำยาเช็ดกระจกที่มีฤทธิ์กรด-ด่างเข้มข้น หรือสารแอมโมเนียเด็ดขาด</li>
+                    <li><strong>ระมัดระวังของมีคม:</strong> ระวังสายตาชาร์จ หัวเข็มขัด หรือเล็บขูดขีดเนื้อฟิล์มขณะเปิด-ปิดม่าน</li>
+                </ol>
+            </div>
+            <button class="btn-primary" style="margin-top: 20px; padding: 12px;" onclick="closeCareGuideModal()">
+                <span>รับทราบคู่มือ</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(5px); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 3000;">
+        <i data-lucide="loader" class="spin-icon" style="width: 48px; height: 48px; color: var(--primary); stroke-width: 2.5; animation: spin 1.2s linear infinite;"></i>
+        <p style="margin-top: 16px; font-weight: 700; color: var(--primary); font-size: 0.95rem;">กำลังดึงข้อมูลภารกิจของคุณ...</p>
+    </div>
+
+    <!-- Core App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

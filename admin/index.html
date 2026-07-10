@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GFS Care Admin Dashboard - ระบบบริหารแบบสอบถามหลังการขาย</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Lucide Icons & Chart.js -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Layout Wrapper -->
+    <div class="admin-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">GF</div>
+                <div>
+                    <h1 class="brand-name">GOODFILM</h1>
+                    <span class="brand-subtitle">GFS Care CRM Panel</span>
+                </div>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-tab="dashboard">
+                    <a href="#">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Dashboard ภาพรวม</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="database">
+                    <a href="#">
+                        <i data-lucide="users"></i>
+                        <span>ฐานข้อมูลลูกค้า</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="kanban">
+                    <a href="#">
+                        <i data-lucide="columns-4"></i>
+                        <span>ท่อติดตามสถานะ</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-tab="reports">
+                    <a href="#">
+                        <i data-lucide="bar-chart-3"></i>
+                        <span>รายงานคะแนนประเมิน</span>
+                    </a>
+                </li>
+
+            </ul>
+            
+            <div class="sidebar-footer">
+                <span>GFS Care Dashboard v2.0</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Pane -->
+        <main class="main-content">
+            
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="เปิด/ปิด เมนูด้านข้าง">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 class="navbar-title" id="page-title">Dashboard ภาพรวม</h2>
+                </div>
+                
+                <div class="navbar-right">
+                    <div id="api-status" class="api-status-badge connected">
+                        <span class="api-status-dot"></span>
+                        <span id="api-status-text">เชื่อมต่อฐานข้อมูลแล้ว ✓</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Scrollable Body -->
+            <div class="content-body">
+                
+                <!-- TAB 1: Dashboard ภาพรวม -->
+                <div class="tab-pane active" id="tab-dashboard">
+                    <!-- KPI Cards Grid -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-details">
+                                <span class="kpi-title">รายชื่อลูกค้าทั้งหมด</span>
+                                <span class="kpi-value" id="kpi-total-cust">0</span>
+                                <span class="kpi-subtext" id="kpi-total-sub">ดึงข้อมูลจากชีต Data</span>
+                            </div>
+                            <div class="kpi-icon-box primary">
+                                <i data-lucide="users-2"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-details">
+                                <span class="kpi-title">ประเมินสำเร็จแล้ว</span>
+                                <span class="kpi-value" id="kpi-done-survey">0</span>
+                                <span class="kpi-subtext text-success" id="kpi-done-rate">0% Response Rate</span>
+                            </div>
+                            <div class="kpi-icon-box success">
+                                <i data-lucide="check-circle-2"></i>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-details">
+                                <span class="kpi-title">รอดำเนินการประเมิน</span>
+                                <span class="kpi-value" id="kpi-pending-survey">0</span>
+                                <span class="kpi-subtext text-warning" id="kpi-pending-rate">0% Pending Tracking</span>
+                            </div>
+                            <div class="kpi-icon-box warning">
+                                <i data-lucide="clock"></i>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-details">
+                                <span class="kpi-title">คะแนนเฉลี่ยรวม</span>
+                                <span class="kpi-value" id="kpi-avg-rating">0.0</span>
+                                <span class="kpi-subtext" id="kpi-avg-desc">เต็ม 5 คะแนน</span>
+                            </div>
+                            <div class="kpi-icon-box secondary">
+                                <i data-lucide="star"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts row -->
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-card-header">
+                                <h3 class="chart-card-title">ความพึงพอใจการประเมินทีมบริการ (Touchpoints Score)</h3>
+                                <i data-lucide="trending-up" class="text-muted" style="width: 18px;"></i>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-scores-bar"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-card-header">
+                                <h3 class="chart-card-title">สรุป Mood อารมณ์โดยรวม</h3>
+                                <i data-lucide="pie-chart" class="text-muted" style="width: 18px;"></i>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-moods-pie"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: ฐานข้อมูลลูกค้า -->
+                <div class="tab-pane" id="tab-database">
+                    <div class="table-controls">
+                        <div class="search-box-container">
+                            <i data-lucide="search" class="search-icon"></i>
+                            <input type="text" id="search-input" class="search-input" placeholder="ค้นหาชื่อ, เบอร์โทร, หรือ ID ลูกค้า..." oninput="filterCustomerTable()">
+                        </div>
+                        <div class="filter-group">
+                            <!-- Month and Day Filters -->
+                            <select id="filter-month" class="filter-select" onchange="filterCustomerTable()">
+                                <option value="all">ทุกเดือน</option>
+                                <option value="1">มกราคม</option>
+                                <option value="2">กุมภาพันธ์</option>
+                                <option value="3">มีนาคม</option>
+                                <option value="4">เมษายน</option>
+                                <option value="5">พฤษภาคม</option>
+                                <option value="6">มิถุนายน</option>
+                                <option value="7">กรกฎาคม</option>
+                                <option value="8">สิงหาคม</option>
+                                <option value="9">กันยายน</option>
+                                <option value="10">ตุลาคม</option>
+                                <option value="11">พฤศจิกายน</option>
+                                <option value="12">ธันวาคม</option>
+                            </select>
+
+                            <select id="filter-day" class="filter-select" onchange="filterCustomerTable()">
+                                <option value="all">ทุกวัน</option>
+                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                                <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                                <option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option>
+                                <option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                                <option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option>
+                                <option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option>
+                                <option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                            </select>
+
+                            <select id="filter-company" class="filter-select" onchange="filterCustomerTable()">
+                                <option value="all">ทุกบริษัท</option>
+                            </select>
+
+                            <select id="filter-status" class="filter-select" onchange="filterCustomerTable()">
+                                <option value="all">ทุกสถานะส่งแบบประเมิน</option>
+                                <option value="Unsent">ยังไม่ส่ง</option>
+                                <option value="Sent">ส่งแล้ว (รอลูกค้าตอบ)</option>
+                                <option value="Completed">ประเมินสำเร็จ</option>
+                                <option value="Action Required">ต้องการการดูแลด่วน</option>
+                            </select>
+
+
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px; text-align: center;">ลำดับ</th>
+                                    <th>บริษัท</th>
+                                    <th>รหัส ID</th>
+                                    <th>ชื่อลูกค้า</th>
+                                    <th>เบอร์ติดต่อ</th>
+                                    <th style="width: 70px;">Line @</th>
+                                    <th>วันที่ติดตั้ง</th>
+                                    <th>ฝ่ายขาย</th>
+                                    <th>สถานะ</th>
+                                    <th style="width: 120px;">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customer-table-body">
+                                <tr>
+                                    <td colspan="10" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูลรายชื่อจาก Google Sheet...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 3: ท่อติดตามสถานะ (Kanban Feedback Pipeline) -->
+                <div class="tab-pane" id="tab-kanban">
+                    <div class="kanban-board">
+                        
+                        <!-- column 1: Unsent -->
+                        <div class="kanban-lane" id="lane-unsent">
+                            <div class="kanban-lane-header unsent">
+                                <span class="kanban-lane-title">ยังไม่ส่งแบบสอบถาม</span>
+                                <span class="kanban-lane-count" id="count-unsent">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="cards-unsent" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Unsent')">
+                                <!-- Cards injected here -->
+                            </div>
+                        </div>
+
+                        <!-- column 2: Sent -->
+                        <div class="kanban-lane" id="lane-sent">
+                            <div class="kanban-lane-header sent">
+                                <span class="kanban-lane-title">ส่งแล้ว (รอประเมิน)</span>
+                                <span class="kanban-lane-count" id="count-sent">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="cards-sent" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Sent')">
+                                <!-- Cards injected here -->
+                            </div>
+                        </div>
+
+                        <!-- column 3: Completed -->
+                        <div class="kanban-lane" id="lane-completed">
+                            <div class="kanban-lane-header completed">
+                                <span class="kanban-lane-title">ทำแบบประเมินสำเร็จ</span>
+                                <span class="kanban-lane-count" id="count-completed">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="cards-completed" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Completed')">
+                                <!-- Cards injected here -->
+                            </div>
+                        </div>
+
+                        <!-- column 4: Action Required -->
+                        <div class="kanban-lane" id="lane-action">
+                            <div class="kanban-lane-header action">
+                                <span class="kanban-lane-title">ต้องการการดูแลด่วน</span>
+                                <span class="kanban-lane-count" id="count-action">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="cards-action" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'Action Required')">
+                                <!-- Cards injected here -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TAB 4: รายงานผลงานทีมและโหวต MVP -->
+                <div class="tab-pane" id="tab-reports">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                        
+                        <div class="chart-card">
+                            <div class="chart-card-header">
+                                <h3 class="chart-card-title">สรุปคะแนนเฉลี่ยผลงานรายแผนก (เต็ม 5.0)</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
+                                <div style="background-color: var(--primary-light); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">💬 ทีมประสานงาน / แอดมิน</h4>
+                                        <p style="font-size: 0.72rem; color: var(--text-muted);">การต้อนรับ การนัดหมาย และการประสานงานข้อมูล</p>
+                                    </div>
+                                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary);" id="report-avg-admin">0.0</div>
+                                </div>
+
+                                <div style="background-color: var(--secondary-light); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--secondary);">🧭 ทีมที่ปรึกษาฟิล์ม / ฝ่ายขาย</h4>
+                                        <p style="font-size: 0.72rem; color: var(--text-muted);">การแนะนำคุณสมบัติรุ่นฟิล์ม ความเป็นมืออาชีพ</p>
+                                    </div>
+                                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--secondary);" id="report-avg-sales">0.0</div>
+                                </div>
+
+                                <div style="background-color: var(--success-light); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--success);">🧰 ทีมช่างเทคนิคติดตั้ง</h4>
+                                        <p style="font-size: 0.72rem; color: var(--text-muted);">ความตรงต่อเวลา ความประณีต และความสะอาดหลังเก็บงาน</p>
+                                    </div>
+                                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--success);" id="report-avg-tech">0.0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-card-header">
+                                <h3 class="chart-card-title">สรุปคะแนนสัดส่วนโหวตทีมผู้ครอง MVP 🏆</h3>
+                            </div>
+                            <div class="chart-container" style="height: 220px;">
+                                <canvas id="chart-mvps-bar"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+            </div>
+        </main>
+    </div>
+
+    <!-- DETAIL DRAWER (Slide-in Customer Journey / Feedback detail) -->
+    <div class="drawer-modal" id="customer-drawer" onclick="closeCustomerDrawer()">
+        <div class="drawer-content" onclick="event.stopPropagation()">
+            
+            <div class="drawer-header">
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary);" id="drawer-cust-name">ชื่อลูกค้า</h3>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);" id="drawer-cust-id">รหัสสัญญา: GF000</span>
+                </div>
+                <button class="drawer-close" onclick="closeCustomerDrawer()">&times;</button>
+            </div>
+
+            <div style="flex: 1;">
+                <!-- Basic details -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background-color: var(--bg-main); padding: 14px; border-radius: var(--radius-md); font-size: 0.78rem; margin-bottom: 20px;">
+                    <div>📞 <span id="drawer-cust-phone">-</span></div>
+                    <div>🏠 <span id="drawer-cust-sitetype">-</span></div>
+                    <div>📅 ติดตั้ง: <span id="drawer-cust-date">-</span></div>
+                    <div>🎞️ รุ่นฟิล์ม: <span id="drawer-cust-film">-</span></div>
+                </div>
+
+                <!-- Customer Journey Timeline -->
+                <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">การเดินทางของแบบสอบถาม (Journey Timeline)</h4>
+                <div class="journey-timeline" id="drawer-timeline-container">
+                    <!-- Timeline nodes injected dynamically -->
+                </div>
+
+                <!-- Detailed Feedback answers -->
+                <div id="drawer-feedback-details" style="display: none; border-top: 1.5px dashed var(--border); padding-top: 20px;">
+                    <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-bottom: 12px;">ผลลัพธ์การประเมินจากลูกค้า</h4>
+                    
+                    <!-- Overall Mood banner -->
+                    <div id="drawer-mood-banner" style="background-color: var(--primary-light); padding: 12px; border-radius: var(--radius-md); font-size: 0.82rem; font-weight: 700; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.8rem;" id="drawer-mood-emoji">😍</span>
+                        <span id="drawer-mood-desc">ประทับใจมากฟิล์มทำงานดีเกินคาด</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.8rem;">
+                        <div>
+                            <strong>❄️ ผลลัพธ์ฟิล์มที่ชื่นชม:</strong>
+                            <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px;" id="drawer-benefits-chips">
+                                <!-- benefit tags -->
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--border); padding-top: 10px;">
+                            <strong>⭐ คะแนนประเมินผู้ให้บริการ:</strong>
+                            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>💬 ทีมต้อนรับ (แอดมิน):</span>
+                                    <strong id="drawer-score-admin">0.0 / 5.0</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>🧭 แนะนำฟิล์ม (ฝ่ายขาย):</span>
+                                    <strong id="drawer-score-sales">0.0 / 5.0</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>🧰 หน้างานติดตั้ง (ทีมช่าง):</span>
+                                    <strong id="drawer-score-tech">0.0 / 5.0</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--border); padding-top: 10px;">
+                            <strong>🏆 ผลโหวต MVP:</strong>
+                            <span id="drawer-vote-mvp" style="font-weight: 700; color: var(--primary); margin-left: 6px;">-</span>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--border); padding-top: 10px;" id="drawer-comment-block">
+                            <strong>💬 คำชมหรือข้อเสนอแนะเพิ่มเติม:</strong>
+                            <p style="background-color: var(--bg-main); padding: 10px; border-radius: var(--radius-sm); font-style: italic; margin-top: 6px;" id="drawer-cust-comment">"-"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drawer Bottom Actions -->
+            <div style="border-top: 1.5px solid var(--border); padding-top: 16px; display: flex; gap: 8px;">
+                <button class="btn-action" style="flex: 1; padding: 10px; justify-content: center;" id="drawer-btn-line">
+                    <i data-lucide="message-square" style="width: 16px;"></i>
+                    <span>ส่ง LINE ซ้ำ</span>
+                </button>
+                <button class="btn-secondary" style="flex: 1; padding: 10px; justify-content: center;" id="drawer-btn-copy">
+                    <i data-lucide="copy" style="width: 16px;"></i>
+                    <span>คัดลอกลิงก์</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ADD CUSTOMER MODAL -->
+    <div class="drawer-modal" id="add-customer-modal" onclick="closeAddCustomerModal()" style="justify-content: center; align-items: center;">
+        <div class="drawer-content" style="max-height: 85vh; border-radius: var(--radius-lg); max-width: 460px; height: auto;" onclick="event.stopPropagation()">
+            <div class="drawer-header" style="margin-bottom: 16px;">
+                <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary);">เพิ่มข้อมูลลูกค้ารายใหม่</h3>
+                <button class="drawer-close" onclick="closeAddCustomerModal()">&times;</button>
+            </div>
+            
+            <form id="add-customer-form" onsubmit="handleAddCustomerSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label" for="add-cust-id">รหัสสัญญา (ID)</label>
+                    <input type="text" id="add-cust-id" class="form-control" placeholder="เช่น GF008 หรือ GF-99" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add-cust-name">ชื่อผู้ติดต่อ</label>
+                    <input type="text" id="add-cust-name" class="form-control" placeholder="กรอกชื่อลูกค้า" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add-cust-phone">เบอร์โทรศัพท์</label>
+                    <input type="tel" id="add-cust-phone" class="form-control" placeholder="กรอกเบอร์โทร 9-10 หลัก" pattern="[0-9]{9,10}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add-cust-sitetype">ประเภทหน้างาน</label>
+                    <select id="add-cust-sitetype" class="form-control" style="appearance: auto;" required>
+                        <option value="" disabled selected>เลือกประเภทหน้างาน</option>
+                        <option value="บ้าน">บ้าน</option>
+                        <option value="คอนโด">คอนโด</option>
+                        <option value="สำนักงาน">สำนักงาน</option>
+                        <option value="ร้านค้า">ร้านค้า</option>
+                        <option value="อาคาร">อาคาร</option>
+                        <option value="โครงการ">โครงการ</option>
+                        <option value="อื่น ๆ">อื่น ๆ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add-cust-date">วันที่ติดตั้ง</label>
+                    <input type="date" id="add-cust-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add-cust-film">รุ่นฟิล์ม / พื้นที่ติดตั้ง (ถ้ามี)</label>
+                    <input type="text" id="add-cust-film" class="form-control" placeholder="เช่น 3M Ceramic Ultra Clear">
+                </div>
+                
+                <button type="submit" class="btn-action" style="width: 100%; padding: 12px; justify-content: center; margin-top: 10px;">
+                    <i data-lucide="save" style="width: 18px; height: 18px;"></i>
+                    <span>บันทึกลง Google Sheet</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Core Admin App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
