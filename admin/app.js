@@ -251,10 +251,15 @@ function loadData() {
                         }
                     }
 
-                    // Always allow local manual override via drag & drop
+                    // Always allow local manual override via drag & drop, EXCEPT if it contradicts a completed survey
                     const localStatus = localStorage.getItem('local_status_' + item.id);
                     if (localStatus) {
-                        status = localStatus;
+                        if ((item.status === 'Completed' || item.feedback) && (localStatus === 'Unsent' || localStatus === 'Sent')) {
+                            // Backend confirms it's completed, so ignore and clear the outdated local 'Sent' state
+                            localStorage.removeItem('local_status_' + item.id);
+                        } else {
+                            status = localStatus;
+                        }
                     }
 
                     return {
@@ -356,10 +361,14 @@ function forceRefreshData() {
                         }
                     }
 
-                    // Always allow local manual override via drag & drop
+                    // Always allow local manual override via drag & drop, EXCEPT if it contradicts a completed survey
                     const localStatus = localStorage.getItem('local_status_' + item.id);
                     if (localStatus) {
-                        status = localStatus;
+                        if ((item.status === 'Completed' || item.feedback) && (localStatus === 'Unsent' || localStatus === 'Sent')) {
+                            localStorage.removeItem('local_status_' + item.id);
+                        } else {
+                            status = localStatus;
+                        }
                     }
 
                     return {
