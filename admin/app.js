@@ -9,6 +9,8 @@ const state = {
     charts: {
         scoresBar: null,
         moodsPie: null,
+        salesBar: null,
+        techBar: null,
         mvpsBar: null
     },
     filterInitialized: false
