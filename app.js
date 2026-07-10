@@ -828,17 +828,10 @@ function submitSurvey() {
     const tyIconBox = document.getElementById('thankyou-icon-box');
 
     if (isHappy) {
-        tyHeader.style.display = 'flex';
+        tyHeader.style.display = 'none';
         tyButtons.style.display = 'flex';
         happyPathContent.style.display = 'block';
         unhappyPathContent.style.display = 'none';
-        
-        tyTitle.innerHTML = 'ขอบคุณสำหรับฟีดแบคดี ๆ ค่ะ';
-        tyTitle.style.color = 'var(--primary)';
-        tyDesc.innerHTML = 'ทีม Goodfilm ดีใจที่คุณประทับใจบริการของเรา<br>หากสะดวก ช่วยแบ่งปันประสบการณ์ดี ๆ บน Google Maps<br>เพื่อเป็นกำลังใจให้ทีมงานของเรานะคะ';
-        tyDesc.style.textAlign = 'center';
-        tyIconBox.style.backgroundColor = 'var(--primary)';
-        tyIconBox.innerHTML = '<i data-lucide="check" style="width: 44px; height: 44px; color: #ffffff; stroke-width: 3;"></i>';
     } else {
         tyHeader.style.display = 'none';
         tyButtons.style.display = 'none';

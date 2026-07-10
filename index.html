@@ -453,111 +453,12 @@
             </div>
 
             <!-- DYNAMIC CONTENT: Happy Path (Review & Reward) -->
-            <div id="happy-path-content" style="display: none; margin-bottom: 24px; padding: 0 20px;">
-                
-                <!-- Box 1: Review Card -->
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px 16px; margin-bottom: 16px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                    <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 12px;">
-                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
-                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
-                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
-                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
-                        <i data-lucide="star" style="width: 28px; height: 28px; color: #fbbf24; fill: #fbbf24;"></i>
-                    </div>
-                    <h3 style="color: var(--primary); font-size: 1.25rem; font-weight: 800; margin-bottom: 8px;">ชวนรีวิวบน Google Maps</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 20px;">
-                        รีวิวสั้น ๆ ของคุณมีความหมายกับเรา<br>และช่วยให้ลูกค้าท่านอื่นตัดสินใจได้ง่ายขึ้น
-                    </p>
-                    <a href="https://g.page/r/CXyrHfNQMLB8EAI/review" target="_blank" onclick="clickGoogleMaps()" style="background: var(--secondary); color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 1rem; width: 100%;">
-                        <i data-lucide="star" style="width: 20px; height: 20px; fill: #fbbf24; color: #fbbf24;"></i>
-                        <span>รีวิวบน Google Maps <i data-lucide="external-link" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i></span>
-                    </a>
-                </div>
-
-                <!-- Box 2: Reward Image Card -->
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; margin-bottom: 16px; overflow: hidden; display: flex; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                    <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px 0 16px 16px;">
-                        <img src="reward.png" style="width: 100%; max-width: 140px; height: auto;" alt="ร่ม 3M" onerror="this.src='https://placehold.co/140x140?text=Reward'">
-                    </div>
-                    <div style="flex: 1.2; padding: 20px 16px 20px 0; display: flex; flex-direction: column; justify-content: center; padding-left: 12px;">
-                        <div style="display: flex; align-items: center; gap: 6px; color: var(--secondary); font-size: 0.65rem; font-weight: 700; margin-bottom: 6px;">
-                            <div style="background: #e0f2fe; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="gift" style="width: 12px; height: 12px; color: var(--secondary); fill: var(--secondary);"></i>
-                            </div>
-                            Goodfilm Thank You Reward
-                        </div>
-                        <h3 style="color: var(--primary); font-size: 1.25rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px;">รับร่ม 3M<br>เป็นของขอบคุณ</h3>
-                        <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.4;">
-                            เมื่อรีวิวแล้ว เพียงแคปหน้าจอ<br>และส่งให้ทีมงาน
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Box 3: 3 Steps -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 6px;">
-                    <!-- Step 1 -->
-                    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 4px 12px 4px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
-                        <div style="position: absolute; top: -8px; left: 8px; background: var(--secondary); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; justify-content: center;">1</div>
-                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/512px-Google_Maps_icon_%282020%29.svg.png" style="width: 24px; height: 24px; object-fit: contain;" alt="Google Maps" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2991/2991231.png'">
-                        </div>
-                        <div style="font-size: 0.65rem; font-weight: 700; color: var(--primary);">รีวิวบน Google Maps</div>
-                    </div>
-                    
-                    <div style="color: var(--primary); font-weight: bold; font-size: 16px;">
-                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 4px 12px 4px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
-                        <div style="position: absolute; top: -8px; left: 8px; background: var(--secondary); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; justify-content: center;">2</div>
-                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                            <i data-lucide="smartphone" style="color: var(--secondary); width: 24px; height: 24px;"></i>
-                            <div style="position: absolute; margin-top: -4px;">
-                                <i data-lucide="camera" style="color: var(--secondary); width: 12px; height: 12px;"></i>
-                            </div>
-                        </div>
-                        <div style="font-size: 0.65rem; font-weight: 700; color: var(--primary);">แคปหน้าจอรีวิว</div>
-                    </div>
-
-                    <div style="color: var(--primary); font-weight: bold; font-size: 16px;">
-                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div style="flex: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 4px 12px 4px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
-                        <div style="position: absolute; top: -8px; left: 8px; background: var(--secondary); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; justify-content: center;">3</div>
-                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #e6f6ee; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                            <span style="color: #06c755; font-weight: 900; font-size: 1rem; font-family: Arial, sans-serif;">LINE</span>
-                        </div>
-                        <div style="font-size: 0.65rem; font-weight: 700; color: var(--primary);">ส่งให้แอดมินทาง LINE</div>
-                    </div>
-                </div>
-
-                <!-- Line Button -->
-                <a href="#" class="btn-outline-primary" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border: 2px solid var(--primary); background: #ffffff; color: var(--primary); text-decoration: none; border-radius: 50px; font-weight: 700; padding: 14px 20px; margin-bottom: 16px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="background: var(--primary); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: bold; font-family: Arial, sans-serif;">LINE</div>
-                        <span style="font-size: 0.95rem;">ส่งหลักฐานรับของขวัญทาง LINE</span>
-                    </div>
-                    <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
-                </a>
-
-                <!-- Box 4: Suggestion note -->
-                <div style="background: #f8fafc; border-radius: 12px; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                    <div style="background: #3b82f6; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <i data-lucide="message-circle" style="color: #ffffff; fill: #ffffff; width: 14px; height: 14px;"></i>
-                    </div>
-                    <span style="font-size: 1rem; color: var(--text-main); font-weight: 600;">หากมีข้อเสนอแนะเพิ่มเติม ทีมงานยินดีรับฟังเสมอค่ะ</span>
-                </div>
-
-                <!-- Footer Note -->
-                <div style="display: flex; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px dashed #cbd5e1; align-items: flex-start;">
-                    <i data-lucide="shield" style="color: var(--text-muted); width: 20px; height: 20px; flex-shrink: 0;"></i>
-                    <span style="font-size: 0.65rem; color: var(--text-muted); line-height: 1.5;">
-                        ของตอบแทนนี้เป็นการขอบคุณสำหรับการสละเวลารีวิวประสบการณ์จริง ไม่เกี่ยวข้องกับการให้คะแนนหรือการรับประกันผลลัพธ์ใด ๆ
-                    </span>
-                </div>
+            <div id="happy-path-content" style="display: none; position: relative; width: 100%; max-width: 500px; margin: 0 auto; margin-bottom: 24px;">
+                <img src="images/review.png" alt="ขอบคุณสำหรับฟีดแบค" style="width: 100%; height: auto; display: block;">
+                <!-- Clickable area for Google Maps Review -->
+                <a href="https://g.page/r/CXyrHfNQMLB8EAI/review" target="_blank" onclick="clickGoogleMaps()" style="position: absolute; top: 40%; left: 9%; width: 82%; height: 7%; cursor: pointer; border-radius: 50px; border: 2px dashed red; background: rgba(255,0,0,0.3);"></a>
+                <!-- Clickable area for LINE button -->
+                <a href="#" style="position: absolute; bottom: 2%; left: 6%; width: 88%; height: 6.5%; cursor: pointer; border-radius: 50px; border: 2px dashed red; background: rgba(255,0,0,0.3);"></a>
             </div>
 
             <!-- Thank you buttons (For Happy Path) -->
