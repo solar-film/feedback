@@ -741,7 +741,6 @@ function validateM5() {
 // Reviews handling
 function clickGoogleMaps() {
     state.formData.googleMapsVisited = true;
-    window.open('https://search.google.com/local/writereview?placeid=ChIJ883qRmqf4jAR-B3J7o63EGo', '_blank');
 }
 
 function hideReviewBanner() {
