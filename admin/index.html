@@ -71,7 +71,10 @@
                     <h2 class="navbar-title" id="page-title">Dashboard ภาพรวม</h2>
                 </div>
                 
-                <div class="navbar-right">
+                <div class="navbar-right" style="display: flex; gap: 10px; align-items: center;">
+                    <button id="btn-refresh-data" class="btn-primary" onclick="forceRefreshData()" style="padding: 6px 12px; font-size: 0.8rem; height: 32px; display: flex; align-items: center; gap: 6px; border-radius: 6px; background-color: var(--surface); color: var(--text-main); border: 1px solid var(--border); box-shadow: none;">
+                        <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> อัปเดตข้อมูล
+                    </button>
                     <div id="api-status" class="api-status-badge connected">
                         <span class="api-status-dot"></span>
                         <span id="api-status-text">เชื่อมต่อฐานข้อมูลแล้ว ✓</span>

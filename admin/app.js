@@ -305,6 +305,84 @@ function updateApiBadge(type, text) {
     }
 }
 
+// FORCE REFRESH DATA (For the Update Button)
+function forceRefreshData() {
+    if (!state.googleSheetsUrl || state.googleSheetsUrl.trim() === '') {
+        showToast('กรุณาระบุ Web App URL', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('btn-refresh-data');
+    if (btn) {
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.classList.add('spin-icon');
+            icon.style.animation = 'spin 1s linear infinite';
+        }
+        btn.disabled = true;
+    }
+    
+    // Bypass cache for visual feedback
+    updateApiBadge('loading', 'กำลังดึงข้อมูลล่าสุด...');
+    
+    fetch(`${state.googleSheetsUrl}?action=getAllCustomersDetailed`)
+        .then(res => {
+            if (!res.ok) throw new Error("HTTP error " + res.status);
+            return res.json();
+        })
+        .then(data => {
+            if (data.status === 'success' && data.data) {
+                const freshCustomers = data.data.map(item => {
+                    let status = item.status || 'Unsent';
+                    if (status !== 'Completed' && status !== 'Action Required') {
+                        const localStatus = localStorage.getItem('local_status_' + item.id);
+                        if (localStatus) {
+                            status = localStatus;
+                        }
+                    }
+                    return {
+                        id: item.id,
+                        company: item.company || '-',
+                        name: item.name,
+                        phone: item.phone,
+                        lineAt: item.lineAt || '-',
+                        siteType: item.siteType,
+                        installDate: formatInstallDate(item.installDate),
+                        filmModel: item.filmModel || '-',
+                        sales: item.sales || '-',
+                        tech: item.tech || '-',
+                        bill: item.bill || '-',
+                        status: status,
+                        feedback: item.feedback || null
+                    };
+                });
+                
+                state.customers = freshCustomers;
+                localStorage.setItem('admin_dashboard_cache', JSON.stringify(freshCustomers));
+                processDataAndRender();
+                updateApiBadge('connected', 'เชื่อมต่อฐานข้อมูลแล้ว ✓');
+                showToast('อัปเดตข้อมูลเรียบร้อยแล้ว', 'success');
+            } else {
+                throw new Error(data.message || "Unknown error");
+            }
+        })
+        .catch(err => {
+            console.error("API error:", err);
+            updateApiBadge('error', 'ข้อผิดพลาดการดึงข้อมูล');
+            showToast('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + err.message, 'error');
+        })
+        .finally(() => {
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    icon.classList.remove('spin-icon');
+                    icon.style.animation = '';
+                }
+                btn.disabled = false;
+            }
+        });
+}
+
 // DATA PROCESSING AND RENDERING
 function processDataAndRender() {
     renderKPIs();
