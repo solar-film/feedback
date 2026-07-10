@@ -829,7 +829,7 @@ function submitSurvey() {
 
     if (isHappy) {
         tyHeader.style.display = 'none';
-        tyButtons.style.display = 'flex';
+        tyButtons.style.display = 'none';
         happyPathContent.style.display = 'block';
         unhappyPathContent.style.display = 'none';
     } else {
