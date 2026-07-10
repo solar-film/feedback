@@ -773,6 +773,13 @@ function copySurveyLink(id, btn) {
         const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; color: var(--success);"></i>';
         lucide.createIcons();
+        
+        // Auto-move to 'Sent' if currently 'Unsent'
+        const customer = state.customers.find(c => c.id === id);
+        if (customer && (!customer.status || customer.status === 'Unsent')) {
+            updateCustomerStatus(id, 'Sent');
+        }
+
         setTimeout(() => {
             btn.innerHTML = originalHtml;
             lucide.createIcons();
@@ -864,6 +871,7 @@ function openCustomerDrawer(id) {
     document.getElementById('drawer-btn-copy').onclick = () => {
         navigator.clipboard.writeText(surveyLink).then(() => {
             showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
+            markAsSent(c.id);
         });
     };
 
