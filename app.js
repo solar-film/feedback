@@ -397,6 +397,7 @@ function changeScreen(screenId) {
         footerNav.style.display = 'none';
     } else {
         header.style.display = 'block';
+        document.getElementById('btn-next').style.display = 'flex';
         
         if (screenId === 'screen-m2' || screenId === 'screen-m3' || screenId === 'screen-m4' || screenId === 'screen-m5') {
             progressSection.style.display = 'none';
