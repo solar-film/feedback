@@ -35,9 +35,9 @@
         <!-- SCREENS -->
 
         <!-- Screen 1: Intro Page -->
-        <div class="game-screen active" id="screen-intro" style="padding: 0; display: block; overflow: auto; background-color: #f0f8ff;">
-            <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto; height: 100%;">
-                <img src="images/1-5.png" alt="Welcome to Goodfilm" style="width: 100%; height: auto; display: block;">
+        <div class="game-screen active" id="screen-intro" style="padding: 0; overflow: hidden; background-color: #f0f8ff;">
+            <div style="position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: flex-end;">
+                <img src="images/1-5.png" alt="Welcome to Goodfilm" style="width: 100%; height: 100%; object-fit: cover; object-position: center bottom;">
                 <!-- Transparent clickable area for the Start Button -->
                 <div onclick="startQuest()" style="position: absolute; bottom: 3%; left: 5%; width: 90%; height: 10%; cursor: pointer; border-radius: 50px;"></div>
             </div>
