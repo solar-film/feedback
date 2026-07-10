@@ -1231,3 +1231,45 @@ body {
 .sub-tag.mood-good { background-color: rgba(56, 161, 105, 0.1); color: var(--success); }
 .sub-tag.mood-bad { background-color: rgba(229, 62, 62, 0.1); color: var(--danger); }
 
+/* Mission 5 Image Overlay */
+.img-overlay-m5 {
+    flex: 1;
+    background: transparent !important;
+    border: 2px solid transparent !important;
+    box-shadow: none !important;
+    position: relative;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.img-overlay-m5.selected {
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+.m5-check-circle {
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: var(--transition);
+}
+.img-overlay-m5.selected .m5-check-circle {
+    background-color: var(--secondary);
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.img-overlay-m5.selected .m5-check-circle::after {
+    content: '';
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    width: 25%;
+    height: 50%;
+    border: solid white;
+    border-width: 0 2.5px 2.5px 0;
+    transform: translate(-50%, -60%) rotate(45deg);
+}

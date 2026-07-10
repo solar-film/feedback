@@ -671,7 +671,7 @@ function selectOverallMood(moodKey, node) {
     SoundFX.playClick();
     
     const list = node.parentNode;
-    list.querySelectorAll('.horizontal-mood-card').forEach(c => c.classList.remove('selected'));
+    list.querySelectorAll('.horizontal-mood-card, .img-overlay-m5').forEach(c => c.classList.remove('selected'));
     node.classList.add('selected');
     
     let moodChar = '😐';

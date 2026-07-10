@@ -383,52 +383,34 @@
         </div>
 
         <!-- Screen 8: Mission 5 / 5 - Mood Scale Selection -->
-        <div class="game-screen" id="screen-m5">
-            <div>
-                <h2 class="quest-title" style="margin-top: 10px;">ตอนนี้คุณรู้สึกกับผลงานติดตั้ง<br>อยู่ใน Mood ไหน?</h2>
-                <p class="quest-subtitle">เลือกอารมณ์ความพึงพอใจโดยรวมของคุณค่ะ</p>
+        <div class="game-screen" id="screen-m5" style="padding: 0; position: relative; background-color: #f0f8ff; overflow: auto;">
+            <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto; min-height: 100%;">
+                <img src="images/5-5.png" alt="Mission 5" style="width: 100%; height: auto; display: block;">
                 
-                <div class="horizontal-mood-list">
-                    <div class="horizontal-mood-card" onclick="selectOverallMood('happy_max', this)">
-                        <span class="mood-card-emoji">😍</span>
-                        <div class="mood-card-text">
-                            <span class="mood-card-title">ประทับใจมาก ฟิล์มทำงานดีเกินคาด</span>
-                            <span class="mood-card-desc">ฟิล์มเย็นกว่าเดิมมาก บริการลื่นไหลมีความสุข</span>
-                        </div>
+                <!-- Interactive Flex Overlay for Moods -->
+                <div style="position: absolute; top: 38%; left: 5%; width: 90%; height: 58%; display: flex; flex-direction: column;">
+                    <div class="img-overlay-m5" onclick="selectOverallMood('happy_max', this)">
+                        <div class="m5-check-circle"></div>
                     </div>
                     
-                    <div class="horizontal-mood-card" onclick="selectOverallMood('happy_mid', this)">
-                        <span class="mood-card-emoji">😊</span>
-                        <div class="mood-card-text">
-                            <span class="mood-card-title">พอใจ ใช้งานได้ตามที่ต้องการ</span>
-                            <span class="mood-card-desc">สเปกฟิล์มได้มาตรฐาน บริการคุ้มราคาน่าพอใจ</span>
-                        </div>
+                    <div class="img-overlay-m5" onclick="selectOverallMood('happy_mid', this)">
+                        <div class="m5-check-circle"></div>
                     </div>
                     
-                    <div class="horizontal-mood-card" onclick="selectOverallMood('normal', this)">
-                        <span class="mood-card-emoji">😐</span>
-                        <div class="mood-card-text">
-                            <span class="mood-card-title">กลาง ๆ ยังอยากดูผลเพิ่ม</span>
-                            <span class="mood-card-desc">ขอลองสัมผัสการกันแดด/ความเย็นในอนาคตก่อน</span>
-                        </div>
+                    <div class="img-overlay-m5" onclick="selectOverallMood('normal', this)">
+                        <div class="m5-check-circle"></div>
                     </div>
                     
-                    <div class="horizontal-mood-card" onclick="selectOverallMood('unhappy', this)">
-                        <span class="mood-card-emoji">😟</span>
-                        <div class="mood-card-text">
-                            <span class="mood-card-title">มีบางจุดที่อยากให้ดูแล</span>
-                            <span class="mood-card-desc">มีฟองอากาศ/ขอบตัดไม่ตรง/หรือต้องการให้แก้ไข</span>
-                        </div>
+                    <div class="img-overlay-m5" onclick="selectOverallMood('unhappy', this)">
+                        <div class="m5-check-circle"></div>
                     </div>
                     
-                    <div class="horizontal-mood-card" onclick="selectOverallMood('danger_alert', this)">
-                        <span class="mood-card-emoji">🚨</span>
-                        <div class="mood-card-text">
-                            <span class="mood-card-title">อยากให้ทีมงานติดต่อกลับด่วน</span>
-                            <span class="mood-card-desc">มีข้อท้วงติง หรือต้องการทีมช่างเข้ามาประเมินเพิ่ม</span>
-                        </div>
+                    <div class="img-overlay-m5" onclick="selectOverallMood('danger_alert', this)">
+                        <div class="m5-check-circle"></div>
                     </div>
                 </div>
+
+                <div style="padding: 0 20px 40px 20px;">
 
                 <!-- DYNAMIC PATH ACTION: Care Follow-up (shown inside Quest 5 card if selected normal/unhappy/alert) -->
                 <div id="care-mission-support" class="followup-container" style="display: none; background-color: rgba(221, 107, 32, 0.03); border: 2px dashed var(--warning); padding: 18px; border-radius: var(--border-radius-lg); margin-top: 20px;">
@@ -477,6 +459,7 @@
                     <i data-lucide="send" style="width: 20px; height: 20px;"></i>
                     <span>ส่งต่อให้ทีมดูแล & เสร็จสิ้นภารกิจ 🚀</span>
                 </button>
+                </div> <!-- End padding div -->
             </div>
         </div>
 
