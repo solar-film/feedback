@@ -398,7 +398,7 @@ function changeScreen(screenId) {
     } else {
         header.style.display = 'block';
         
-        if (screenId === 'screen-m2' || screenId === 'screen-m3' || screenId === 'screen-m4') {
+        if (screenId === 'screen-m2' || screenId === 'screen-m3' || screenId === 'screen-m4' || screenId === 'screen-m5') {
             progressSection.style.display = 'none';
         } else {
             progressSection.style.display = 'flex';
