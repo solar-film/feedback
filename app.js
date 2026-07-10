@@ -804,12 +804,19 @@ function submitSurvey() {
 
     // Toggle optional review card and reward on success page
     const happyPathContent = document.getElementById('happy-path-content');
+    const unhappyPathContent = document.getElementById('unhappy-path-content');
+    const tyHeader = document.getElementById('thankyou-header');
+    const tyButtons = document.getElementById('thankyou-buttons');
     const tyTitle = document.getElementById('thankyou-title');
     const tyDesc = document.getElementById('thankyou-desc');
     const tyIconBox = document.getElementById('thankyou-icon-box');
 
     if (isHappy) {
+        tyHeader.style.display = 'flex';
+        tyButtons.style.display = 'flex';
         happyPathContent.style.display = 'block';
+        unhappyPathContent.style.display = 'none';
+        
         tyTitle.innerHTML = 'ขอบคุณสำหรับฟีดแบคดี ๆ ค่ะ';
         tyTitle.style.color = 'var(--primary)';
         tyDesc.innerHTML = 'ทีม Goodfilm ดีใจที่คุณประทับใจบริการของเรา<br>หากสะดวก ช่วยแบ่งปันประสบการณ์ดี ๆ บน Google Maps<br>เพื่อเป็นกำลังใจให้ทีมงานของเรานะคะ';
@@ -817,12 +824,10 @@ function submitSurvey() {
         tyIconBox.style.backgroundColor = 'var(--primary)';
         tyIconBox.innerHTML = '<i data-lucide="check" style="width: 44px; height: 44px; color: #ffffff; stroke-width: 3;"></i>';
     } else {
+        tyHeader.style.display = 'none';
+        tyButtons.style.display = 'none';
         happyPathContent.style.display = 'none';
-        tyTitle.innerText = 'รับเรื่องดูแลต่อทันที 🛠️';
-        tyTitle.style.color = 'var(--warning)';
-        tyDesc.innerText = 'ขออภัยหากมีส่วนใดที่ทำให้คุณไม่ประทับใจ ทีมงาน Goodfilm ได้รับข้อเสนอแนะของคุณแล้ว และจะรีบประสานงานเพื่อตรวจสอบและแก้ไขปัญหาให้คุณอย่างรวดเร็วที่สุดค่ะ';
-        tyIconBox.style.backgroundColor = 'var(--warning)';
-        tyIconBox.innerHTML = '<i data-lucide="alert-circle" style="width: 44px; height: 44px; color: #ffffff; stroke-width: 3;"></i>';
+        unhappyPathContent.style.display = 'block';
     }
 
     // Google Sheets apps script fetch integration

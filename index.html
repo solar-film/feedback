@@ -438,10 +438,10 @@
         </div>
 
         <!-- Screen 9: Thank You Page / Reward Grid / Review Banner Option -->
-        <div class="game-screen" id="screen-thankyou">
+        <div class="game-screen" id="screen-thankyou" style="padding: 0; background-color: #f0f8ff;">
             
-            <!-- Success check icon -->
-            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 12px; margin-bottom: 24px;">
+            <!-- Success check icon (Standard Header) -->
+            <div id="thankyou-header" style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 12px; margin-bottom: 24px; padding-top: 20px;">
                 <!-- Blue circle with icon badge -->
                 <div id="thankyou-icon-box" style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(27, 67, 124, 0.2); position: relative; margin-bottom: 16px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
                     <i data-lucide="check" style="width: 44px; height: 44px; color: #ffffff; stroke-width: 3;"></i>
@@ -453,7 +453,7 @@
             </div>
 
             <!-- DYNAMIC CONTENT: Happy Path (Review & Reward) -->
-            <div id="happy-path-content" style="display: none; margin-bottom: 24px;">
+            <div id="happy-path-content" style="display: none; margin-bottom: 24px; padding: 0 20px;">
                 
                 <!-- Box 1: Review Card -->
                 <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px 16px; margin-bottom: 16px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
@@ -560,14 +560,23 @@
                 </div>
             </div>
 
-            <!-- Thank you buttons -->
-            <div style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Thank you buttons (For Happy Path) -->
+            <div id="thankyou-buttons" style="display: flex; flex-direction: column; gap: 10px; padding: 0 20px 20px 20px;">
                 <button class="btn-primary" onclick="location.reload()" style="width: 100%;">
                     <span>กลับสู่หน้าหลัก</span>
                 </button>
                 <button class="btn-secondary" onclick="showCareGuideModal()" style="width: 100%;">
                     <span>ดูวิธีดูแลฟิล์มหลังติดตั้ง</span>
                 </button>
+            </div>
+            
+            <!-- DYNAMIC CONTENT: Unhappy Path (Full Image Overlay) -->
+            <div id="unhappy-path-content" style="display: none; position: relative; width: 100%; max-width: 500px; margin: 0 auto;">
+                <img src="images/end.png" alt="รับเรื่องดูแลต่อทันที" style="width: 100%; height: auto; display: block;">
+                <!-- Clickable area for กลับสู่หน้าหลัก -->
+                <div onclick="location.reload()" style="position: absolute; top: 48%; left: 5%; width: 90%; height: 8%; cursor: pointer; border-radius: 50px;"></div>
+                <!-- Clickable area for ดูวิธีดูแลฟิล์มหลังติดตั้ง -->
+                <div onclick="showCareGuideModal()" style="position: absolute; top: 58%; left: 5%; width: 90%; height: 8%; cursor: pointer; border-radius: 50px;"></div>
             </div>
         </div>
 
