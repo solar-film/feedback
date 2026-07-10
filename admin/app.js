@@ -662,23 +662,38 @@ function renderKanbanBoard() {
         card.setAttribute('ondragstart', `dragStart(event, '${c.id}')`);
         card.setAttribute('onclick', `openCustomerDrawer('${c.id}')`);
 
+        let moveButtons = `<div style="display: flex; gap: 4px; align-items: center;">`;
+        const laneOrder = ['Unsent', 'Sent', 'Completed', 'Action Required'];
+        const currentIndex = laneOrder.indexOf(laneKey);
+        if (currentIndex > 0) {
+            moveButtons += `<button onclick="moveKanbanCard('${c.id}', '${laneOrder[currentIndex - 1]}', event)" style="background:transparent; border:none; padding:4px; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; border-radius:4px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'"><i data-lucide="chevron-left" style="width:16px; height:16px;"></i></button>`;
+        }
+        if (currentIndex < 3) {
+            moveButtons += `<button onclick="moveKanbanCard('${c.id}', '${laneOrder[currentIndex + 1]}', event)" style="background:transparent; border:none; padding:4px; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; border-radius:4px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'"><i data-lucide="chevron-right" style="width:16px; height:16px;"></i></button>`;
+        }
+        moveButtons += `</div>`;
+
         let footerHtml = '';
         if (c.feedback) {
             const overall = c.feedback.overallMood || '😐';
             const avg = (((c.feedback.ratings.admin || 0) + (c.feedback.ratings.sales || 0) + (c.feedback.ratings.tech || 0)) / 3).toFixed(1);
             footerHtml = `
-                <div class="kanban-card-footer">
-                    <span style="font-size: 1.2rem;">${overall}</span>
-                    <span class="kanban-card-rating">
-                        <i data-lucide="star" style="width:12px; height:12px; fill:var(--accent); color:var(--accent);"></i>
-                        <span>${avg} / 5</span>
-                    </span>
+                <div class="kanban-card-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <span style="font-size: 1.2rem;">${overall}</span>
+                        <span class="kanban-card-rating">
+                            <i data-lucide="star" style="width:12px; height:12px; fill:var(--accent); color:var(--accent);"></i>
+                            <span>${avg} / 5</span>
+                        </span>
+                    </div>
+                    ${moveButtons}
                 </div>
             `;
         } else {
             footerHtml = `
-                <div class="kanban-card-footer" style="font-size: 0.65rem; color: var(--text-muted);">
-                    <span>รอดำเนินการ</span>
+                <div class="kanban-card-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size: 0.65rem; color: var(--text-muted);">รอดำเนินการ</span>
+                    ${moveButtons}
                 </div>
             `;
         }
@@ -704,20 +719,12 @@ function renderKanbanBoard() {
     lucide.createIcons();
 }
 
-// Drag & Drop Kanban Handlers
-function dragStart(e, customerId) {
-    e.dataTransfer.setData('text/plain', customerId);
+function moveKanbanCard(customerId, targetStatus, e) {
+    if (e) e.stopPropagation();
+    updateCustomerStatus(customerId, targetStatus);
 }
 
-function allowDrop(e) {
-    e.preventDefault();
-}
-
-function handleDrop(e, targetStatus) {
-    e.preventDefault();
-    const customerId = e.dataTransfer.getData('text/plain');
-    
-    // Find customer and update status
+function updateCustomerStatus(customerId, targetStatus) {
     const customer = state.customers.find(c => c.id === customerId);
     if (!customer) return;
 
@@ -730,6 +737,21 @@ function handleDrop(e, targetStatus) {
     renderKanbanBoard();
     renderCustomerTable();
     renderKPIs();
+}
+
+// Drag & Drop Kanban Handlers
+function dragStart(e, customerId) {
+    e.dataTransfer.setData('text/plain', customerId);
+}
+
+function allowDrop(e) {
+    e.preventDefault();
+}
+
+function handleDrop(e, targetStatus) {
+    e.preventDefault();
+    const customerId = e.dataTransfer.getData('text/plain');
+    updateCustomerStatus(customerId, targetStatus);
 }
 
 // Quick status change helper (when sending LINE)
