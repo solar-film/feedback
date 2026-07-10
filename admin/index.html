@@ -72,6 +72,17 @@
                 </div>
                 
                 <div class="navbar-right" style="display: flex; gap: 10px; align-items: center;">
+                    <div class="global-filters" style="display: flex; gap: 8px; align-items: center; background: var(--surface); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.8rem;">
+                        <i data-lucide="calendar" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
+                        <select id="global-filter-month" onchange="applyGlobalFilter()" style="border: none; background: transparent; outline: none; cursor: pointer; color: var(--text-main); font-family: inherit;">
+                            <!-- Populated by JS -->
+                        </select>
+                        <span style="color: var(--border);">|</span>
+                        <input type="date" id="global-filter-start" onchange="applyGlobalFilter()" style="border: none; background: transparent; outline: none; cursor: pointer; color: var(--text-main); font-family: inherit; font-size: 0.75rem;">
+                        <span style="color: var(--text-muted); font-size: 0.75rem;">ถึง</span>
+                        <input type="date" id="global-filter-end" onchange="applyGlobalFilter()" style="border: none; background: transparent; outline: none; cursor: pointer; color: var(--text-main); font-family: inherit; font-size: 0.75rem;">
+                    </div>
+                    
                     <button id="btn-refresh-data" class="btn-primary" onclick="forceRefreshData()" style="padding: 6px 12px; font-size: 0.8rem; height: 32px; display: flex; align-items: center; gap: 6px; border-radius: 6px; background-color: var(--surface); color: var(--text-main); border: 1px solid var(--border); box-shadow: none;">
                         <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> อัปเดตข้อมูล
                     </button>
@@ -166,35 +177,7 @@
                             <input type="text" id="search-input" class="search-input" placeholder="ค้นหาชื่อ, เบอร์โทร, หรือ ID ลูกค้า..." oninput="filterCustomerTable()">
                         </div>
                         <div class="filter-group">
-                            <!-- Month and Day Filters -->
-                            <select id="filter-month" class="filter-select" onchange="filterCustomerTable()">
-                                <option value="all">ทุกเดือน</option>
-                                <option value="1">มกราคม</option>
-                                <option value="2">กุมภาพันธ์</option>
-                                <option value="3">มีนาคม</option>
-                                <option value="4">เมษายน</option>
-                                <option value="5">พฤษภาคม</option>
-                                <option value="6">มิถุนายน</option>
-                                <option value="7">กรกฎาคม</option>
-                                <option value="8">สิงหาคม</option>
-                                <option value="9">กันยายน</option>
-                                <option value="10">ตุลาคม</option>
-                                <option value="11">พฤศจิกายน</option>
-                                <option value="12">ธันวาคม</option>
-                            </select>
-
-                            <select id="filter-day" class="filter-select" onchange="filterCustomerTable()">
-                                <option value="all">ทุกวัน</option>
-                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-                                <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
-                                <option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option>
-                                <option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
-                                <option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option>
-                                <option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option>
-                                <option value="29">29</option><option value="30">30</option><option value="31">31</option>
-                            </select>
-
+                            <!-- Company and Status Filters (Table Only) -->
                             <select id="filter-company" class="filter-select" onchange="filterCustomerTable()">
                                 <option value="all">ทุกบริษัท</option>
                             </select>

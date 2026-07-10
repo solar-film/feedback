@@ -4,6 +4,7 @@
 const state = {
     currentTab: 'dashboard',
     googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec',
+    allCustomers: [],
     customers: [],
     charts: {
         scoresBar: null,
@@ -217,8 +218,7 @@ function loadData() {
     const cachedData = localStorage.getItem('admin_dashboard_cache');
     if (cachedData) {
         try {
-            state.customers = JSON.parse(cachedData);
-            processDataAndRender();
+            updateDataAndRender(JSON.parse(cachedData));
             updateApiBadge('loading', 'กำลังอัปเดตข้อมูลล่าสุด...');
         } catch(e) {
             console.error("Cache parsing error", e);
@@ -266,9 +266,8 @@ function loadData() {
                 // Compare and update if data changed or cache was empty
                 const freshJson = JSON.stringify(freshCustomers);
                 if (freshJson !== cachedData) {
-                    state.customers = freshCustomers;
                     localStorage.setItem('admin_dashboard_cache', freshJson);
-                    processDataAndRender();
+                    updateDataAndRender(freshCustomers);
                 }
                 updateApiBadge('connected', 'เชื่อมต่อฐานข้อมูลแล้ว ✓');
             } else {
@@ -357,9 +356,8 @@ function forceRefreshData() {
                     };
                 });
                 
-                state.customers = freshCustomers;
                 localStorage.setItem('admin_dashboard_cache', JSON.stringify(freshCustomers));
-                processDataAndRender();
+                updateDataAndRender(freshCustomers);
                 updateApiBadge('connected', 'เชื่อมต่อฐานข้อมูลแล้ว ✓');
                 showToast('อัปเดตข้อมูลเรียบร้อยแล้ว', 'success');
             } else {
@@ -384,17 +382,79 @@ function forceRefreshData() {
 }
 
 // DATA PROCESSING AND RENDERING
-function processDataAndRender() {
-    renderKPIs();
-    
-    // Set default filters on initial data load
-    if (!state.filterInitialized && state.customers.length > 0) {
+function updateDataAndRender(customersData) {
+    state.allCustomers = customersData;
+    if (!state.filterInitialized && state.allCustomers.length > 0) {
         populateFilters(true);
         state.filterInitialized = true;
     } else {
         populateFilters(false);
     }
-    
+    applyGlobalFilter();
+}
+
+function applyGlobalFilter() {
+    const monthVal = document.getElementById('global-filter-month')?.value || 'all';
+    const startVal = document.getElementById('global-filter-start')?.value;
+    const endVal = document.getElementById('global-filter-end')?.value;
+
+    state.customers = state.allCustomers.filter(c => {
+        let m = '', y = '';
+        if (c.installDate && c.installDate !== '-') {
+            const dateStr = formatInstallDate(c.installDate);
+            if (dateStr.indexOf('-') > -1) {
+                const p = dateStr.split('-');
+                m = parseInt(p[1], 10);
+                y = p[0].length === 2 ? "20" + p[0] : p[0];
+            } else if (dateStr.indexOf('/') > -1) {
+                const p = dateStr.split('/');
+                m = parseInt(p[1], 10);
+                y = p[2].length === 2 ? "20" + p[2] : p[2];
+            }
+        }
+        const rowMonthYear = (m && y) ? `${m}-${y}` : '';
+
+        // Month filter check
+        let matchesMonth = true;
+        if (monthVal !== 'all') {
+            matchesMonth = (rowMonthYear === monthVal);
+        }
+
+        // Date Range check
+        let matchesDateRange = true;
+        if (c.installDate && c.installDate !== '-') {
+            const dateStr = formatInstallDate(c.installDate);
+            let rowDateObj = null;
+            if (dateStr.indexOf('-') > -1) {
+                const p = dateStr.split('-');
+                rowDateObj = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+            } else if (dateStr.indexOf('/') > -1) {
+                const p = dateStr.split('/');
+                rowDateObj = new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
+            }
+
+            if (rowDateObj) {
+                if (startVal) {
+                    const sDate = new Date(startVal);
+                    sDate.setHours(0,0,0,0);
+                    if (rowDateObj < sDate) matchesDateRange = false;
+                }
+                if (endVal) {
+                    const eDate = new Date(endVal);
+                    eDate.setHours(23,59,59,999);
+                    if (rowDateObj > eDate) matchesDateRange = false;
+                }
+            }
+        }
+
+        return matchesMonth && matchesDateRange;
+    });
+
+    processDataAndRender();
+}
+
+function processDataAndRender() {
+    renderKPIs();
     renderCustomerTable();
     renderKanbanBoard();
     filterCustomerTable();
@@ -501,11 +561,9 @@ function renderCustomerTable() {
 
 // Search and Filter Database Table
 function filterCustomerTable() {
-    const query = document.getElementById('search-input').value.toLowerCase().trim();
-    const month = document.getElementById('filter-month').value;
-    const day = document.getElementById('filter-day').value;
-    const status = document.getElementById('filter-status').value;
-    const companyFilter = document.getElementById('filter-company').value;
+    const query = document.getElementById('search-input')?.value.toLowerCase().trim() || '';
+    const status = document.getElementById('filter-status')?.value || 'all';
+    const companyFilter = document.getElementById('filter-company')?.value || 'all';
 
     const rows = document.querySelectorAll('#customer-table-body tr');
     
@@ -517,7 +575,6 @@ function filterCustomerTable() {
         const name = row.cells[3].innerText.toLowerCase();
         const phone = row.cells[4].innerText.toLowerCase();
         const lineAt = row.cells[5].innerText.toLowerCase();
-        const installDate = row.cells[6].innerText.toLowerCase();
         const sales = row.cells[7].innerText.toLowerCase();
         const rowStatusTag = row.cells[8].querySelector('.status-badge');
         
@@ -526,30 +583,11 @@ function filterCustomerTable() {
         else if (rowStatusTag.classList.contains('completed')) rowStatus = 'Completed';
         else if (rowStatusTag.classList.contains('action')) rowStatus = 'Action Required';
 
-        // Parse date values from installDate (D/M/YYYY or YYYY-MM-DD)
-        let rowDay = '';
-        let rowMonth = '';
-        let rowYear = '';
-        if (installDate.indexOf('-') > -1) {
-            const parts = installDate.split('-');
-            rowDay = parseInt(parts[2], 10).toString();
-            rowMonth = parseInt(parts[1], 10).toString();
-            rowYear = parts[0].length === 2 ? "20" + parts[0] : parts[0];
-        } else if (installDate.indexOf('/') > -1) {
-            const parts = installDate.split('/');
-            rowDay = parseInt(parts[0], 10).toString();
-            rowMonth = parseInt(parts[1], 10).toString();
-            rowYear = parts[2].length === 2 ? "20" + parts[2] : parts[2];
-        }
-        const rowMonthYear = `${rowMonth}-${rowYear}`;
-
         const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || lineAt.includes(query) || sales.includes(query) || company.toLowerCase().includes(query);
         const matchesCompany = companyFilter === 'all' || company === companyFilter;
-        const matchesMonth = month === 'all' || rowMonthYear === month;
-        const matchesDay = day === 'all' || rowDay === day;
         const matchesStatus = status === 'all' || rowStatus === status;
 
-        if (matchesQuery && matchesCompany && matchesMonth && matchesDay && matchesStatus) {
+        if (matchesQuery && matchesCompany && matchesStatus) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
@@ -1201,25 +1239,25 @@ function parseDateObj(dateStr) {
     return new Date(dateStr);
 }
 function populateFilters(init) {
-    const monthSelect = document.getElementById('filter-month');
+    const monthSelect = document.getElementById('global-filter-month');
     const companySelect = document.getElementById('filter-company');
-    if (!monthSelect || !companySelect) return;
     
     const monthNames = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
     const uniqueMonths = new Set();
     const uniqueCompanies = new Set();
 
-    state.customers.forEach(c => {
+    state.allCustomers.forEach(c => {
         if (c.company && c.company !== '-') uniqueCompanies.add(c.company);
 
         if (!c.installDate || c.installDate === '-') return;
         let m = '', y = '';
-        if (c.installDate.indexOf('-') > -1) {
-            const p = c.installDate.split('-');
+        const dateStr = formatInstallDate(c.installDate);
+        if (dateStr.indexOf('-') > -1) {
+            const p = dateStr.split('-');
             m = parseInt(p[1], 10);
             y = p[0].length === 2 ? "20" + p[0] : p[0];
-        } else if (c.installDate.indexOf('/') > -1) {
-            const p = c.installDate.split('/');
+        } else if (dateStr.indexOf('/') > -1) {
+            const p = dateStr.split('/');
             m = parseInt(p[1], 10);
             y = p[2].length === 2 ? "20" + p[2] : p[2];
         }
@@ -1227,43 +1265,55 @@ function populateFilters(init) {
     });
 
     // Populate Months
-    let currentMonthVal = monthSelect.value;
-    monthSelect.innerHTML = '<option value="all">ทุกเดือน</option>';
-    const sortedMonths = Array.from(uniqueMonths).map(str => {
-        const p = str.split('-');
-        return { val: str, m: parseInt(p[0]), y: parseInt(p[1]) };
-    }).sort((a, b) => b.y !== a.y ? b.y - a.y : b.m - a.m);
-    
-    sortedMonths.forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item.val;
-        opt.textContent = `${monthNames[item.m]} ${item.y}`;
-        monthSelect.appendChild(opt);
-    });
+    if (monthSelect) {
+        let currentMonthVal = monthSelect.value;
+        monthSelect.innerHTML = '<option value="all">ทุกเดือน</option>';
+        const sortedMonths = Array.from(uniqueMonths).map(str => {
+            const p = str.split('-');
+            return { val: str, m: parseInt(p[0]), y: parseInt(p[1]) };
+        }).sort((a, b) => b.y !== a.y ? b.y - a.y : b.m - a.m);
+        
+        sortedMonths.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.val;
+            opt.textContent = `${monthNames[item.m]} ${item.y}`;
+            monthSelect.appendChild(opt);
+        });
 
-    if (init && sortedMonths.length > 0) {
-        monthSelect.value = sortedMonths[0].val; // Default to newest month
-    } else if (!init && currentMonthVal) {
-        if (currentMonthVal.indexOf('-') === -1 && currentMonthVal !== 'all') {
-            const currentYear = new Date().getFullYear();
-            const newVal = `${currentMonthVal}-${currentYear}`;
-            monthSelect.value = Array.from(monthSelect.options).some(o => o.value === newVal) ? newVal : 'all';
-        } else {
-            monthSelect.value = currentMonthVal;
+        if (init) {
+            const currentM = new Date().getMonth() + 1;
+            const currentY = new Date().getFullYear();
+            const currentMonthKey = `${currentM}-${currentY}`;
+            
+            if (Array.from(monthSelect.options).some(o => o.value === currentMonthKey)) {
+                monthSelect.value = currentMonthKey;
+            } else if (sortedMonths.length > 0) {
+                monthSelect.value = sortedMonths[0].val; // Default to newest month
+            }
+        } else if (currentMonthVal) {
+            if (currentMonthVal.indexOf('-') === -1 && currentMonthVal !== 'all') {
+                const currentYear = new Date().getFullYear();
+                const newVal = `${currentMonthVal}-${currentYear}`;
+                monthSelect.value = Array.from(monthSelect.options).some(o => o.value === newVal) ? newVal : 'all';
+            } else {
+                monthSelect.value = currentMonthVal;
+            }
         }
     }
 
     // Populate Companies
-    const currentCompanyVal = companySelect.value;
-    companySelect.innerHTML = '<option value="all">ทุกบริษัท</option>';
-    Array.from(uniqueCompanies).sort().forEach(comp => {
-        const opt = document.createElement('option');
-        opt.value = comp;
-        opt.textContent = comp;
-        companySelect.appendChild(opt);
-    });
-    if (!init && currentCompanyVal) {
-        companySelect.value = currentCompanyVal;
+    if (companySelect) {
+        const currentCompanyVal = companySelect.value;
+        companySelect.innerHTML = '<option value="all">ทุกบริษัท</option>';
+        Array.from(uniqueCompanies).sort().forEach(comp => {
+            const opt = document.createElement('option');
+            opt.value = comp;
+            opt.textContent = comp;
+            companySelect.appendChild(opt);
+        });
+        if (!init && currentCompanyVal) {
+            companySelect.value = currentCompanyVal;
+        }
     }
 }
 
