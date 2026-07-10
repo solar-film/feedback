@@ -46,55 +46,59 @@
         <!-- Screen 2: Mission 1 / 5 - Contact Form (Removed) -->
 
         <!-- Screen 3: Mission 2 / 5 - Film Results -->
-        <div class="game-screen" id="screen-m2">
-            <div>
-                <h2 class="quest-title" style="margin-top: 10px;">หลังติดตั้งแล้ว<br>ฟิล์มช่วยเรื่องไหนได้บ้าง?</h2>
-                <p class="quest-subtitle">เลือกได้มากกว่า 1 ข้อ ไม่มีคำตอบผิดค่ะ</p>
+        <div class="game-screen" id="screen-m2" style="padding: 0; position: relative; background-color: #f0f8ff; overflow: auto;">
+            <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto;">
+                <img src="images/2-5.png" alt="Mission 2" style="width: 100%; height: auto; display: block;">
                 
-                <div class="chips-grid">
-                    <div class="chip-option" onclick="toggleChip(this, 'cool')">
-                        <div class="chip-checkbox-circle"></div>
-                        <span class="chip-emoji">❄️</span>
-                        <span class="chip-text">ห้องเย็นขึ้น</span>
+                <!-- Interactive Grid Overlay -->
+                <div style="position: absolute; top: 30%; left: 4%; width: 92%; height: 60%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 2%;">
+                    <!-- Row 1 -->
+                    <div class="chip-option img-overlay-chip" onclick="toggleChip(this, 'cool')">
+                        <span class="chip-text" style="display: none;">ห้องเย็นขึ้น</span>
+                        <div class="img-check-circle"></div>
                     </div>
-                    <div class="chip-option" onclick="toggleChip(this, 'sun')">
-                        <div class="chip-checkbox-circle"></div>
-                        <span class="chip-emoji">☀️</span>
-                        <span class="chip-text">แสงจ้าลดลง</span>
+                    <div class="chip-option img-overlay-chip" onclick="toggleChip(this, 'sun')">
+                        <span class="chip-text" style="display: none;">แสงจ้าลดลง</span>
+                        <div class="img-check-circle"></div>
                     </div>
-                    <div class="chip-option" onclick="toggleChip(this, 'comfort')">
-                        <div class="chip-checkbox-circle"></div>
-                        <span class="chip-emoji">🛋️</span>
-                        <span class="chip-text">ใช้งานพื้นที่สบายขึ้น</span>
+                    <div class="chip-option img-overlay-chip" onclick="toggleChip(this, 'comfort')">
+                        <span class="chip-text" style="display: none;">ใช้งานพื้นที่สบายขึ้น</span>
+                        <div class="img-check-circle"></div>
                     </div>
-                    <div class="chip-option" onclick="toggleChip(this, 'privacy')">
-                        <div class="chip-checkbox-circle"></div>
-                        <span class="chip-emoji">👀</span>
-                        <span class="chip-text">ความเป็นส่วนตัวดีขึ้น</span>
+                    
+                    <!-- Row 2 -->
+                    <div class="chip-option img-overlay-chip" onclick="toggleChip(this, 'privacy')">
+                        <span class="chip-text" style="display: none;">มีความเป็นส่วนตัว</span>
+                        <div class="img-check-circle"></div>
                     </div>
-                    <div class="chip-option" onclick="toggleChip(this, 'aesthetic')">
-                        <div class="chip-checkbox-circle"></div>
-                        <span class="chip-emoji">✨</span>
-                        <span class="chip-text">กระจกดูสวยขึ้น</span>
+                    <div class="chip-option img-overlay-chip" onclick="toggleChip(this, 'aesthetic')">
+                        <span class="chip-text" style="display: none;">กระจกดูสวยขึ้น</span>
+                        <div class="img-check-circle"></div>
                     </div>
-                    <div class="chip-option" onclick="toggleChip(this, 'safe')">
-                        <div class="chip-checkbox-circle"></div>
-                        <span class="chip-emoji">🛡️</span>
-                        <span class="chip-text">รู้สึกปลอดภัยขึ้น</span>
+                    <div class="chip-option img-overlay-chip" onclick="toggleChip(this, 'safe')">
+                        <span class="chip-text" style="display: none;">รู้สึกปลอดภัย</span>
+                        <div class="img-check-circle"></div>
                     </div>
-                    <div class="chip-option" onclick="toggleChip(this, 'quiet')">
-                        <div class="chip-checkbox-circle"></div>
-                        <span class="chip-emoji">🔇</span>
-                        <span class="chip-text">บรรยากาศภายในสงบขึ้น</span>
+                    
+                    <!-- Row 3 -->
+                    <div class="chip-option img-overlay-chip" onclick="toggleChip(this, 'fast_ac')">
+                        <span class="chip-text" style="display: none;">แอร์ทำงานเร็วขึ้น</span>
+                        <div class="img-check-circle"></div>
                     </div>
-                    <div class="chip-option" onclick="toggleChip(this, 'unsure')">
-                        <div class="chip-checkbox-circle"></div>
-                        <span class="chip-emoji">🤔</span>
-                        <span class="chip-text">ยังไม่แน่ใจ อยากให้ทีมงานแนะนำเพิ่ม</span>
+                    <div class="chip-option img-overlay-chip" onclick="toggleChip(this, 'quiet')">
+                        <span class="chip-text" style="display: none;">บรรยากาศภายในสงบลง</span>
+                        <div class="img-check-circle"></div>
+                    </div>
+                    <div class="chip-option img-overlay-chip" onclick="toggleChip(this, 'all')">
+                        <span class="chip-text" style="display: none;">ทุกข้อเลยจ้า</span>
+                        <div class="img-check-circle"></div>
                     </div>
                 </div>
 
-                <div class="success-unlock-banner" id="unlock-banner-m2">
+                <div id="prompt-banner-m2" style="position: absolute; bottom: 3%; left: 5%; width: 90%; text-align: center; font-weight: 500; font-size: 1.05rem; color: #64748b; animation: bounce 2s infinite;">
+                    👇 จิ้มเลือกคำตอบเพื่อไปต่อกันเลย!
+                </div>
+                <div class="success-unlock-banner" id="unlock-banner-m2" style="position: absolute; bottom: 3%; left: 5%; width: 90%; text-align: center; display: none; font-weight: 500; font-size: 1.15rem; color: var(--primary); text-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(255,255,255,0.9);">
                     เยี่ยมเลย! คุณปลดล็อกภารกิจถัดไปแล้ว 💙
                 </div>
             </div>
@@ -363,52 +367,24 @@
         </div>
 
         <!-- Screen 7: Mission 4 / 5 - MVP Selection -->
-        <div class="game-screen" id="screen-m4">
-            <div>
-                <h2 class="quest-title" style="margin-top: 10px;">ทีมไหนคือ MVP<br>ในงานนี้?</h2>
-                <p class="quest-subtitle">ถ้ามีทีมที่ทำให้คุณประทับใจเป็นพิเศษ เลือกให้เราได้เลยค่ะ</p>
+        <div class="game-screen" id="screen-m4" style="padding: 0; position: relative; background-color: #f0f8ff; overflow: auto;">
+            <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto;">
+                <img src="images/4-5.png" alt="Mission 4" style="width: 100%; height: auto; display: block;">
                 
-                <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px;">
-                    <div class="mvp-option-card" onclick="selectMVP('admin', this)">
-                        <div class="mvp-radio-circle"></div>
-                        <div style="background-color: #f1f5f9; padding: 8px; border-radius: 12px; color: var(--primary); display: flex; align-items: center; justify-content: center;">
-                            <i data-lucide="headset" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
-                        </div>
-                        <span class="mvp-option-text">ทีมประสานงาน / แอดมิน</span>
-                    </div>
-                    <div class="mvp-option-card" onclick="selectMVP('sales', this)">
-                        <div class="mvp-radio-circle"></div>
-                        <div style="background-color: #fff7ed; padding: 8px; border-radius: 12px; color: #f97316; display: flex; align-items: center; justify-content: center;">
-                            <i data-lucide="lightbulb" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
-                        </div>
-                        <span class="mvp-option-text">ทีมที่ปรึกษาฟิล์ม / ฝ่ายขาย</span>
-                    </div>
-                    <div class="mvp-option-card" onclick="selectMVP('tech', this)">
-                        <div class="mvp-radio-circle"></div>
-                        <div style="background-color: #fdf2f8; padding: 8px; border-radius: 12px; color: #ec4899; display: flex; align-items: center; justify-content: center;">
-                            <i data-lucide="wrench" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
-                        </div>
-                        <span class="mvp-option-text">ทีมช่างติดตั้ง</span>
-                    </div>
-                    <div class="mvp-option-card" onclick="selectMVP('all', this)">
-                        <div class="mvp-radio-circle"></div>
-                        <div style="background-color: #eff6ff; padding: 8px; border-radius: 12px; color: #3b82f6; display: flex; align-items: center; justify-content: center;">
-                            <i data-lucide="heart" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
-                        </div>
-                        <span class="mvp-option-text">ทุกทีมดูแลดีมาก</span>
-                    </div>
-                    <div class="mvp-option-card" onclick="selectMVP('none', this)">
-                        <div class="mvp-radio-circle"></div>
-                        <div style="background-color: #f3f4f6; padding: 8px; border-radius: 12px; color: #6b7280; display: flex; align-items: center; justify-content: center;">
-                            <i data-lucide="help-circle" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
-                        </div>
-                        <span class="mvp-option-text">ยังไม่แน่ใจ</span>
-                    </div>
+                <!-- Interactive Flex Overlay -->
+                <div style="position: absolute; top: 43%; left: 5%; width: 90%; height: 53.5%; display: flex; flex-direction: column;">
+                    <div class="mvp-option-card img-overlay-mvp" onclick="selectMVP('admin', this)"></div>
+                    <div class="mvp-option-card img-overlay-mvp" onclick="selectMVP('sales', this)"></div>
+                    <div class="mvp-option-card img-overlay-mvp" onclick="selectMVP('tech', this)"></div>
+                    <div class="mvp-option-card img-overlay-mvp" onclick="selectMVP('all', this)"></div>
+                    <div class="mvp-option-card img-overlay-mvp" onclick="selectMVP('none', this)"></div>
                 </div>
+            </div>
 
+            <div style="padding: 10px 20px 40px 20px; max-width: 500px; margin: 0 auto;">
                 <div class="form-group">
-                    <label class="form-label" style="font-weight: 700; font-size: 0.85rem;">อยากฝากคำชม หรือข้อเสนอแนะถึงทีมไหนเป็นพิเศษไหมคะ?</label>
-                    <textarea id="mvp-comment" class="form-control" style="padding: 12px; height: 100px; resize: none; border-radius: 12px;" placeholder="เช่น แอดมินตอบไวมาก / ฝ่ายขายอธิบายเข้าใจง่าย / ทีมช่างทำงานเรียบร้อย / อยากให้ปรับปรุงเรื่องการนัดหมาย"></textarea>
+                    <label class="form-label" style="font-weight: 700; font-size: 0.95rem; text-align: center; display: block;">อยากฝากคำชม หรือข้อเสนอแนะถึงทีมไหนเป็นพิเศษไหมคะ?</label>
+                    <textarea id="mvp-comment" class="form-control" style="padding: 12px; height: 100px; resize: none; border-radius: 12px; margin-top: 10px;" placeholder="พิมพ์ข้อความที่นี่..."></textarea>
                 </div>
             </div>
         </div>

@@ -397,7 +397,13 @@ function changeScreen(screenId) {
         footerNav.style.display = 'none';
     } else {
         header.style.display = 'block';
-        progressSection.style.display = 'flex';
+        
+        if (screenId === 'screen-m2') {
+            progressSection.style.display = 'none';
+        } else {
+            progressSection.style.display = 'flex';
+        }
+        
         footerNav.style.display = 'flex';
         document.querySelector('.app-container').scrollTop = 0;
     }
@@ -517,13 +523,16 @@ function validateM2() {
     document.getElementById('btn-next').disabled = !isValid;
     
     const banner = document.getElementById('unlock-banner-m2');
+    const promptBanner = document.getElementById('prompt-banner-m2');
     if (isValid) {
         if (banner.style.display !== 'block') {
             SoundFX.playLevelUp();
         }
         banner.style.display = 'block';
+        if(promptBanner) promptBanner.style.display = 'none';
     } else {
         banner.style.display = 'none';
+        if(promptBanner) promptBanner.style.display = 'block';
     }
 }
 

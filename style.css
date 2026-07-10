@@ -420,6 +420,68 @@ body {
     opacity: 1;
 }
 
+/* Image Overlay Interactive Grid */
+.img-overlay-chip {
+    background: transparent !important;
+    border: 2px solid transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    position: relative;
+    border-radius: 16px;
+    cursor: pointer;
+}
+.img-overlay-chip.selected {
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+.img-check-circle {
+    position: absolute;
+    top: 8%;
+    right: 8%;
+    width: 28%;
+    max-width: 28px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: var(--transition);
+}
+.img-overlay-chip.selected .img-check-circle {
+    background-color: var(--secondary);
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.img-overlay-chip.selected .img-check-circle::after {
+    content: '';
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    width: 30%;
+    height: 55%;
+    border: solid white;
+    border-width: 0 2.5px 2.5px 0;
+    transform: translate(-50%, -60%) rotate(45deg);
+}
+
+/* MVP Image Overlay */
+.img-overlay-mvp {
+    flex: 1;
+    background: transparent !important;
+    border: 2px solid transparent !important;
+    box-shadow: none !important;
+    position: relative;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+}
+.img-overlay-mvp:last-child {
+    margin-bottom: 0;
+}
+.img-overlay-mvp.selected {
+    background-color: rgba(27, 67, 124, 0.05) !important;
+    border-color: var(--secondary) !important;
+}
+
 /* Touchpoint List Menu - Mission 3 */
 .touchpoint-menu-list {
     display: flex;
