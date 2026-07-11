@@ -1439,7 +1439,7 @@ function fetchAndGenerateLinks() {
                             <span style="color: var(--text-muted);">(${c.id})</span>
                             <div style="color: var(--secondary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; font-size: 0.68rem; margin-top: 2px;">${shortUrl}</div>
                         </div>
-                        <button class="btn-primary" style="padding: 4px 10px; font-size: 0.65rem; width: auto; height: auto; border-radius: 6px; flex-shrink: 0;" onclick="copyToClipboard('${shortUrl}', this)">
+                        <button class="btn-primary" style="padding: 4px 10px; font-size: 0.65rem; width: auto; height: auto; border-radius: 6px; flex-shrink: 0;" onclick="copyToClipboard('${shortUrl}', this, '${c.id}')">
                             คัดลอกลิงก์
                         </button>
                     `;
@@ -1454,9 +1454,12 @@ function fetchAndGenerateLinks() {
         });
 }
 
-function copyToClipboard(text, btn) {
+function copyToClipboard(text, btn, id = null) {
     navigator.clipboard.writeText(text).then(() => {
         showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
+        
+        if (id) markAsSent(id);
+
         const origText = btn.innerText;
         btn.innerText = '✓ คัดลอกแล้ว';
         btn.style.backgroundColor = 'var(--success)';
