@@ -1093,6 +1093,112 @@ function renderDashboardCharts() {
             cutout: '65%'
         }
     });
+
+    // 3. Sales and Tech Performance Charts
+    const ctxSales = document.getElementById('chart-sales-perf');
+    const ctxTech = document.getElementById('chart-tech-perf');
+
+    if (ctxSales && ctxTech) {
+        let salesStats = {};
+        let techStats = {};
+
+        state.customers.forEach(c => {
+            if (c.feedback) {
+                // Sales
+                if (c.sales && c.sales !== '-') {
+                    if (!salesStats[c.sales]) salesStats[c.sales] = { sum: 0, count: 0 };
+                    salesStats[c.sales].sum += c.feedback.ratings.sales;
+                    salesStats[c.sales].count++;
+                }
+                // Tech
+                if (c.tech && c.tech !== '-') {
+                    if (!techStats[c.tech]) techStats[c.tech] = { sum: 0, count: 0 };
+                    techStats[c.tech].sum += c.feedback.ratings.tech;
+                    techStats[c.tech].count++;
+                }
+            }
+        });
+
+        // Prepare data for Sales Chart (sorted by rating descending)
+        const salesData = Object.keys(salesStats).map(k => ({
+            name: k,
+            avg: (salesStats[k].sum / salesStats[k].count).toFixed(2),
+            count: salesStats[k].count
+        })).sort((a, b) => b.avg - a.avg);
+
+        // Prepare data for Tech Chart (sorted by rating descending)
+        const techData = Object.keys(techStats).map(k => ({
+            name: k,
+            avg: (techStats[k].sum / techStats[k].count).toFixed(2),
+            count: techStats[k].count
+        })).sort((a, b) => b.avg - a.avg);
+
+        if (state.charts.salesBar) state.charts.salesBar.destroy();
+        state.charts.salesBar = new Chart(ctxSales, {
+            type: 'bar',
+            data: {
+                labels: salesData.map(d => d.name),
+                datasets: [{
+                    label: 'คะแนนเฉลี่ยฝ่ายขาย',
+                    data: salesData.map(d => d.avg),
+                    backgroundColor: '#005eb8',
+                    borderRadius: 4,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                return `จำนวนประเมิน: ${salesData[context.dataIndex].count} งาน`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        if (state.charts.techBar) state.charts.techBar.destroy();
+        state.charts.techBar = new Chart(ctxTech, {
+            type: 'bar',
+            data: {
+                labels: techData.map(d => d.name),
+                datasets: [{
+                    label: 'คะแนนเฉลี่ยทีมช่าง',
+                    data: techData.map(d => d.avg),
+                    backgroundColor: '#10b981',
+                    borderRadius: 4,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                return `จำนวนประเมิน: ${techData[context.dataIndex].count} งาน`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
 }
 
 function renderReportCharts() {
