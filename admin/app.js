@@ -1052,10 +1052,21 @@ function renderDashboardCharts() {
     const avgSales = countSales > 0 ? (sumSales / countSales).toFixed(2) : 0;
     const avgTech = countTech > 0 ? (sumTech / countTech).toFixed(2) : 0;
 
+    // Helper to get emoji for score
+    const getEmojiForScore = (score) => {
+        if (score >= 4.5) return '😍';
+        if (score >= 3.5) return '😊';
+        if (score >= 2.5) return '😐';
+        if (score >= 1.5) return '😟';
+        if (score > 0) return '🚨';
+        return '';
+    };
+
     // 1. Scores Bar Chart
     if (state.charts.scoresBar) state.charts.scoresBar.destroy();
     state.charts.scoresBar = new Chart(ctxBar, {
         type: 'bar',
+        plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
         data: {
             labels: ['💬 ทีมประสานงาน / แอดมิน', '🧭 แนะนำฟิล์ม / ฝ่ายขาย', '🧰 หน้างานติดตั้ง / ทีมช่าง'],
             datasets: [{
@@ -1069,11 +1080,20 @@ function renderDashboardCharts() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: { 
+                legend: { display: false },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value) => getEmojiForScore(value),
+                    font: { size: 18 }
+                }
+            },
             scales: {
                 y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
                 x: { grid: { display: false } }
-            }
+            },
+            layout: { padding: { top: 20 } }
         }
     });
 
@@ -1162,6 +1182,7 @@ function renderDashboardCharts() {
         if (state.charts.salesBar) state.charts.salesBar.destroy();
         state.charts.salesBar = new Chart(ctxSales, {
             type: 'bar',
+            plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
             data: {
                 labels: salesData.map(d => d.name),
                 datasets: [{
@@ -1177,6 +1198,12 @@ function renderDashboardCharts() {
                 maintainAspectRatio: false,
                 plugins: { 
                     legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        formatter: (value) => getEmojiForScore(value),
+                        font: { size: 16 }
+                    },
                     tooltip: {
                         callbacks: {
                             afterLabel: function(context) {
@@ -1188,13 +1215,15 @@ function renderDashboardCharts() {
                 scales: {
                     y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
                     x: { grid: { display: false } }
-                }
+                },
+                layout: { padding: { top: 20 } }
             }
         });
 
         if (state.charts.techBar) state.charts.techBar.destroy();
         state.charts.techBar = new Chart(ctxTech, {
             type: 'bar',
+            plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
             data: {
                 labels: techData.map(d => d.name),
                 datasets: [{
@@ -1210,6 +1239,12 @@ function renderDashboardCharts() {
                 maintainAspectRatio: false,
                 plugins: { 
                     legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        formatter: (value) => getEmojiForScore(value),
+                        font: { size: 16 }
+                    },
                     tooltip: {
                         callbacks: {
                             afterLabel: function(context) {
@@ -1221,7 +1256,8 @@ function renderDashboardCharts() {
                 scales: {
                     y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
                     x: { grid: { display: false } }
-                }
+                },
+                layout: { padding: { top: 20 } }
             }
         });
     }
