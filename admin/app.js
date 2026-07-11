@@ -702,7 +702,7 @@ function renderKanbanBoard() {
             <div class="kanban-card-title">${c.name} <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: normal; margin-left: 4px;">#${c.id}</span></div>
             <div class="kanban-card-meta">📞 ${c.phone} | LINE: ${c.lineAt || '-'}</div>
             <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">📅 ติดตั้ง: ${c.installDate || '-'}</div>
-            <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px;">👤 ฝ่ายขาย: ${c.sales || '-'}</div>
+            <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px;">👤 ฝ่ายขาย: ${c.sales || '-'} | 🔧 ช่าง: ${c.tech || '-'}</div>
             ${footerHtml}
         `;
 

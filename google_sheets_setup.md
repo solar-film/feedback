@@ -207,7 +207,7 @@ function handleGetAllCustomersDetailed() {
       installDate: r["InstallDate"] || r["วันที่ติดตั้ง"] || "",
       filmModel: r["FilmModel"] || r["รุ่นฟิล์ม"] || r["รุ่นฟิล์ม / พื้นที่ติดตั้ง"] || "",
       sales: r["Sales"] || r["เซลล์ผู้ดูแล"] || r["ฝ่ายขาย"] || "-",
-      tech: r["Tech"] || r["ช่างติดตั้ง"] || "-",
+      tech: r["Tech"] || r["ช่างติดตั้ง"] || r["ทีมช่าง"] || "-",
       bill: r["Bill"] || r["เลขที่บิล"] || "-",
       status: status,
       feedback: feedback
