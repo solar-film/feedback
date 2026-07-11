@@ -104,6 +104,20 @@
             </div>
         </div>
 
+        <!-- Screen 3.5: Mission 3 / 5 - Intro Menu -->
+        <div class="game-screen" id="screen-m3" style="padding: 0; position: relative; background-color: #f0f8ff; overflow: hidden; height: 100%;">
+            <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto; flex-shrink: 0;">
+                <img src="images/3-5.png" alt="Mission 3 Menu" style="width: 100%; height: auto; display: block;">
+                
+                <!-- Interactive Absolute Overlay -->
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; padding: 0;">
+                    <div class="img-overlay-m3" onclick="startM3Sequence()" style="position: absolute; top: 34%; left: 5%; width: 90%; height: 12%; cursor: pointer;"></div>
+                    <div class="img-overlay-m3" onclick="startM3Sequence()" style="position: absolute; top: 47.5%; left: 5%; width: 90%; height: 12%; cursor: pointer;"></div>
+                    <div class="img-overlay-m3" onclick="startM3Sequence()" style="position: absolute; top: 61%; left: 5%; width: 90%; height: 12%; cursor: pointer;"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Screen 4: Mission 3 / 5 - Admin -->
         <div class="game-screen" id="screen-m3-admin" style="padding: 0; position: relative; background-image: url('images/bg.png'); background-size: cover; background-position: top center; overflow-x: hidden; overflow-y: auto;">
         <img src="images/3-5(1-1).png" alt="Mission 3 Admin Header" style="width: 100%; display: block; position: relative; z-index: 2;">

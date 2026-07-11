@@ -441,6 +441,10 @@ function changeScreen(screenId) {
             validateM2();
             break;
             
+        case 'screen-m3':
+            fill.style.width = '45%';
+            document.getElementById('btn-next').style.display = 'none';
+            break;
         case 'screen-m3-admin':
             fill.style.width = '50%';
             stepText.innerText = 'MISSION 3 / 5';
@@ -1077,4 +1081,11 @@ function copyToClipboard(text, btn) {
     }).catch(err => {
         console.error('Could not copy text: ', err);
     });
+}
+
+// Start Mission 3 linear sequence
+function startM3Sequence() {
+    SoundFX.playClick();
+    state.historyStack.push('screen-m3');
+    changeScreen('screen-m3-admin');
 }
