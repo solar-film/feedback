@@ -494,7 +494,7 @@ function changeScreen(screenId) {
 function nextStep() {
     if (state.currentScreen === 'screen-m2') {
         state.historyStack.push('screen-m2');
-        changeScreen('screen-m3-admin');
+        changeScreen('screen-m3');
     } else if (state.currentScreen === 'screen-m3-admin') {
         state.historyStack.push('screen-m3-admin');
         changeScreen('screen-m3-sales');
@@ -1083,9 +1083,37 @@ function copyToClipboard(text, btn) {
     });
 }
 
+
+
 // Start Mission 3 linear sequence
-function startM3Sequence() {
+window.openM3Step = function(step) {
     SoundFX.playClick();
-    state.historyStack.push('screen-m3');
-    changeScreen('screen-m3-admin');
-}
+    if (state.m3Completed) {
+        // If already completed, don't allow re-entering from the hub unless we want to edit.
+        // Let's just go to admin to allow editing if they want.
+        state.historyStack.push('screen-m3');
+        changeScreen('screen-m3-admin');
+    } else {
+        state.historyStack.push('screen-m3');
+        changeScreen('screen-m3-admin');
+    }
+};
+
+window.checkM3HubCompletion = function() {
+    if (state.m3Completed) {
+        // Show checkmarks
+        document.getElementById('tp-menu-admin').classList.add('completed');
+        document.getElementById('tp-menu-sales').classList.add('completed');
+        document.getElementById('tp-menu-tech').classList.add('completed');
+        
+        document.querySelector('#tp-menu-admin .m3-check-circle').style.display = 'block';
+        document.querySelector('#tp-menu-sales .m3-check-circle').style.display = 'block';
+        document.querySelector('#tp-menu-tech .m3-check-circle').style.display = 'block';
+        
+        // Show next button
+        document.getElementById('btn-next').style.display = 'flex';
+        document.getElementById('btn-next').disabled = false;
+    } else {
+        document.getElementById('btn-next').style.display = 'none';
+    }
+};
