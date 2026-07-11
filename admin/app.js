@@ -1028,24 +1028,29 @@ function renderDashboardCharts() {
     if (!ctxBar || !ctxPie) return;
 
     // Calculate averages per team
-    let sumAdmin = 0, sumSales = 0, sumTech = 0, count = 0;
+    let sumAdmin = 0, sumSales = 0, sumTech = 0;
+    let countAdmin = 0, countSales = 0, countTech = 0;
     let moods = { '😍': 0, '😊': 0, '😐': 0, '😟': 0, '🚨': 0 };
 
     state.customers.forEach(c => {
         if (c.feedback) {
-            sumAdmin += c.feedback.ratings.admin;
-            sumSales += c.feedback.ratings.sales;
-            sumTech += c.feedback.ratings.tech;
-            count++;
+            const rA = Number(c.feedback.ratings?.admin) || 0;
+            if (rA > 0) { sumAdmin += rA; countAdmin++; }
+            
+            const rS = Number(c.feedback.ratings?.sales) || 0;
+            if (rS > 0) { sumSales += rS; countSales++; }
+            
+            const rT = Number(c.feedback.ratings?.tech) || 0;
+            if (rT > 0) { sumTech += rT; countTech++; }
 
             const emoji = c.feedback.overallMood;
             if (moods[emoji] !== undefined) moods[emoji]++;
         }
     });
 
-    const avgAdmin = count > 0 ? (sumAdmin / count).toFixed(2) : 0;
-    const avgSales = count > 0 ? (sumSales / count).toFixed(2) : 0;
-    const avgTech = count > 0 ? (sumTech / count).toFixed(2) : 0;
+    const avgAdmin = countAdmin > 0 ? (sumAdmin / countAdmin).toFixed(2) : 0;
+    const avgSales = countSales > 0 ? (sumSales / countSales).toFixed(2) : 0;
+    const avgTech = countTech > 0 ? (sumTech / countTech).toFixed(2) : 0;
 
     // 1. Scores Bar Chart
     if (state.charts.scoresBar) state.charts.scoresBar.destroy();
@@ -1104,17 +1109,38 @@ function renderDashboardCharts() {
 
         state.customers.forEach(c => {
             if (c.feedback) {
+                let salesName = c.sales || '-';
+                let techName = c.tech && c.tech !== '-' ? c.tech : '-';
+
+                // Parse "Sales+Tech" format if present
+                if (salesName.includes('+')) {
+                    const parts = salesName.split('+');
+                    salesName = parts[0].trim();
+                    if (techName === '-') {
+                        techName = parts.slice(1).join('+').trim();
+                    }
+                }
+                
+                salesName = salesName.trim();
+                techName = techName.trim();
+
                 // Sales
-                if (c.sales && c.sales !== '-') {
-                    if (!salesStats[c.sales]) salesStats[c.sales] = { sum: 0, count: 0 };
-                    salesStats[c.sales].sum += c.feedback.ratings.sales;
-                    salesStats[c.sales].count++;
+                if (salesName && salesName !== '-') {
+                    const rS = Number(c.feedback.ratings?.sales) || 0;
+                    if (rS > 0) {
+                        if (!salesStats[salesName]) salesStats[salesName] = { sum: 0, count: 0 };
+                        salesStats[salesName].sum += rS;
+                        salesStats[salesName].count++;
+                    }
                 }
                 // Tech
-                if (c.tech && c.tech !== '-') {
-                    if (!techStats[c.tech]) techStats[c.tech] = { sum: 0, count: 0 };
-                    techStats[c.tech].sum += c.feedback.ratings.tech;
-                    techStats[c.tech].count++;
+                if (techName && techName !== '-') {
+                    const rT = Number(c.feedback.ratings?.tech) || 0;
+                    if (rT > 0) {
+                        if (!techStats[techName]) techStats[techName] = { sum: 0, count: 0 };
+                        techStats[techName].sum += rT;
+                        techStats[techName].count++;
+                    }
                 }
             }
         });
