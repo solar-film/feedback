@@ -254,7 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Clear previously seeded    // Apply fallback logic just in case localstorage logic fails
-    if (localStorage.getItem('google_sheets_apps_script_url') === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec') {
+    const cachedUrl = localStorage.getItem('google_sheets_apps_script_url');
+    if (cachedUrl === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec' ||
+        cachedUrl === 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec') {
         localStorage.removeItem('google_sheets_apps_script_url');
     }
 
@@ -312,7 +314,7 @@ function parseUrlParameters() {
 
     // Handle short URL by fetching customer details from Google Sheets tab 'Data'
     if (id) {
-        const sheetsUrl = 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec';
+        const sheetsUrl = 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec';
 
         const loader = document.getElementById('loading-overlay');
         loader.style.display = 'flex';
@@ -839,7 +841,7 @@ function submitSurvey() {
     }
 
     // Google Sheets apps script fetch integration
-    const sheetsUrl = 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec';
+    const sheetsUrl = 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec';
     const submitBtn = document.getElementById('btn-submit-survey');
     
     if (sheetsUrl) {

@@ -3,7 +3,7 @@
 // Global state variables
 const state = {
     currentTab: 'dashboard',
-    googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec',
+    googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec',
     allCustomers: [],
     customers: [],
     charts: {
@@ -205,8 +205,11 @@ function toggleSidebar() {
 
 // LOAD DATABASE
 function loadData() {
-    if (localStorage.getItem('google_sheets_apps_script_url') === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec') {
+    const cachedUrl = localStorage.getItem('google_sheets_apps_script_url');
+    if (cachedUrl === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec' ||
+        cachedUrl === 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec') {
         localStorage.removeItem('google_sheets_apps_script_url');
+        state.googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec';
     }
 
     if (!state.googleSheetsUrl || state.googleSheetsUrl.trim() === '') {
