@@ -1093,7 +1093,7 @@ function renderDashboardCharts() {
                 y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
                 x: { grid: { display: false } }
             },
-            layout: { padding: { top: 20 } }
+            layout: { padding: { top: 35 } }
         }
     });
 
@@ -1216,7 +1216,7 @@ function renderDashboardCharts() {
                     y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
                     x: { grid: { display: false } }
                 },
-                layout: { padding: { top: 20 } }
+                layout: { padding: { top: 35 } }
             }
         });
 
