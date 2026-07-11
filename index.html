@@ -105,33 +105,42 @@
         </div>
 
         <!-- Screen 4: Mission 3 / 5 - Admin -->
-        <div class="game-screen" id="screen-m3-admin" style="padding-bottom: 24px; overflow-y: auto;">
-            <img src="images/3-5(1).png" alt="Mission 3 Admin" style="width: calc(100% + 40px); max-width: none; margin-left: -20px; margin-top: -16px; display: block;">
-            
-            <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; border: 1.5px solid #eef3f8; margin-top: -80px; position: relative; z-index: 2; box-shadow: 0 -4px 15px rgba(0,0,0,0.08);">
+        <div class="game-screen" id="screen-m3-admin" style="padding: 0; position: relative; background-color: #f0f8ff; overflow-x: hidden; overflow-y: auto;">
+        <img src="images/3-5(1).png" alt="Mission 3 Admin" style="position: absolute; top: 0; left: 0; width: 100%; z-index: 0; pointer-events: none;">
+        <div style="position: relative; z-index: 1; padding: 60% 5% 30% 5%; width: 100%;">
+            <div style="background-color: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                <div style="display: flex; align-items: center; border-bottom: 2px dashed #eef3f8; padding-bottom: 12px; margin-bottom: 16px;">
+                    <i data-lucide="message-circle" style="color: #4299e1; width: 24px; height: 24px; margin-right: 8px;"></i>
+                    <span style="font-weight: 700; color: #1b437c; font-size: 1.05rem;">ด่านต้อนรับ: การติดต่อและประสานงาน</span>
+                </div>
                 <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">การตอบกลับ การนัดหมาย และการแจ้งข้อมูล ชัดเจนแค่ไหน?</p>
                     
                     <div class="emoji-rating-row">
                         <div class="emoji-rating-btn" onclick="selectSubMood('admin', 5, this)">
                             <span class="emoji-rating-face">⚡</span>
                             <span class="emoji-rating-label">ตอบไว<br>ประสานดีมาก</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('admin', 4, this)">
                             <span class="emoji-rating-face">😊</span>
                             <span class="emoji-rating-label">ชัดเจน<br>ช่วยเหลือดี</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('admin', 3, this)">
                             <span class="emoji-rating-face">😐</span>
                             <span class="emoji-rating-label">พอใช้<br>มีจุดช้า</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('admin', 2, this)">
                             <span class="emoji-rating-face">😟</span>
                             <span class="emoji-rating-label">ข้อมูล<br>ไม่ชัดเจน</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('admin', 1, this)">
                             <span class="emoji-rating-face">🚨</span>
                             <span class="emoji-rating-label">อยากปรับปรุง<br>ด่วน</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                     </div>
 
                     <!-- Good items helper chips -->
@@ -162,37 +171,44 @@
                         <label class="form-label" style="font-size: 1rem; font-weight: 700;">ข้อเสนอแนะเพิ่มเติม (ถ้ามี)</label>
                         <textarea id="comment-admin" class="form-control" style="padding: 10px; height: 70px; resize: none; border-radius: 10px;" placeholder="เล่าให้เราฟังได้เลยค่ะ"></textarea>
                     </div>
-            </div>
-        </div>
-
+            </div></div></div>
         <!-- Screen 5: Mission 3 / 5 - Sales -->
-        <div class="game-screen" id="screen-m3-sales" style="padding-bottom: 24px; overflow-y: auto;">
-            <img src="images/3-5(2).png" alt="Mission 3 Sales" style="width: calc(100% + 40px); max-width: none; margin-left: -20px; margin-top: -16px; display: block;">
-            
-            <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; border: 1.5px solid #eef3f8; margin-top: -80px; position: relative; z-index: 2; box-shadow: 0 -4px 15px rgba(0,0,0,0.08);">
+        <div class="game-screen" id="screen-m3-sales" style="padding: 0; position: relative; background-color: #f0f8ff; overflow-x: hidden; overflow-y: auto;">
+        <img src="images/3-5(2).png" alt="Mission 3 Sales" style="position: absolute; top: 0; left: 0; width: 100%; z-index: 0; pointer-events: none;">
+        <div style="position: relative; z-index: 1; padding: 60% 5% 30% 5%; width: 100%;">
+            <div style="background-color: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                <div style="display: flex; align-items: center; border-bottom: 2px dashed #eef3f8; padding-bottom: 12px; margin-bottom: 16px;">
+                    <i data-lucide="star" style="color: #f6ad55; width: 24px; height: 24px; margin-right: 8px;"></i>
+                    <span style="font-weight: 700; color: #1b437c; font-size: 1.05rem;">ด่านเลือกฟิล์ม: การแนะนำของเซลล์</span>
+                </div>
                 <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">คำแนะนำเรื่องฟิล์ม ราคา และเงื่อนไข ตรงกับความต้องการแค่ไหน?</p>
                     
                     <div class="emoji-rating-row">
                         <div class="emoji-rating-btn" onclick="selectSubMood('sales', 5, this)">
                             <span class="emoji-rating-face">🎯</span>
                             <span class="emoji-rating-label">ตรงโจทย์<br>แนะนำได้ดี</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('sales', 4, this)">
                             <span class="emoji-rating-face">😊</span>
                             <span class="emoji-rating-label">เข้าใจง่าย<br>ช่วยตัดสินใจ</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('sales', 3, this)">
                             <span class="emoji-rating-face">😐</span>
                             <span class="emoji-rating-label">พอใช้<br>อยากได้ข้อมูลเพิ่ม</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('sales', 2, this)">
                             <span class="emoji-rating-face">😟</span>
                             <span class="emoji-rating-label">ไม่ตรงกับ<br>ความต้องการ</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('sales', 1, this)">
                             <span class="emoji-rating-face">🚨</span>
                             <span class="emoji-rating-label">อยากให้<br>โทรกลับ</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                     </div>
 
                     <!-- Good items -->
@@ -223,37 +239,44 @@
                         <label class="form-label" style="font-size: 1rem; font-weight: 700;">ข้อเสนอแนะเพิ่มเติม (ถ้ามี)</label>
                         <textarea id="comment-sales" class="form-control" style="padding: 10px; height: 70px; resize: none; border-radius: 10px;" placeholder="เล่าให้เราฟังได้เลยค่ะ"></textarea>
                     </div>
-            </div>
-        </div>
-
+            </div></div></div>
         <!-- Screen 6: Mission 3 / 5 - Tech -->
-        <div class="game-screen" id="screen-m3-tech" style="padding-bottom: 24px; overflow-y: auto;">
-            <img src="images/3-5(3).png" alt="Mission 3 Tech" style="width: calc(100% + 40px); max-width: none; margin-left: -20px; margin-top: -16px; display: block;">
-            
-            <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; border: 1.5px solid #eef3f8; margin-top: -80px; position: relative; z-index: 2; box-shadow: 0 -4px 15px rgba(0,0,0,0.08);">
+        <div class="game-screen" id="screen-m3-tech" style="padding: 0; position: relative; background-color: #f0f8ff; overflow-x: hidden; overflow-y: auto;">
+        <img src="images/3-5(3).png" alt="Mission 3 Tech" style="position: absolute; top: 0; left: 0; width: 100%; z-index: 0; pointer-events: none;">
+        <div style="position: relative; z-index: 1; padding: 60% 5% 30% 5%; width: 100%;">
+            <div style="background-color: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                <div style="display: flex; align-items: center; border-bottom: 2px dashed #eef3f8; padding-bottom: 12px; margin-bottom: 16px;">
+                    <i data-lucide="tool" style="color: #48bb78; width: 24px; height: 24px; margin-right: 8px;"></i>
+                    <span style="font-weight: 700; color: #1b437c; font-size: 1.05rem;">ด่านหน้างาน: การติดตั้งโดยช่าง</span>
+                </div>
                 <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">ประสบการณ์ในวันติดตั้งเป็นอย่างไรบ้าง?</p>
                     
                     <div class="emoji-rating-row">
                         <div class="emoji-rating-btn" onclick="selectSubMood('tech', 5, this)">
                             <span class="emoji-rating-face">🏆</span>
                             <span class="emoji-rating-label">เรียบร้อย<br>ประทับใจมาก</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('tech', 4, this)">
                             <span class="emoji-rating-face">😊</span>
                             <span class="emoji-rating-label">พอใจ<br>ดูแลบริการดี</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('tech', 3, this)">
                             <span class="emoji-rating-face">😐</span>
                             <span class="emoji-rating-label">พอใช้<br>อยากให้ปรับ</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('tech', 2, this)">
                             <span class="emoji-rating-face">😟</span>
                             <span class="emoji-rating-label">ยังไม่ค่อย<br>พึงพอใจ</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                         <div class="emoji-rating-btn" onclick="selectSubMood('tech', 1, this)">
                             <span class="emoji-rating-face">🚨</span>
                             <span class="emoji-rating-label">ต้องการให้<br>ช่างตรวจเช็ค</span>
-                        </div>
+                              <div class="emoji-radio-circle"></div>
+                          </div>
                     </div>
 
                     <!-- Good items -->
@@ -286,9 +309,7 @@
                         <label class="form-label" style="font-size: 1rem; font-weight: 700;">ข้อเสนอแนะเพิ่มเติม (ถ้ามี)</label>
                         <textarea id="comment-tech" class="form-control" style="padding: 10px; height: 70px; resize: none; border-radius: 10px;" placeholder="เล่าให้เราฟังได้เลยค่ะ"></textarea>
                     </div>
-            </div>
-        </div>
-
+            </div></div></div>
         <!-- Screen 7: Mission 4 / 5 - MVP Selection -->
         <div class="game-screen" id="screen-m4" style="padding: 0; position: relative; background-color: #f0f8ff; overflow: auto;">
             <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto;">
