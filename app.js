@@ -490,22 +490,16 @@ function changeScreen(screenId) {
 function nextStep() {
     if (state.currentScreen === 'screen-m2') {
         state.historyStack.push('screen-m2');
-        changeScreen('screen-m3');
-    } else if (state.currentScreen === 'screen-m3') {
-        state.historyStack.push('screen-m3');
+        changeScreen('screen-m3-admin');
+    } else if (state.currentScreen === 'screen-m3-admin') {
+        state.historyStack.push('screen-m3-admin');
+        changeScreen('screen-m3-sales');
+    } else if (state.currentScreen === 'screen-m3-sales') {
+        state.historyStack.push('screen-m3-sales');
+        changeScreen('screen-m3-tech');
+    } else if (state.currentScreen === 'screen-m3-tech') {
+        state.historyStack.push('screen-m3-tech');
         changeScreen('screen-m4');
-    } else if (state.currentScreen === 'screen-m3-details') {
-        // In accordion sub-screen, next button toggles accordion cards
-        if (state.activeAccordion === 'admin') {
-            state.activeAccordion = 'sales';
-            toggleAccordionUI('sales');
-        } else if (state.activeAccordion === 'sales') {
-            state.activeAccordion = 'tech';
-            toggleAccordionUI('tech');
-        } else if (state.activeAccordion === 'tech') {
-            // Checked rated touchpoints, return to Touchpoint Menu Screen
-            changeScreen('screen-m3');
-        }
     } else if (state.currentScreen === 'screen-m4') {
         state.historyStack.push('screen-m4');
         changeScreen('screen-m5');
@@ -514,9 +508,7 @@ function nextStep() {
 
 // Back Step
 function prevStep() {
-    if (state.currentScreen === 'screen-m3-details') {
-        changeScreen('screen-m3');
-    } else if (state.historyStack.length > 0) {
+    if (state.historyStack.length > 0) {
         const prev = state.historyStack.pop();
         changeScreen(prev);
     }
