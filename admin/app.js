@@ -253,12 +253,13 @@ function loadData() {
                         }
                     }
 
-                    // Always allow local manual override via drag & drop, EXCEPT if it contradicts a completed survey
                     const localStatus = localStorage.getItem('local_status_' + item.id);
                     if (localStatus) {
                         if ((item.status === 'Completed' || item.feedback) && (localStatus === 'Unsent' || localStatus === 'Sent')) {
                             // Backend confirms it's completed, so ignore and clear the outdated local 'Sent' state
                             localStorage.removeItem('local_status_' + item.id);
+                        } else if (item.status === 'Sent' && localStatus === 'Sent') {
+                            localStorage.removeItem('local_status_' + item.id); // server caught up
                         } else {
                             status = localStatus;
                         }
@@ -737,6 +738,18 @@ function updateCustomerStatus(customerId, targetStatus) {
     renderKanbanBoard();
     renderCustomerTable();
     renderKPIs();
+
+    // Sync status to backend
+    if (state.googleSheetsUrl && (targetStatus === 'Sent' || targetStatus === 'Unsent')) {
+        fetch(state.googleSheetsUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'updateStatus',
+                id: customerId,
+                status: targetStatus
+            })
+        }).catch(err => console.error("Failed to sync status to Google Sheets:", err));
+    }
 }
 
 // Drag & Drop Kanban Handlers

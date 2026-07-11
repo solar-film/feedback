@@ -49,6 +49,23 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
     
+    // ตรวจสอบว่าเป็นการส่งอัปเดตสถานะหรือไม่
+    if (data.action === "updateStatus") {
+      var logSheetName = "GFS_Status_Log";
+      var logSheet = doc.getSheetByName(logSheetName);
+      if (!logSheet) {
+        logSheet = doc.insertSheet(logSheetName);
+        var logHeaders = ["ID", "Status", "Timestamp"];
+        logSheet.appendRow(logHeaders);
+        logSheet.getRange(1, 1, 1, logHeaders.length).setFontWeight("bold").setBackground("#eef3f8");
+      }
+      logSheet.appendRow([data.id || "", data.status || "", new Date()]);
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        message: "Status updated successfully"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
     // ดึงค่าแยกตามหมวดหมู่โครงสร้างเว็บแอปพลิเคชัน
     var id = data.id || "";
     
@@ -154,8 +171,20 @@ function getSheetData(sheetName) {
 function handleGetAllCustomersDetailed() {
   var dataRows = getSheetData("Data");
   var fbRows = getSheetData("GFS_Care_Quest");
+  var logRows = getSheetData("GFS_Status_Log");
   
   if (!dataRows) return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ไม่พบชีต Data" })).setMimeType(ContentService.MimeType.JSON);
+  
+  // แปลง GFS_Status_Log เป็น dictionary เพื่อดึงสถานะล่าสุด
+  var statusLogDict = {};
+  if (logRows) {
+    for (var i = 0; i < logRows.length; i++) {
+      var lId = logRows[i]["ID"] || "";
+      if (lId) {
+        statusLogDict[lId] = logRows[i]["Status"] || "Unsent";
+      }
+    }
+  }
   
   // แปลง GFS_Care_Quest เป็น dictionary (key = ID)
   var feedbackDict = {};
@@ -195,7 +224,8 @@ function handleGetAllCustomersDetailed() {
   var result = dataRows.map(function(r) {
     var id = r["ID"] || r["รหัสลูกค้า"] || r["รหัส ID"] || "";
     var feedback = feedbackDict[id] || null;
-    var status = feedback ? "Completed" : "Unsent";
+    var sentStatus = statusLogDict[id] || "Unsent";
+    var status = feedback ? "Completed" : sentStatus;
     
     return {
       id: id,
