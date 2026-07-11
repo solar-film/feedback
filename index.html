@@ -104,59 +104,12 @@
             </div>
         </div>
 
-        <!-- Screen 4: Mission 3 / 5 - Touchpoints List Menu -->
-        <div class="game-screen" id="screen-m3" style="padding: 0; position: relative; background-color: #f0f8ff; overflow: hidden; height: 100%;">
-            <div style="position: relative; width: 100%; max-width: 500px; margin: 0 auto; flex-shrink: 0;">
-                <img src="images/3-5.png" alt="Mission 3" style="width: 100%; height: auto; display: block;">
-                
-                <!-- Interactive Absolute Overlay for Touchpoint Menu -->
-                <div id="touchpoints-list-menu" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; padding: 0;">
-                    
-                    <div class="img-overlay-m3" id="tp-menu-admin" onclick="openAccordionStep('admin')" style="position: absolute; top: 34%; left: 5%; width: 90%; height: 12%;">
-                        <div class="m3-arrow-container">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </div>
-                        <div class="m3-check-circle">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </div>
-                    </div>
-                    
-                    <div class="img-overlay-m3" id="tp-menu-sales" onclick="openAccordionStep('sales')" style="position: absolute; top: 47.5%; left: 5%; width: 90%; height: 12%;">
-                        <div class="m3-arrow-container">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </div>
-                        <div class="m3-check-circle">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </div>
-                    </div>
-                    
-                    <div class="img-overlay-m3" id="tp-menu-tech" onclick="openAccordionStep('tech')" style="position: absolute; top: 61%; left: 5%; width: 90%; height: 12%;">
-                        <div class="m3-arrow-container">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </div>
-                        <div class="m3-check-circle">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
-
-        <!-- Screen 5: Mission 3 / 5 Detailed accordion sub-pages -->
-        <div class="game-screen" id="screen-m3-details" style="padding-bottom: 24px; overflow-y: auto;">
-            <img src="images/head-bg.png" alt="Mission 3 Header" style="width: calc(100% + 40px); max-width: none; margin-left: -20px; margin-top: -16px; margin-bottom: 16px; display: block;">
+        <!-- Screen 4: Mission 3 / 5 - Admin -->
+        <div class="game-screen" id="screen-m3-admin" style="padding-bottom: 24px; overflow-y: auto;">
+            <img src="images/3-5(1).png" alt="Mission 3 Admin" style="width: calc(100% + 40px); max-width: none; margin-left: -20px; margin-top: -16px; margin-bottom: 16px; display: block;">
             
-            <!-- 3.1 ด่านต้อนรับ -->
-            <div class="touchpoint-accordion-card" id="acc-card-admin">
-                <div class="tp-acc-header active" onclick="toggleAccordionUI('admin')">
-                    <span style="font-weight: 500; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px;">
-                        <span>💬</span> ด่านต้อนรับ: การติดต่อและประสานงาน
-                    </span>
-                    <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--primary);"></i>
-                </div>
-                <div class="tp-acc-content" style="display: block;">
-                    <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">การตอบกลับ การนัดหมาย และการแจ้งข้อมูล ชัดเจนแค่ไหน?</p>
+            <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; border: 1.5px solid #eef3f8;">
+                <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">การตอบกลับ การนัดหมาย และการแจ้งข้อมูล ชัดเจนแค่ไหน?</p>
                     
                     <div class="emoji-rating-row">
                         <div class="emoji-rating-btn" onclick="selectSubMood('admin', 5, this)">
@@ -209,19 +162,15 @@
                         <label class="form-label" style="font-size: 1rem; font-weight: 700;">ข้อเสนอแนะเพิ่มเติม (ถ้ามี)</label>
                         <textarea id="comment-admin" class="form-control" style="padding: 10px; height: 70px; resize: none; border-radius: 10px;" placeholder="เล่าให้เราฟังได้เลยค่ะ"></textarea>
                     </div>
-                </div>
             </div>
+        </div>
 
-            <!-- 3.2 ด่านเลือกฟิล์ม -->
-            <div class="touchpoint-accordion-card" id="acc-card-sales">
-                <div class="tp-acc-header" onclick="toggleAccordionUI('sales')">
-                    <span style="font-weight: 500; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px;">
-                        <span>🧭</span> ด่านเลือกฟิล์ม: การแนะนำโซลูชัน
-                    </span>
-                    <i data-lucide="chevron-right" style="width: 16px; height: 16px; color: var(--primary);"></i>
-                </div>
-                <div class="tp-acc-content">
-                    <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">คำแนะนำเรื่องฟิล์ม ราคา และเงื่อนไข ตรงกับความต้องการแค่ไหน?</p>
+        <!-- Screen 5: Mission 3 / 5 - Sales -->
+        <div class="game-screen" id="screen-m3-sales" style="padding-bottom: 24px; overflow-y: auto;">
+            <img src="images/3-5(2).png" alt="Mission 3 Sales" style="width: calc(100% + 40px); max-width: none; margin-left: -20px; margin-top: -16px; margin-bottom: 16px; display: block;">
+            
+            <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; border: 1.5px solid #eef3f8;">
+                <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">คำแนะนำเรื่องฟิล์ม ราคา และเงื่อนไข ตรงกับความต้องการแค่ไหน?</p>
                     
                     <div class="emoji-rating-row">
                         <div class="emoji-rating-btn" onclick="selectSubMood('sales', 5, this)">
@@ -274,19 +223,15 @@
                         <label class="form-label" style="font-size: 1rem; font-weight: 700;">ข้อเสนอแนะเพิ่มเติม (ถ้ามี)</label>
                         <textarea id="comment-sales" class="form-control" style="padding: 10px; height: 70px; resize: none; border-radius: 10px;" placeholder="เล่าให้เราฟังได้เลยค่ะ"></textarea>
                     </div>
-                </div>
             </div>
+        </div>
 
-            <!-- 3.3 ด่านหน้างาน -->
-            <div class="touchpoint-accordion-card" id="acc-card-tech">
-                <div class="tp-acc-header" onclick="toggleAccordionUI('tech')">
-                    <span style="font-weight: 500; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px;">
-                        <span>🧰</span> ด่านหน้างาน: การติดตั้งและความเรียบร้อย
-                    </span>
-                    <i data-lucide="chevron-right" style="width: 16px; height: 16px; color: var(--primary);"></i>
-                </div>
-                <div class="tp-acc-content">
-                    <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">ประสบการณ์ในวันติดตั้งเป็นอย่างไรบ้าง?</p>
+        <!-- Screen 6: Mission 3 / 5 - Tech -->
+        <div class="game-screen" id="screen-m3-tech" style="padding-bottom: 24px; overflow-y: auto;">
+            <img src="images/3-5(3).png" alt="Mission 3 Tech" style="width: calc(100% + 40px); max-width: none; margin-left: -20px; margin-top: -16px; margin-bottom: 16px; display: block;">
+            
+            <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; border: 1.5px solid #eef3f8;">
+                <p class="form-label" style="font-size: 1rem; margin-bottom: 12px;">ประสบการณ์ในวันติดตั้งเป็นอย่างไรบ้าง?</p>
                     
                     <div class="emoji-rating-row">
                         <div class="emoji-rating-btn" onclick="selectSubMood('tech', 5, this)">
@@ -341,13 +286,7 @@
                         <label class="form-label" style="font-size: 1rem; font-weight: 700;">ข้อเสนอแนะเพิ่มเติม (ถ้ามี)</label>
                         <textarea id="comment-tech" class="form-control" style="padding: 10px; height: 70px; resize: none; border-radius: 10px;" placeholder="เล่าให้เราฟังได้เลยค่ะ"></textarea>
                     </div>
-                </div>
             </div>
-
-            <div id="tp-success-banner" style="display: none; background-color: rgba(56, 161, 105, 0.05); border: 1.5px solid rgba(56, 161, 105, 0.2); color: var(--success); padding: 14px; border-radius: 16px; text-align: center; font-size: 0.85rem; font-weight: 700; margin-bottom: 16px;">
-                ⭐ คุณทำภารกิจ Mission 3 สำเร็จแล้ว! ขอบคุณสำหรับทุกความคิดเห็นค่ะ 💙
-            </div>
-
         </div>
 
         <!-- Screen 7: Mission 4 / 5 - MVP Selection -->

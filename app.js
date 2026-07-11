@@ -417,7 +417,7 @@ function changeScreen(screenId) {
         header.style.display = 'block';
         document.getElementById('btn-next').style.display = 'flex';
         
-        if (screenId === 'screen-m2' || screenId === 'screen-m3' || screenId === 'screen-m3-details' || screenId === 'screen-m4' || screenId === 'screen-m5') {
+        if (screenId === 'screen-m2' || screenId.startsWith('screen-m3') || screenId === 'screen-m4' || screenId === 'screen-m5') {
             progressSection.style.display = 'none';
         } else {
             progressSection.style.display = 'flex';
@@ -441,26 +441,28 @@ function changeScreen(screenId) {
             validateM2();
             break;
             
-        case 'screen-m3':
-            fill.style.width = '60%';
+        case 'screen-m3-admin':
+            fill.style.width = '50%';
             stepText.innerText = 'MISSION 3 / 5';
-            descText.innerText = 'ทีม Goodfilm ดูแลคุณดีแค่ไหน?';
+            descText.innerText = 'ด่านต้อนรับ ดูแลคุณดีแค่ไหน?';
             document.getElementById('btn-back').style.display = 'block';
-            
-            // Check completed status indicators
-            updateTouchpointMenuStatus();
-            validateM3();
+            validateM3Step('admin');
             break;
             
-        case 'screen-m3-details':
+        case 'screen-m3-sales':
             fill.style.width = '60%';
             stepText.innerText = 'MISSION 3 / 5';
-            descText.innerText = 'ทีม Goodfilm ดูแลคุณดีแค่ไหน?';
+            descText.innerText = 'ด่านเลือกฟิล์ม การแนะนำถูกใจไหม?';
             document.getElementById('btn-back').style.display = 'block';
+            validateM3Step('sales');
+            break;
             
-            // Display active accordion card
-            toggleAccordionUI(state.activeAccordion);
-            validateM3SubPage();
+        case 'screen-m3-tech':
+            fill.style.width = '70%';
+            stepText.innerText = 'MISSION 3 / 5';
+            descText.innerText = 'ด่านหน้างาน การติดตั้งและเตรียมพร้อม';
+            document.getElementById('btn-back').style.display = 'block';
+            validateM3Step('tech');
             break;
             
         case 'screen-m4':
@@ -585,7 +587,7 @@ function toggleAccordionUI(step) {
         }
     });
     lucide.createIcons();
-    validateM3SubPage();
+    validateM3Step(section);
 }
 
 // Select Emoji Mood in touchpoints sub-accordion card
@@ -614,7 +616,7 @@ function selectSubMood(section, score, node) {
         bad.style.display = 'block';
     }
 
-    validateM3SubPage();
+    validateM3Step(section);
 }
 
 function toggleMiniChip(chip, section, text) {
@@ -629,46 +631,19 @@ function toggleMiniChip(chip, section, text) {
     }
 }
 
-// Validate touchpoints subpage Next/Back buttons
-function validateM3SubPage() {
-    const activeSection = state.activeAccordion;
-    const score = state.formData.ratings[activeSection];
-    
-    // Enable sub-screen next button only when rating is chosen
-    document.getElementById('btn-next').disabled = score === 0;
-}
 
-// Update touched items checkbox status in main menu
-function updateTouchpointMenuStatus() {
-    const items = ['admin', 'sales', 'tech'];
-    let completedCount = 0;
-    
-    items.forEach(i => {
-        const row = document.getElementById(`tp-menu-${i}`);
-        if (state.formData.ratings[i] > 0) {
-            row.classList.add('completed');
-            completedCount++;
-        } else {
-            row.classList.remove('completed');
-        }
-    });
 
-    const banner = document.getElementById('tp-success-banner');
-    if (completedCount === 3) {
-        banner.style.display = 'block';
-    } else {
-        banner.style.display = 'none';
-    }
-}
 
-function validateM3() {
-    const r = state.formData.ratings;
-    const isValid = r.admin > 0 && r.sales > 0 && r.tech > 0;
-    
-    document.getElementById('btn-next').disabled = !isValid;
-}
+
+
 
 // Mission 4: Select MVP
+
+// Validate touchpoints step Next/Back buttons
+function validateM3Step(section) {
+    const score = state.formData.ratings[section];
+    document.getElementById('btn-next').disabled = score === 0;
+}
 function selectMVP(team, node) {
     SoundFX.playClick();
     
