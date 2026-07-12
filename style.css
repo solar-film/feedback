@@ -13,7 +13,7 @@
     --warning: #dd6b20;
     --danger: #e53e3e;
     --accent: #ffd700;
-    --border-radius-lg: 24px;
+    --border-radius-lg: 32px;
     --border-radius-md: 14px;
     --shadow-soft: 0 8px 24px rgba(27, 67, 124, 0.04);
     --shadow-hover: 0 16px 36px rgba(27, 67, 124, 0.08);
@@ -1040,10 +1040,20 @@ body {
 
 /* Footer Navigation Bar */
 .footer-nav {
+    position: sticky;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 1000;
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
     padding: 16px 20px 24px 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    border-bottom-left-radius: var(--border-radius-lg);
+    border-bottom-right-radius: var(--border-radius-lg);
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.03);
 }
 
 .btn-primary {
