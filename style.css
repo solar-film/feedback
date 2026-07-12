@@ -530,7 +530,7 @@ body {
 .m3-arrow-container {
     position: absolute;
     right: 6.5%;
-    top: 43%;
+    top: 38%;
     transform: translateY(-50%);
     width: 26px;
     height: 26px;
@@ -555,7 +555,7 @@ body {
 .m3-check-circle {
     position: absolute;
     right: 6.5%;
-    top: 43%;
+    top: 38%;
     transform: translateY(-50%);
     width: 26px;
     height: 26px;
