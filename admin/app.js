@@ -746,6 +746,7 @@ function updateCustomerStatus(customerId, targetStatus) {
     if (state.googleSheetsUrl && (targetStatus === 'Sent' || targetStatus === 'Unsent')) {
         fetch(state.googleSheetsUrl, {
             method: 'POST',
+            mode: 'no-cors',
             body: JSON.stringify({
                 action: 'updateStatus',
                 id: customerId,
@@ -774,11 +775,7 @@ function handleDrop(e, targetStatus) {
 function markAsSent(id) {
     const customer = state.customers.find(c => c.id === id);
     if (customer && customer.status === 'Unsent') {
-        customer.status = 'Sent';
-        localStorage.setItem('local_status_' + id, 'Sent');
-        renderKanbanBoard();
-        renderCustomerTable();
-        renderKPIs();
+        updateCustomerStatus(id, 'Sent');
     }
 }
 
