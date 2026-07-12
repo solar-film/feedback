@@ -1042,7 +1042,7 @@ body {
 .footer-nav {
     position: sticky;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.35);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     z-index: 1000;
