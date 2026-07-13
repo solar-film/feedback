@@ -992,7 +992,7 @@ function renderJourneyTimeline(customer) {
                 <span class="timeline-time">-</span>
             </div>
             <div class="timeline-body">
-                อยู่ระหว่างการรอลูกค้าเปิดลิงก์เข้ามาทำภารกิจ ${c.company === 'MHL' ? 'MHL' : 'Goodfilm'} Care Quest
+                อยู่ระหว่างการรอลูกค้าเปิดลิงก์เข้ามาทำภารกิจ ${customer.company === 'MHL' ? 'MHL' : 'Goodfilm'} Care Quest
             </div>
         `;
     }
