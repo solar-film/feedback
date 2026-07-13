@@ -335,7 +335,7 @@ function parseUrlParameters() {
                     const reviewGfs = document.getElementById('google-review-link-gfs');
                     const reviewMhl = document.getElementById('google-review-link-mhl');
                     if (reviewGfs && reviewMhl) {
-                        if (c.company === 'MHL') {
+                        if (c.company === 'MHL' || window.location.href.includes('MHL')) {
                             reviewMhl.style.display = 'block';
                         } else {
                             reviewGfs.style.display = 'block';
@@ -752,8 +752,17 @@ function submitSurvey() {
     const reviewGfs = document.getElementById('google-review-link-gfs');
     const reviewMhl = document.getElementById('google-review-link-mhl');
     if (reviewGfs && reviewMhl) {
-        // Double check display state based on ID directly before showing
-        const isMHL = (state.formData.id && state.formData.id.includes('MHL'));
+        // Fallback: Check state, check URL params, check full URL string
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentId = state.formData.id || urlParams.get('id');
+        
+        // Extreme fallback for weird browser URL issues
+        if (!currentId && window.location.href.includes('MHL')) {
+            currentId = 'MHL';
+        }
+
+        const isMHL = (currentId && currentId.includes('MHL'));
+        
         if (isMHL) {
             reviewMhl.style.display = 'block';
             reviewGfs.style.display = 'none';
