@@ -437,8 +437,8 @@ body {
     cursor: pointer;
 }
 .img-overlay-chip.selected {
-    background-color: transparent !important;
-    border-color: transparent !important;
+    background-color: rgba(255, 0, 0, 0.4) !important;
+    border-color: red !important;
 }
 .img-check-circle {
     position: absolute;
@@ -484,8 +484,8 @@ body {
     margin-bottom: 0;
 }
 .img-overlay-mvp.selected {
-    background-color: transparent !important;
-    border-color: transparent !important;
+    background-color: rgba(255, 0, 0, 0.4) !important;
+    border-color: red !important;
 }
 
 .mvp-check-circle {
@@ -1305,8 +1305,8 @@ body {
     transition: all 0.2s;
 }
 .img-overlay-m5.selected {
-    background-color: transparent !important;
-    border-color: transparent !important;
+    background-color: rgba(255, 0, 0, 0.4) !important;
+    border-color: red !important;
 }
 .m5-check-circle {
     position: absolute;
