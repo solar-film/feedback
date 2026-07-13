@@ -331,6 +331,15 @@ function parseUrlParameters() {
                     if (c.siteType) state.formData.siteType = c.siteType;
                     if (c.installDate) state.formData.installDate = c.installDate;
                     if (c.filmModel) state.formData.filmModel = c.filmModel;
+                    
+                    const reviewLinkElem = document.getElementById('google-review-link');
+                    if (reviewLinkElem) {
+                        if (c.company === 'MHL') {
+                            reviewLinkElem.href = 'https://g.page/r/CRkVPWjmECaEEAI/review';
+                        } else {
+                            reviewLinkElem.href = 'https://g.page/r/CXyrHfNQMLB8EAI/review';
+                        }
+                    }
                 } else {
                     alert('❌ ไม่พบรหัสลูกค้านี้ในฐานข้อมูลชีต Data ค่ะ');
                 }
