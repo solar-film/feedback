@@ -332,12 +332,13 @@ function parseUrlParameters() {
                     if (c.installDate) state.formData.installDate = c.installDate;
                     if (c.filmModel) state.formData.filmModel = c.filmModel;
                     
-                    const reviewLinkElem = document.getElementById('google-review-link');
-                    if (reviewLinkElem) {
+                    const reviewGfs = document.getElementById('google-review-link-gfs');
+                    const reviewMhl = document.getElementById('google-review-link-mhl');
+                    if (reviewGfs && reviewMhl) {
                         if (c.company === 'MHL') {
-                            reviewLinkElem.href = 'https://g.page/r/CRkVPWjmECaEEAI/review';
+                            reviewMhl.style.display = 'block';
                         } else {
-                            reviewLinkElem.href = 'https://g.page/r/CXyrHfNQMLB8EAI/review';
+                            reviewGfs.style.display = 'block';
                         }
                     }
                 } else {
@@ -748,14 +749,17 @@ function submitSurvey() {
     const isHappy = state.formData.overallMood === '😍' || state.formData.overallMood === '😊';
     
     // Safety check: Update Google Maps link right before showing it based on ID
-    const reviewLinkElem = document.getElementById('google-review-link');
-    if (reviewLinkElem) {
-        // Use formData.id (which might be set from URL) or company from state if we stored it
+    const reviewGfs = document.getElementById('google-review-link-gfs');
+    const reviewMhl = document.getElementById('google-review-link-mhl');
+    if (reviewGfs && reviewMhl) {
+        // Double check display state based on ID directly before showing
         const isMHL = (state.formData.id && state.formData.id.includes('MHL'));
         if (isMHL) {
-            reviewLinkElem.href = 'https://g.page/r/CRkVPWjmECaEEAI/review';
+            reviewMhl.style.display = 'block';
+            reviewGfs.style.display = 'none';
         } else {
-            reviewLinkElem.href = 'https://g.page/r/CXyrHfNQMLB8EAI/review';
+            reviewGfs.style.display = 'block';
+            reviewMhl.style.display = 'none';
         }
     }
     
