@@ -747,6 +747,18 @@ function submitSurvey() {
 
     const isHappy = state.formData.overallMood === '😍' || state.formData.overallMood === '😊';
     
+    // Safety check: Update Google Maps link right before showing it based on ID
+    const reviewLinkElem = document.getElementById('google-review-link');
+    if (reviewLinkElem) {
+        // Use formData.id (which might be set from URL) or company from state if we stored it
+        const isMHL = (state.formData.id && state.formData.id.includes('MHL'));
+        if (isMHL) {
+            reviewLinkElem.href = 'https://g.page/r/CRkVPWjmECaEEAI/review';
+        } else {
+            reviewLinkElem.href = 'https://g.page/r/CXyrHfNQMLB8EAI/review';
+        }
+    }
+    
     const urlParams = new URLSearchParams(window.location.search);
     const fallbackId = urlParams.get('id') || state.formData.id || "-";
     
