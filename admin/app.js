@@ -783,7 +783,9 @@ function markAsSent(id) {
 // Copy link action helper
 function copySurveyLink(id, btn) {
     const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(id)}`;
-    navigator.clipboard.writeText(surveyLink).then(() => {
+    const copyPromise = navigator.clipboard ? navigator.clipboard.writeText(surveyLink) : fallbackCopyTextToClipboard(surveyLink);
+
+    copyPromise.then(() => {
         const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; color: var(--success);"></i>';
         lucide.createIcons();
@@ -798,7 +800,10 @@ function copySurveyLink(id, btn) {
             btn.innerHTML = originalHtml;
             lucide.createIcons();
         }, 1500);
-    }).catch(err => console.error('Could not copy link:', err));
+    }).catch(err => {
+        console.error('Could not copy link:', err);
+        showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
+    });
 }
 
 // DETAIL DRAWER & TIMELINE
@@ -884,9 +889,13 @@ function openCustomerDrawer(id) {
     };
     
     document.getElementById('drawer-btn-copy').onclick = () => {
-        navigator.clipboard.writeText(surveyLink).then(() => {
+        const copyPromise = navigator.clipboard ? navigator.clipboard.writeText(surveyLink) : fallbackCopyTextToClipboard(surveyLink);
+        copyPromise.then(() => {
             showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
             markAsSent(c.id);
+        }).catch(err => {
+            console.error('Could not copy link:', err);
+            showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
         });
     };
 
@@ -1453,8 +1462,29 @@ function fetchAndGenerateLinks() {
         });
 }
 
+function fallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        var successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return successful ? Promise.resolve() : Promise.reject('fallback failed');
+    } catch (err) {
+        document.body.removeChild(textArea);
+        return Promise.reject(err);
+    }
+}
+
 function copyToClipboard(text, btn, id = null) {
-    navigator.clipboard.writeText(text).then(() => {
+    const copyPromise = navigator.clipboard ? navigator.clipboard.writeText(text) : fallbackCopyTextToClipboard(text);
+    
+    copyPromise.then(() => {
         showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
         
         if (id) markAsSent(id);
@@ -1470,6 +1500,7 @@ function copyToClipboard(text, btn, id = null) {
         }, 1500);
     }).catch(err => {
         console.error('Could not copy text: ', err);
+        showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
     });
 }
 
