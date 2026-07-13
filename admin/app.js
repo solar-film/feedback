@@ -783,7 +783,7 @@ function markAsSent(id) {
 // Copy link action helper
 function copySurveyLink(id, btn) {
     const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(id)}`;
-    const copyPromise = (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(surveyLink) : fallbackCopyTextToClipboard(surveyLink);
+    const copyPromise = copyTextRobust(surveyLink);
 
     copyPromise.then(() => {
         const originalHtml = btn.innerHTML;
@@ -890,7 +890,7 @@ function openCustomerDrawer(id) {
     };
     
     document.getElementById('drawer-btn-copy').onclick = () => {
-        const copyPromise = (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(surveyLink) : fallbackCopyTextToClipboard(surveyLink);
+        const copyPromise = copyTextRobust(surveyLink);
         copyPromise.then(() => {
             const btn = document.getElementById('drawer-btn-copy');
             const originalHtml = btn.innerHTML;
@@ -1496,8 +1496,19 @@ function fallbackCopyTextToClipboard(text) {
     }
 }
 
+function copyTextRobust(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).catch(err => {
+            console.warn('Clipboard API failed, using fallback:', err);
+            return fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        return fallbackCopyTextToClipboard(text);
+    }
+}
+
 function copyToClipboard(text, btn, id = null) {
-    const copyPromise = (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(text) : fallbackCopyTextToClipboard(text);
+    const copyPromise = copyTextRobust(text);
     
     copyPromise.then(() => {
         showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
