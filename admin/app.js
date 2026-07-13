@@ -772,10 +772,9 @@ function handleDrop(e, targetStatus) {
     updateCustomerStatus(customerId, targetStatus);
 }
 
-// Quick status change helper (when sending LINE)
 function markAsSent(id) {
     const customer = state.customers.find(c => c.id === id);
-    if (customer && customer.status === 'Unsent') {
+    if (customer && (!customer.status || customer.status === 'Unsent')) {
         updateCustomerStatus(id, 'Sent');
     }
 }
@@ -803,6 +802,7 @@ function copySurveyLink(id, btn) {
         }, 1000);
     }).catch(err => {
         console.error('Could not copy link:', err);
+        alert('Copy failed: ' + err.message + '\nnavigator.clipboard: ' + !!navigator.clipboard);
         showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
     });
 }
@@ -910,6 +910,7 @@ function openCustomerDrawer(id) {
             }, 1000);
         }).catch(err => {
             console.error('Could not copy link:', err);
+            alert('Copy failed: ' + err.message + '\nnavigator.clipboard: ' + !!navigator.clipboard);
             showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
         });
     };
@@ -1531,6 +1532,7 @@ function copyToClipboard(text, btn, id = null) {
         }, 1000);
     }).catch(err => {
         console.error('Could not copy text: ', err);
+        alert('Copy failed: ' + err.message + '\nnavigator.clipboard: ' + !!navigator.clipboard);
         showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
     });
 }
