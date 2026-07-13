@@ -39,7 +39,7 @@
             <div style="position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: flex-end;">
                 <img src="images/1-5.png" alt="Welcome to Goodfilm" style="width: 100%; height: 100%; object-fit: cover; object-position: center top; transform: scale(1.03); transform-origin: center top;">
                 <!-- Transparent clickable area for the Start Button -->
-                <div onclick="startQuest()" style="position: absolute; bottom: 0; left: 5%; width: 90%; height: 18%; cursor: pointer; border-radius: 50px;"></div>
+                <div onclick="startQuest()" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; bottom: 0; left: 5%; width: 90%; height: 18%; cursor: pointer; border-radius: 50px;"></div>
             </div>
         </div>
 
@@ -111,7 +111,7 @@
                 
                 <!-- Interactive Absolute Overlay -->
                 <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; padding: 0;">
-                    <div class="img-overlay-m3" id="tp-menu-admin" onclick="openM3Step('admin')" style="position: absolute; top: 34%; left: 5%; width: 90%; height: 12%; cursor: pointer;">
+                    <div class="img-overlay-m3" id="tp-menu-admin" onclick="openM3Step('admin')" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 34%; left: 5%; width: 90%; height: 12%; cursor: pointer;">
                         <div class="m3-arrow-container">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </div>
@@ -119,7 +119,7 @@
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
                     </div>
-                    <div class="img-overlay-m3" id="tp-menu-sales" onclick="openM3Step('sales')" style="position: absolute; top: 47.5%; left: 5%; width: 90%; height: 12%; cursor: pointer;">
+                    <div class="img-overlay-m3" id="tp-menu-sales" onclick="openM3Step('sales')" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 47.5%; left: 5%; width: 90%; height: 12%; cursor: pointer;">
                         <div class="m3-arrow-container">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </div>
@@ -127,7 +127,7 @@
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
                     </div>
-                    <div class="img-overlay-m3" id="tp-menu-tech" onclick="openM3Step('tech')" style="position: absolute; top: 60%; left: 5%; width: 90%; height: 12%; cursor: pointer;">
+                    <div class="img-overlay-m3" id="tp-menu-tech" onclick="openM3Step('tech')" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 60%; left: 5%; width: 90%; height: 12%; cursor: pointer;">
                         <div class="m3-arrow-container">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </div>
@@ -392,23 +392,23 @@
                     <img src="images/5-5.png" alt="Mission 5" style="width: 100%; height: auto; display: block;">
                     
                     <!-- Interactive Overlays for Moods -->
-                    <div class="img-overlay-m5" onclick="selectOverallMood('happy_max', this)" style="position: absolute; top: 31%; left: 5%; width: 90%; height: 11%;">
+                    <div class="img-overlay-m5" onclick="selectOverallMood('happy_max', this)" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 31%; left: 5%; width: 90%; height: 11%;">
                         <div class="m5-check-circle"></div>
                     </div>
                     
-                    <div class="img-overlay-m5" onclick="selectOverallMood('happy_mid', this)" style="position: absolute; top: 44%; left: 5%; width: 90%; height: 11%;">
+                    <div class="img-overlay-m5" onclick="selectOverallMood('happy_mid', this)" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 44%; left: 5%; width: 90%; height: 11%;">
                         <div class="m5-check-circle"></div>
                     </div>
                     
-                    <div class="img-overlay-m5" onclick="selectOverallMood('normal', this)" style="position: absolute; top: 57%; left: 5%; width: 90%; height: 11%;">
+                    <div class="img-overlay-m5" onclick="selectOverallMood('normal', this)" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 57%; left: 5%; width: 90%; height: 11%;">
                         <div class="m5-check-circle"></div>
                     </div>
                     
-                    <div class="img-overlay-m5" onclick="selectOverallMood('unhappy', this)" style="position: absolute; top: 70%; left: 5%; width: 90%; height: 11%;">
+                    <div class="img-overlay-m5" onclick="selectOverallMood('unhappy', this)" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 70%; left: 5%; width: 90%; height: 11%;">
                         <div class="m5-check-circle"></div>
                     </div>
                     
-                    <div class="img-overlay-m5" onclick="selectOverallMood('danger_alert', this)" style="position: absolute; top: 81.5%; left: 5%; width: 90%; height: 11%;">
+                    <div class="img-overlay-m5" onclick="selectOverallMood('danger_alert', this)" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 81.5%; left: 5%; width: 90%; height: 11%;">
                         <div class="m5-check-circle"></div>
                     </div>
                 </div>
@@ -458,9 +458,9 @@
             <div id="happy-path-content" style="display: none; position: relative; width: 100%; max-width: 500px; margin: 0 auto; margin-bottom: 24px;">
                 <img src="images/review.png" alt="ขอบคุณสำหรับฟีดแบค" style="width: 100%; height: auto; display: block;">
                 <!-- Clickable area for Google Maps Review -->
-                <a id="google-review-link" href="https://g.page/r/CXyrHfNQMLB8EAI/review" target="_blank" onclick="clickGoogleMaps()" style="position: absolute; top: 42.5%; left: 16%; width: 68%; height: 6%; cursor: pointer; border-radius: 50px;"></a>
+                <a id="google-review-link" href="https://g.page/r/CXyrHfNQMLB8EAI/review" target="_blank" onclick="clickGoogleMaps()" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 42.5%; left: 16%; width: 68%; height: 6%; cursor: pointer; border-radius: 50px;"></a>
                 <!-- Clickable area for Care Guide button (formerly LINE) -->
-                <a href="#" onclick="showCareGuideModal()" style="position: absolute; bottom: 1.5%; left: 30%; width: 62%; height: 5.5%; cursor: pointer; border-radius: 50px;"></a>
+                <a href="#" onclick="showCareGuideModal()" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; bottom: 1.5%; left: 30%; width: 62%; height: 5.5%; cursor: pointer; border-radius: 50px;"></a>
             </div>
 
             <!-- Thank you buttons (For Happy Path) -->
@@ -477,9 +477,9 @@
             <div id="unhappy-path-content" style="display: none; position: relative; width: 100%; max-width: 500px; margin: 0 auto;">
                 <img src="images/end.png" alt="รับเรื่องดูแลต่อทันที" style="width: 100%; height: auto; display: block;">
                 <!-- Clickable area for กลับสู่หน้าหลัก -->
-                <div onclick="location.reload()" style="position: absolute; top: 76%; left: 5%; width: 90%; height: 8.5%; cursor: pointer; border-radius: 50px;"></div>
+                <div onclick="location.reload()" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 76%; left: 5%; width: 90%; height: 8.5%; cursor: pointer; border-radius: 50px;"></div>
                 <!-- Clickable area for ดูวิธีดูแลฟิล์มหลังติดตั้ง -->
-                <div onclick="showCareGuideModal()" style="position: absolute; top: 85.5%; left: 5%; width: 90%; height: 8.5%; cursor: pointer; border-radius: 50px;"></div>
+                <div onclick="showCareGuideModal()" style="background-color: rgba(255, 0, 0, 0.4); border: 2px solid red; position: absolute; top: 85.5%; left: 5%; width: 90%; height: 8.5%; cursor: pointer; border-radius: 50px;"></div>
             </div>
         </div>
 
