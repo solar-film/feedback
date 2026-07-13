@@ -1477,34 +1477,35 @@ function fetchAndGenerateLinks() {
         });
 }
 
-function fallbackCopyTextToClipboard(text) {
-    var textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.top = "0";
-    textArea.style.left = "0";
-    textArea.style.position = "fixed";
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
+function copyTextRobust(text) {
     try {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
         var successful = document.execCommand('copy');
         document.body.removeChild(textArea);
-        return successful ? Promise.resolve() : Promise.reject('fallback failed');
+        
+        if (successful) {
+            return Promise.resolve();
+        }
     } catch (err) {
-        document.body.removeChild(textArea);
-        return Promise.reject(err);
+        try {
+            if (document.body.contains(textArea)) {
+                document.body.removeChild(textArea);
+            }
+        } catch (e) {}
     }
-}
 
-function copyTextRobust(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-        return navigator.clipboard.writeText(text).catch(err => {
-            console.warn('Clipboard API failed, using fallback:', err);
-            return fallbackCopyTextToClipboard(text);
-        });
-    } else {
-        return fallbackCopyTextToClipboard(text);
+        return navigator.clipboard.writeText(text);
     }
+    
+    return Promise.reject(new Error('All copy methods failed'));
 }
 
 function copyToClipboard(text, btn, id = null) {
