@@ -890,29 +890,33 @@ function openCustomerDrawer(id) {
     };
     
     document.getElementById('drawer-btn-copy').onclick = () => {
-        const copyPromise = copyTextRobust(surveyLink);
-        copyPromise.then(() => {
-            const btn = document.getElementById('drawer-btn-copy');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="check" style="width: 16px;"></i><span>คัดลอกแล้ว</span>';
-            btn.style.backgroundColor = 'var(--success)';
-            btn.style.color = '#fff';
-            lucide.createIcons();
-            
-            showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
-            
-            setTimeout(() => {
-                markAsSent(c.id);
-                closeCustomerDrawer();
-                btn.innerHTML = originalHtml;
-                btn.style.backgroundColor = '';
-                btn.style.color = '';
-            }, 1000);
-        }).catch(err => {
-            console.error('Could not copy link:', err);
-            alert('Copy failed: ' + err.message + '\nnavigator.clipboard: ' + !!navigator.clipboard);
-            showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
-        });
+        try {
+            const copyPromise = copyTextRobust(surveyLink);
+            copyPromise.then(() => {
+                const btn = document.getElementById('drawer-btn-copy');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" style="width: 16px;"></i><span>คัดลอกแล้ว</span>';
+                btn.style.backgroundColor = 'var(--success)';
+                btn.style.color = '#fff';
+                lucide.createIcons();
+                
+                showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
+                
+                setTimeout(() => {
+                    markAsSent(c.id);
+                    closeCustomerDrawer();
+                    btn.innerHTML = originalHtml;
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                }, 1000);
+            }).catch(err => {
+                console.error('Could not copy link:', err);
+                alert('Promise rejected: ' + err.message);
+                showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
+            });
+        } catch (fatalErr) {
+            alert('Fatal Error in drawer copy: ' + fatalErr.message);
+        }
     };
 
     // Open sliding drawer overlay
@@ -1510,31 +1514,35 @@ function copyTextRobust(text) {
 }
 
 function copyToClipboard(text, btn, id = null) {
-    const copyPromise = copyTextRobust(text);
-    
-    copyPromise.then(() => {
-        showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
-
-        const origText = btn.innerText;
-        btn.innerText = '✓ คัดลอกแล้ว';
-        btn.style.backgroundColor = 'var(--success)';
-        btn.style.backgroundImage = 'none'; // remove linear gradient
+    try {
+        const copyPromise = copyTextRobust(text);
         
-        setTimeout(() => {
-            if (id) markAsSent(id);
-            // We don't need to restore btn if it gets destroyed by markAsSent's re-render, 
-            // but just in case it doesn't:
-            if (document.body.contains(btn)) {
-                btn.innerText = origText;
-                btn.style.backgroundColor = '';
-                btn.style.backgroundImage = '';
-            }
-        }, 1000);
-    }).catch(err => {
-        console.error('Could not copy text: ', err);
-        alert('Copy failed: ' + err.message + '\nnavigator.clipboard: ' + !!navigator.clipboard);
-        showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
-    });
+        copyPromise.then(() => {
+            showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
+
+            const origText = btn.innerText;
+            btn.innerText = '✓ คัดลอกแล้ว';
+            btn.style.backgroundColor = 'var(--success)';
+            btn.style.backgroundImage = 'none'; // remove linear gradient
+            
+            setTimeout(() => {
+                if (id) markAsSent(id);
+                // We don't need to restore btn if it gets destroyed by markAsSent's re-render, 
+                // but just in case it doesn't:
+                if (document.body.contains(btn)) {
+                    btn.innerText = origText;
+                    btn.style.backgroundColor = '';
+                    btn.style.backgroundImage = '';
+                }
+            }, 1000);
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+            alert('Promise rejected: ' + err.message);
+            showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
+        });
+    } catch (fatalErr) {
+        alert("Fatal Error in copyToClipboard: " + fatalErr.message);
+    }
 }
 
 function getCustomerMonth(installDateStr) {
