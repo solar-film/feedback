@@ -428,8 +428,8 @@ body {
 
 /* Image Overlay Interactive Grid */
 .img-overlay-chip {
-    background: rgba(255, 0, 0, 0.4) !important;
-    border: 2px solid red !important;
+    background: transparent !important;
+    border: 2px solid transparent !important;
     box-shadow: none !important;
     padding: 0 !important;
     position: relative;
@@ -437,8 +437,8 @@ body {
     cursor: pointer;
 }
 .img-overlay-chip.selected {
-    background-color: rgba(255, 0, 0, 0.4) !important;
-    border-color: red !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
 }
 .img-check-circle {
     position: absolute;
@@ -471,8 +471,8 @@ body {
 /* MVP Image Overlay */
 .img-overlay-mvp {
     flex: 1;
-    background: rgba(255, 0, 0, 0.4) !important;
-    border: 2px solid red !important;
+    background: transparent !important;
+    border: 2px solid transparent !important;
     box-shadow: none !important;
     position: relative;
     border-radius: 12px;
@@ -484,8 +484,8 @@ body {
     margin-bottom: 0;
 }
 .img-overlay-mvp.selected {
-    background-color: rgba(255, 0, 0, 0.4) !important;
-    border-color: red !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
 }
 
 .mvp-check-circle {
@@ -519,8 +519,8 @@ body {
 /* Mission 3 Image Overlay */
 .img-overlay-m3 {
     flex: 1;
-    background: rgba(255, 0, 0, 0.4) !important;
-    border: 2px solid red !important;
+    background: transparent !important;
+    border: 2px solid transparent !important;
     box-shadow: none !important;
     position: relative;
     border-radius: 16px;
@@ -1296,8 +1296,8 @@ body {
 /* Mission 5 Image Overlay */
 .img-overlay-m5 {
     flex: 1;
-    background: rgba(255, 0, 0, 0.4) !important;
-    border: 2px solid red !important;
+    background: transparent !important;
+    border: 2px solid transparent !important;
     box-shadow: none !important;
     position: relative;
     border-radius: 12px;
@@ -1305,8 +1305,8 @@ body {
     transition: all 0.2s;
 }
 .img-overlay-m5.selected {
-    background-color: rgba(255, 0, 0, 0.4) !important;
-    border-color: red !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
 }
 .m5-check-circle {
     position: absolute;
