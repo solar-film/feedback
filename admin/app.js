@@ -572,7 +572,8 @@ function renderCustomerTable() {
 
         // Dynamic LINE Message
         const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
-        const lineMessage = `สวัสดีครับคุณ${c.name} Goodfilm รบกวนเวลาสั้น ๆ 2 นาที ร่วมทำภารกิจประเมินความพึงพอใจการติดตั้งฟิล์ม ผ่านลิงก์นี้นะครับ: ${surveyLink} ขอบคุณมากครับ 💙`;
+        const companyName = c.company === 'MHL' ? 'MHL' : 'Goodfilm';
+        const lineMessage = `สวัสดีครับคุณ${c.name} ${companyName} รบกวนเวลาสั้น ๆ 2 นาที ร่วมทำภารกิจประเมินความพึงพอใจการติดตั้งฟิล์ม ผ่านลิงก์นี้นะครับ: ${surveyLink} ขอบคุณมากครับ 💙`;
         const lineDeepLink = `https://line.me/R/msg/text/?${encodeURIComponent(lineMessage)}`;
 
         tr.innerHTML = `
@@ -874,7 +875,8 @@ function openCustomerDrawer(id) {
 
     // Dynamic LINE link & copy inside Drawer
     const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
-    const lineMessage = `สวัสดีครับคุณ${c.name} Goodfilm รบกวนเวลาสั้น ๆ 2 นาที ร่วมทำภารกิจประเมินความพึงพอใจการติดตั้งฟิล์ม ผ่านลิงก์นี้นะครับ: ${surveyLink} ขอบคุณมากครับ 💙`;
+    const companyName = c.company === 'MHL' ? 'MHL' : 'Goodfilm';
+    const lineMessage = `สวัสดีครับคุณ${c.name} ${companyName} รบกวนเวลาสั้น ๆ 2 นาที ร่วมทำภารกิจประเมินความพึงพอใจการติดตั้งฟิล์ม ผ่านลิงก์นี้นะครับ: ${surveyLink} ขอบคุณมากครับ 💙`;
     
     document.getElementById('drawer-btn-line').onclick = () => {
         window.open(`https://line.me/R/msg/text/?${encodeURIComponent(lineMessage)}`, '_blank');
@@ -961,7 +963,7 @@ function renderJourneyTimeline(customer) {
                 <span class="timeline-time">-</span>
             </div>
             <div class="timeline-body">
-                อยู่ระหว่างการรอลูกค้าเปิดลิงก์เข้ามาทำภารกิจ Goodfilm Care Quest
+                อยู่ระหว่างการรอลูกค้าเปิดลิงก์เข้ามาทำภารกิจ ${c.company === 'MHL' ? 'MHL' : 'Goodfilm'} Care Quest
             </div>
         `;
     }
