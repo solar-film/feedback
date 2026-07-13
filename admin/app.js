@@ -783,23 +783,24 @@ function markAsSent(id) {
 // Copy link action helper
 function copySurveyLink(id, btn) {
     const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(id)}`;
-    const copyPromise = navigator.clipboard ? navigator.clipboard.writeText(surveyLink) : fallbackCopyTextToClipboard(surveyLink);
+    const copyPromise = (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(surveyLink) : fallbackCopyTextToClipboard(surveyLink);
 
     copyPromise.then(() => {
         const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; color: var(--success);"></i>';
         lucide.createIcons();
-        
-        // Auto-move to 'Sent' if currently 'Unsent'
-        const customer = state.customers.find(c => c.id === id);
-        if (customer && (!customer.status || customer.status === 'Unsent')) {
-            updateCustomerStatus(id, 'Sent');
-        }
 
         setTimeout(() => {
-            btn.innerHTML = originalHtml;
-            lucide.createIcons();
-        }, 1500);
+            // Auto-move to 'Sent' if currently 'Unsent'
+            const customer = state.customers.find(c => c.id === id);
+            if (customer && (!customer.status || customer.status === 'Unsent')) {
+                updateCustomerStatus(id, 'Sent');
+            }
+            if (document.body.contains(btn)) {
+                btn.innerHTML = originalHtml;
+                lucide.createIcons();
+            }
+        }, 1000);
     }).catch(err => {
         console.error('Could not copy link:', err);
         showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
@@ -889,10 +890,24 @@ function openCustomerDrawer(id) {
     };
     
     document.getElementById('drawer-btn-copy').onclick = () => {
-        const copyPromise = navigator.clipboard ? navigator.clipboard.writeText(surveyLink) : fallbackCopyTextToClipboard(surveyLink);
+        const copyPromise = (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(surveyLink) : fallbackCopyTextToClipboard(surveyLink);
         copyPromise.then(() => {
+            const btn = document.getElementById('drawer-btn-copy');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="check" style="width: 16px;"></i><span>คัดลอกแล้ว</span>';
+            btn.style.backgroundColor = 'var(--success)';
+            btn.style.color = '#fff';
+            lucide.createIcons();
+            
             showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
-            markAsSent(c.id);
+            
+            setTimeout(() => {
+                markAsSent(c.id);
+                closeCustomerDrawer();
+                btn.innerHTML = originalHtml;
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+            }, 1000);
         }).catch(err => {
             console.error('Could not copy link:', err);
             showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
@@ -1482,22 +1497,26 @@ function fallbackCopyTextToClipboard(text) {
 }
 
 function copyToClipboard(text, btn, id = null) {
-    const copyPromise = navigator.clipboard ? navigator.clipboard.writeText(text) : fallbackCopyTextToClipboard(text);
+    const copyPromise = (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(text) : fallbackCopyTextToClipboard(text);
     
     copyPromise.then(() => {
         showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
-        
-        if (id) markAsSent(id);
 
         const origText = btn.innerText;
         btn.innerText = '✓ คัดลอกแล้ว';
         btn.style.backgroundColor = 'var(--success)';
         btn.style.backgroundImage = 'none'; // remove linear gradient
+        
         setTimeout(() => {
-            btn.innerText = origText;
-            btn.style.backgroundColor = '';
-            btn.style.backgroundImage = '';
-        }, 1500);
+            if (id) markAsSent(id);
+            // We don't need to restore btn if it gets destroyed by markAsSent's re-render, 
+            // but just in case it doesn't:
+            if (document.body.contains(btn)) {
+                btn.innerText = origText;
+                btn.style.backgroundColor = '';
+                btn.style.backgroundImage = '';
+            }
+        }, 1000);
     }).catch(err => {
         console.error('Could not copy text: ', err);
         showToast('เกิดข้อผิดพลาดในการคัดลอกลิงก์', 'error');
