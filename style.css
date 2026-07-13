@@ -428,8 +428,8 @@ body {
 
 /* Image Overlay Interactive Grid */
 .img-overlay-chip {
-    background: transparent !important;
-    border: 2px solid transparent !important;
+    background: rgba(255, 0, 0, 0.4) !important;
+    border: 2px solid red !important;
     box-shadow: none !important;
     padding: 0 !important;
     position: relative;
@@ -471,8 +471,8 @@ body {
 /* MVP Image Overlay */
 .img-overlay-mvp {
     flex: 1;
-    background: transparent !important;
-    border: 2px solid transparent !important;
+    background: rgba(255, 0, 0, 0.4) !important;
+    border: 2px solid red !important;
     box-shadow: none !important;
     position: relative;
     border-radius: 12px;
@@ -519,8 +519,8 @@ body {
 /* Mission 3 Image Overlay */
 .img-overlay-m3 {
     flex: 1;
-    background: transparent !important;
-    border: 2px solid transparent !important;
+    background: rgba(255, 0, 0, 0.4) !important;
+    border: 2px solid red !important;
     box-shadow: none !important;
     position: relative;
     border-radius: 16px;
@@ -1296,8 +1296,8 @@ body {
 /* Mission 5 Image Overlay */
 .img-overlay-m5 {
     flex: 1;
-    background: transparent !important;
-    border: 2px solid transparent !important;
+    background: rgba(255, 0, 0, 0.4) !important;
+    border: 2px solid red !important;
     box-shadow: none !important;
     position: relative;
     border-radius: 12px;
