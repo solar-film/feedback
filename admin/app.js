@@ -277,7 +277,7 @@ function loadData() {
                         name: item.name,
                         phone: item.phone,
                         lineAt: item.lineAt || '-',
-                        siteType: item.siteType,
+                        siteType: item._col_16 || item.siteType || item.company || '-',
                         installDate: formatInstallDate(item.installDate),
                         filmModel: item.filmModel || '-',
                         sales: item.sales || '-',
@@ -386,7 +386,7 @@ function forceRefreshData() {
                         name: item.name,
                         phone: item.phone,
                         lineAt: item.lineAt || '-',
-                        siteType: item.siteType,
+                        siteType: item._col_16 || item.siteType || item.company || '-',
                         installDate: formatInstallDate(item.installDate),
                         filmModel: item.filmModel || '-',
                         sales: item.sales || '-',
@@ -1754,15 +1754,15 @@ function renderPresentationSlide() {
             
             <div class="slide-scores">
                 <div class="slide-score-item">
-                    <img src="../images/admin.png" alt="Admin" style="height: 40px; width: auto;">
+                    <img src="../images/admin.png" alt="Admin" class="slide-score-img">
                     <span class="slide-score-val">${fb.ratings?.admin || '-'} / 5</span>
                 </div>
                 <div class="slide-score-item">
-                    <img src="../images/sales.png" alt="Sales" style="height: 40px; width: auto;">
+                    <img src="../images/sales.png" alt="Sales" class="slide-score-img">
                     <span class="slide-score-val">${fb.ratings?.sales || '-'} / 5</span>
                 </div>
                 <div class="slide-score-item">
-                    <img src="../images/tech.png" alt="Tech" style="height: 40px; width: auto;">
+                    <img src="../images/tech.png" alt="Tech" class="slide-score-img">
                     <span class="slide-score-val">${fb.ratings?.tech || '-'} / 5</span>
                 </div>
             </div>
