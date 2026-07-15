@@ -638,7 +638,7 @@ function filterCustomerTable() {
     const rows = document.querySelectorAll('#customer-table-body tr');
     
     rows.forEach(row => {
-        if (row.cells.length < 9) return; // Skip headers/empty rows
+        if (row.cells.length < 10) return; // Skip headers/empty rows
 
         const company = row.cells[1].innerText;
         const id = row.cells[2].innerText.toLowerCase();
@@ -646,14 +646,15 @@ function filterCustomerTable() {
         const phone = row.cells[4].innerText.toLowerCase();
         const lineAt = row.cells[5].innerText.toLowerCase();
         const sales = row.cells[7].innerText.toLowerCase();
-        const rowStatusTag = row.cells[8].querySelector('.status-badge');
+        const tech = row.cells[8].innerText.toLowerCase();
+        const rowStatusTag = row.cells[9].querySelector('.status-badge');
         
         let rowStatus = 'Unsent';
-        if (rowStatusTag.classList.contains('sent')) rowStatus = 'Sent';
-        else if (rowStatusTag.classList.contains('completed')) rowStatus = 'Completed';
-        else if (rowStatusTag.classList.contains('action')) rowStatus = 'Action Required';
+        if (rowStatusTag && rowStatusTag.classList.contains('sent')) rowStatus = 'Sent';
+        else if (rowStatusTag && rowStatusTag.classList.contains('completed')) rowStatus = 'Completed';
+        else if (rowStatusTag && rowStatusTag.classList.contains('action')) rowStatus = 'Action Required';
 
-        const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || lineAt.includes(query) || sales.includes(query) || company.toLowerCase().includes(query);
+        const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || lineAt.includes(query) || sales.includes(query) || tech.includes(query) || company.toLowerCase().includes(query);
         const matchesStatus = status === 'all' || rowStatus === status;
 
         if (matchesQuery && matchesStatus) {
