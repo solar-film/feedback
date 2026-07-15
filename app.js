@@ -1172,6 +1172,9 @@ function updateDashboardStats() {
         
         const mvp = item.mvp || (item.teamFeedback ? item.teamFeedback.mvpTeam : 'none');
         const comment = item.mvpComment || (item.teamFeedback ? item.teamFeedback.customerComment : '');
+        const adminComment = item.teamFeedback ? item.teamFeedback.adminComment : '';
+        const salesComment = item.teamFeedback ? item.teamFeedback.salesComment : '';
+        const techComment = item.teamFeedback ? item.teamFeedback.technicianComment : '';
         
         const overall = item.overall || {
             overallMood: item.overallMood || '😐',
@@ -1205,6 +1208,9 @@ function updateDashboardStats() {
             <div class="submission-detail-row">⭐ คะแนน (แอดมิน: ${ratings.admin} | ฝ่ายขาย: ${ratings.sales} | ช่าง: ${ratings.tech})</div>
             <div class="submission-detail-row" style="color: var(--accent); font-weight: 700;">🏆 MVP: ${mvp === 'admin' ? 'แอดมิน' : mvp === 'sales' ? 'ฝ่ายขาย' : mvp === 'tech' ? 'ช่าง' : mvp === 'all' ? 'ทุกทีม' : 'ไม่มี'}</div>
             ${comment ? `<div style="background-color: #f7fafc; padding: 6px; border-radius: 6px; font-style: italic; margin-top: 4px;">"${comment}"</div>` : ''}
+            ${adminComment ? `<div style="background-color: #f7fafc; padding: 6px; border-radius: 6px; font-style: italic; margin-top: 4px; color: #4b5563; font-size: 0.7rem;">💬 แอดมิน: "${adminComment}"</div>` : ''}
+            ${salesComment ? `<div style="background-color: #f7fafc; padding: 6px; border-radius: 6px; font-style: italic; margin-top: 4px; color: #4b5563; font-size: 0.7rem;">💬 ฝ่ายขาย: "${salesComment}"</div>` : ''}
+            ${techComment ? `<div style="background-color: #f7fafc; padding: 6px; border-radius: 6px; font-style: italic; margin-top: 4px; color: #4b5563; font-size: 0.7rem;">💬 ช่าง: "${techComment}"</div>` : ''}
             ${supportHtml}
             <div style="font-size: 0.65rem; color: var(--text-muted); text-align: right; margin-top: 6px;">
                 เวลาบันทึก: ${dateStr}
