@@ -1601,7 +1601,7 @@ body {
 
 .pp-tc-info h4 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     color: #1e293b;
     font-weight: 700;
 }
@@ -1614,7 +1614,7 @@ body {
 }
 
 .pp-tc-score {
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: 900;
     line-height: 1;
     color: #0f172a;
@@ -1660,9 +1660,9 @@ body {
 }
 
 .pp-tag {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
+    padding: 8px 16px;
+    border-radius: 24px;
+    font-size: 1.2rem;
     font-weight: 600;
 }
 .pp-team-card.admin .pp-tag { background: #eff6ff; color: #2563eb; }
@@ -1675,21 +1675,22 @@ body {
 }
 
 .pp-comment-box {
-    padding: 12px 16px;
-    border-radius: 8px;
+    padding: 16px 20px;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
-    font-size: 0.9rem;
+    font-size: 1.3rem;
     color: #334155;
     display: flex;
-    gap: 8px;
+    gap: 12px;
     align-items: flex-start;
+    line-height: 1.5;
 }
 .pp-team-card.admin .pp-comment-box { background: #fafafa; }
 .pp-team-card.sales .pp-comment-box { background: #fffcf8; border-color: #ffedd5; }
 .pp-team-card.tech .pp-comment-box { background: #f8fafc; border-color: #dcfce3; }
 
 .pp-comment-icon {
-    width: 16px; height: 16px;
+    width: 24px; height: 24px;
     flex-shrink: 0;
     margin-top: 2px;
 }
