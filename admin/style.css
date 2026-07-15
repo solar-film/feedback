@@ -1342,7 +1342,7 @@ body {
     gap: 16px;
     font-family: 'Inter', 'Prompt', sans-serif;
     background: #f8fafc;
-    height: 100%;
+    min-height: 100%;
 }
 
 /* Card Wrapper */
@@ -1810,6 +1810,7 @@ body {
     animation: alertPulse 2s infinite;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .pp-support-details::before {
