@@ -48,12 +48,7 @@
                         <span>ท่อติดตามสถานะ</span>
                     </a>
                 </li>
-                <li class="menu-item" data-tab="reports">
-                    <a href="#">
-                        <i data-lucide="bar-chart-3"></i>
-                        <span>รายงานคะแนนประเมิน</span>
-                    </a>
-                </li>
+                
                 <li class="menu-item" data-tab="presentation">
                     <a href="#">
                         <i data-lucide="projector"></i>
@@ -136,6 +131,37 @@
                             </div>
                             <div class="kpi-icon-box success">
                                 <i data-lucide="check-circle-2"></i>
+                            </div>
+                        </div>
+
+                        <div class="chart-card" style="grid-column: 3 / span 2; grid-row: 1 / span 2; display: flex; flex-direction: column;">
+                            <div class="chart-card-header">
+                                <h3 class="chart-card-title">สรุปคะแนนเฉลี่ยผลงานรายแผนก (เต็ม 5.0)</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
+                                <div style="background-color: var(--primary-light); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">💬 ทีมประสานงาน / แอดมิน</h4>
+                                        <p style="font-size: 0.72rem; color: var(--text-muted);">การต้อนรับ การนัดหมาย และการประสานงานข้อมูล</p>
+                                    </div>
+                                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary);" id="report-avg-admin">0.0</div>
+                                </div>
+
+                                <div style="background-color: var(--secondary-light); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--secondary);">🧭 ทีมที่ปรึกษาฟิล์ม / ฝ่ายขาย</h4>
+                                        <p style="font-size: 0.72rem; color: var(--text-muted);">การแนะนำคุณสมบัติรุ่นฟิล์ม ความเป็นมืออาชีพ</p>
+                                    </div>
+                                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--secondary);" id="report-avg-sales">0.0</div>
+                                </div>
+
+                                <div style="background-color: var(--success-light); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--success);">🧰 ทีมช่างเทคนิคติดตั้ง</h4>
+                                        <p style="font-size: 0.72rem; color: var(--text-muted);">ความตรงต่อเวลา ความประณีต และความสะอาดหลังเก็บงาน</p>
+                                    </div>
+                                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--success);" id="report-avg-tech">0.0</div>
+                                </div>
                             </div>
                         </div>
 
@@ -363,50 +389,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 4: รายงานผลงานทีมและโหวต MVP -->
-                <div class="tab-pane" id="tab-reports">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                        
-                        <div class="chart-card">
-                            <div class="chart-card-header">
-                                <h3 class="chart-card-title">สรุปคะแนนเฉลี่ยผลงานรายแผนก (เต็ม 5.0)</h3>
-                            </div>
-                            <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
-                                <div style="background-color: var(--primary-light); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                                    <div>
-                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">💬 ทีมประสานงาน / แอดมิน</h4>
-                                        <p style="font-size: 0.72rem; color: var(--text-muted);">การต้อนรับ การนัดหมาย และการประสานงานข้อมูล</p>
-                                    </div>
-                                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary);" id="report-avg-admin">0.0</div>
-                                </div>
-
-                                <div style="background-color: var(--secondary-light); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                                    <div>
-                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--secondary);">🧭 ทีมที่ปรึกษาฟิล์ม / ฝ่ายขาย</h4>
-                                        <p style="font-size: 0.72rem; color: var(--text-muted);">การแนะนำคุณสมบัติรุ่นฟิล์ม ความเป็นมืออาชีพ</p>
-                                    </div>
-                                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--secondary);" id="report-avg-sales">0.0</div>
-                                </div>
-
-                                <div style="background-color: var(--success-light); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                                    <div>
-                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--success);">🧰 ทีมช่างเทคนิคติดตั้ง</h4>
-                                        <p style="font-size: 0.72rem; color: var(--text-muted);">ความตรงต่อเวลา ความประณีต และความสะอาดหลังเก็บงาน</p>
-                                    </div>
-                                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--success);" id="report-avg-tech">0.0</div>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                    </div>
-                </div>
-
-
-            </div>
-            
-            <!-- TAB 5: โหมดนำเสนอ -->
+                <!-- TAB 5: โหมดนำเสนอ -->
             <div class="tab-pane" id="tab-presentation" style="height: 100%; padding: 0;">
                 <div id="presentation-container" style="background-color: #f0f8ff; border-radius: 12px; height: calc(100vh - 120px); display: flex; flex-direction: column; overflow: hidden; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     <!-- Slide Content (Dynamically injected) -->
