@@ -49,6 +49,13 @@
                     </a>
                 </li>
                 
+                <li class="menu-item" data-tab="gifts">
+                    <a href="#">
+                        <i data-lucide="gift"></i>
+                        <span>สถานะจัดส่งของรางวัล</span>
+                    </a>
+                </li>
+                
                 <li class="menu-item" data-tab="presentation">
                     <a href="#">
                         <i data-lucide="projector"></i>
@@ -389,7 +396,36 @@
                     </div>
                 </div>
 
-                <!-- TAB 5: โหมดนำเสนอ -->
+                <!-- TAB 4: สถานะจัดส่งของรางวัล -->
+            <div class="tab-pane" id="tab-gifts">
+                <div style="background-color: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow: hidden;">
+                    <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; color: var(--text-main); font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="gift" style="color: #ec4899;"></i> สถานะจัดส่งของรางวัลสำหรับลูกค้ารีวิว
+                        </h3>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>รหัสลูกค้า</th>
+                                    <th>ชื่อลูกค้า</th>
+                                    <th>บริษัท</th>
+                                    <th>สถานะจัดส่ง</th>
+                                    <th>ของรางวัล</th>
+                                    <th style="text-align: right;">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gifts-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: โหมดนำเสนอ -->
             <div class="tab-pane" id="tab-presentation" style="height: 100%; padding: 0;">
                 <div id="presentation-container" style="background-color: #f0f8ff; border-radius: 12px; height: calc(100vh - 120px); display: flex; flex-direction: column; overflow: hidden; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     <!-- Slide Content (Dynamically injected) -->
@@ -544,6 +580,60 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal for Gift Delivery Status -->
+    <div class="modal" id="modal-gift" onclick="if(event.target===this) closeGiftModal()">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i data-lucide="gift"></i> สถานะจัดส่งของรางวัล</h2>
+                <button class="modal-close" onclick="closeGiftModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="gift-cust-id">
+                
+                <div class="form-group">
+                    <label class="form-label" for="gift-status">สถานะจัดส่ง <span class="text-danger">*</span></label>
+                    <select id="gift-status" class="form-control" style="appearance: auto;" required>
+                        <option value="" disabled selected>เลือกสถานะ</option>
+                        <option value="เตรียมจัดส่ง">เตรียมจัดส่ง</option>
+                        <option value="จัดส่งแล้ว">จัดส่งแล้ว</option>
+                        <option value="ของตีกลับ">ของตีกลับ</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="gift-item">ของรางวัลที่จัดส่ง <span class="text-danger">*</span></label>
+                    <select id="gift-item" class="form-control" style="appearance: auto;" required>
+                        <option value="" disabled selected>เลือกของรางวัล</option>
+                        <option value="ร่ม3M">ร่ม3M</option>
+                        <option value="ผ้าไมโครไฟเบอร์ 2 ผืน">ผ้าไมโครไฟเบอร์ 2 ผืน</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="gift-address">ที่อยู่สำหรับจัดส่ง <span class="text-danger">*</span></label>
+                    <textarea id="gift-address" class="form-control" rows="3" placeholder="ระบุที่อยู่จัดส่ง..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="gift-remark">หมายเหตุ (ถ้ามี)</label>
+                    <textarea id="gift-remark" class="form-control" rows="2" placeholder="ระบุหมายเหตุเพิ่มเติม..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-primary" onclick="saveGiftStatus()" style="flex: 1; padding: 12px; justify-content: center;">
+                        <i data-lucide="save" style="width: 18px;"></i> บันทึกข้อมูล
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="deleteGiftStatus()" id="btn-delete-gift" style="padding: 12px; color: var(--danger); border-color: var(--danger); display: none;">
+                        <i data-lucide="trash-2" style="width: 18px;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Print Layout (Hidden by default, used only when printing) -->
+    <div id="print-layout" style="display: none;"></div>
 
     <!-- Core Admin App Logic -->
     <script defer src="app.js"></script>

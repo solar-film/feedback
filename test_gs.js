@@ -1,20 +1,4 @@
-# คู่มือการตั้งค่า Google Sheet สำหรับ Goodfilm Care Quest
 
-เพื่อบันทึกข้อมูลแบบสอบถามจากเว็บแอปพลิเคชันเข้าสู่ Google Sheet ที่คุณระบุ:
-📄 **[https://docs.google.com/spreadsheets/d/1IRU1ZjQIUbpBmz_MAzVtXdQQ93eQbJNJO9nC7fGvAKs](https://docs.google.com/spreadsheets/d/1IRU1ZjQIUbpBmz_MAzVtXdQQ93eQbJNJO9nC7fGvAKs/edit?gid=0#gid=0)**
-
-โปรดทำตามขั้นตอนการตั้งค่า **Google Apps Script** ด้านล่างนี้ค่ะ:
-
----
-
-## 🛠️ ขั้นตอนการติดตั้ง Apps Script
-
-1. เปิดเบราว์เซอร์ไปที่ Google Sheet ของคุณ
-2. ที่เมนูด้านบน เลือก **ส่วนขยาย (Extensions)** -> **Apps Script**
-3. ลบโค้ดเดิมทั้งหมดในไฟล์ `รหัส.gs` (หรือ `Code.gs`) ออก
-4. คัดลอกโค้ดด้านล่างนี้ไปวางแทนที่:
-
-```javascript
 function doPost(e) {
   var sheetName = "GFS_Care_Quest";
   var doc = SpreadsheetApp.getActiveSpreadsheet();
@@ -87,60 +71,6 @@ function doPost(e) {
         message: "Review status updated successfully"
       })).setMimeType(ContentService.MimeType.JSON);
     }
-    // ตรวจสอบว่าเป็นการส่งอัปเดตสถานะของขวัญหรือไม่
-    if (data.action === "updateGiftStatus") {
-      var giftSheetName = "Gift";
-      var giftSheet = doc.getSheetByName(giftSheetName);
-      if (!giftSheet) {
-        giftSheet = doc.insertSheet(giftSheetName);
-        var giftHeaders = ["ID", "Status", "Address", "Gift", "Remark", "Timestamp"];
-        giftSheet.appendRow(giftHeaders);
-        giftSheet.getRange(1, 1, 1, giftHeaders.length).setFontWeight("bold").setBackground("#eef3f8");
-      }
-      
-      var dataRange = giftSheet.getDataRange();
-      var values = dataRange.getValues();
-      var found = false;
-      for (var i = 1; i < values.length; i++) {
-        if (values[i][0] === data.id) {
-          giftSheet.getRange(i + 1, 2).setValue(data.status);
-          giftSheet.getRange(i + 1, 3).setValue(data.address);
-          giftSheet.getRange(i + 1, 4).setValue(data.gift);
-          giftSheet.getRange(i + 1, 5).setValue(data.remark);
-          giftSheet.getRange(i + 1, 6).setValue(new Date());
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        giftSheet.appendRow([data.id, data.status, data.address, data.gift, data.remark, new Date()]);
-      }
-      return ContentService.createTextOutput(JSON.stringify({
-        status: "success",
-        message: "Gift status updated successfully"
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-    
-    // ตรวจสอบว่าเป็นการลบข้อมูลของขวัญหรือไม่
-    if (data.action === "deleteGiftStatus") {
-      var giftSheetName = "Gift";
-      var giftSheet = doc.getSheetByName(giftSheetName);
-      if (giftSheet) {
-        var dataRange = giftSheet.getDataRange();
-        var values = dataRange.getValues();
-        for (var i = 1; i < values.length; i++) {
-          if (values[i][0] === data.id) {
-            giftSheet.deleteRow(i + 1);
-            break;
-          }
-        }
-      }
-      return ContentService.createTextOutput(JSON.stringify({
-        status: "success",
-        message: "Gift status deleted successfully"
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-
     
     // ดึงค่าแยกตามหมวดหมู่โครงสร้างเว็บแอปพลิเคชัน
     var id = data.id || "";
@@ -254,23 +184,6 @@ function handleGetAllCustomersDetailed() {
   var dataRows = getSheetData("Data");
   var fbRows = getSheetData("GFS_Care_Quest");
   var logRows = getSheetData("GFS_Status_Log");
-  var giftRows = getSheetData("Gift");
-  var giftDict = {};
-  if (giftRows) {
-    for (var i = 0; i < giftRows.length; i++) {
-      var gId = giftRows[i]["ID"] || "";
-      if (gId) {
-        giftDict[gId] = {
-          status: giftRows[i]["Status"] || "",
-          address: giftRows[i]["Address"] || "",
-          gift: giftRows[i]["Gift"] || "",
-          remark: giftRows[i]["Remark"] || "",
-          timestamp: giftRows[i]["Timestamp"] || ""
-        };
-      }
-    }
-  }
-
   
   if (!dataRows) return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ไม่พบชีต Data" })).setMimeType(ContentService.MimeType.JSON);
   
@@ -325,9 +238,6 @@ function handleGetAllCustomersDetailed() {
     var feedback = feedbackDict[id] || null;
     var sentStatus = statusLogDict[id] || "Unsent";
     var status = feedback ? "Completed" : sentStatus;
-    var giftData = giftDict[id] || null;
-    var addressFromData = r["_col_16"] || ""; // Column Q
-
     
     return {
       id: id,
@@ -343,9 +253,7 @@ function handleGetAllCustomersDetailed() {
       adminName: r["_col_17"] || r["Admin"] || r["แอดมิน"] || "-",
       bill: r["Bill"] || r["เลขที่บิล"] || "-",
       status: status,
-      feedback: feedback,
-      giftData: giftData,
-      addressFromData: addressFromData
+      feedback: feedback
     };
   });
   
@@ -389,28 +297,3 @@ function handleGetAllCustomers() {
   
   return ContentService.createTextOutput(JSON.stringify({ status: "success", data: result })).setMimeType(ContentService.MimeType.JSON);
 }
-```
-
-5. กดไอคอน 💾 **บันทึกโครงการ (Save)** ด้านบน
-6. กดปุ่ม **การทำให้ใช้งานได้ (Deploy)** -> **การทำให้ใช้งานได้ใหม่ (New deployment)**
-7. เลือกประเภทการจัดจำหน่ายเป็น **เว็บแอป (Web app)**
-8. ตั้งค่ารายละเอียดดังนี้:
-   * **คำอธิบาย (Description)**: Goodfilm Care Quest API
-   * **เรียกใช้งานในฐานะ (Execute as)**: ฉัน (Me - อีเมลของคุณ)
-   * **ผู้ที่มีสิทธิ์เข้าถึง (Who has access)**:ทุกคน (Anyone) *(สำคัญมาก! เพื่อให้ฟรอนต์เอนด์สามารถส่ง POST เข้ามาบันทึกได้)*
-9. กดปุ่ม **ทำให้ใช้งานได้ (Deploy)**
-10. ระบบอาจขอสิทธิ์เข้าถึงบัญชี ให้กด **ให้สิทธิ์เข้าถึง (Authorize Access)** -> เลือกบัญชีจีเมลของคุณ -> กด **Advanced** -> กด **Go to ... (unsafe)** -> กด **Allow**
-11. เมื่อเสร็จสิ้น คุณจะได้รับ **URL ของเว็บแอป (Web App URL)** เช่น `https://script.google.com/macros/s/.../exec`
-12. คัดลอกลิงก์นั้นไว้
-
----
-
-## 🔗 วิธีนำมาเชื่อมต่อกับหน้าเว็บแบบประเมิน
-
-1. เปิดหน้าเว็บ Goodfilm Care Quest ขึ้นมา (เช่น `http://localhost:8080`)
-2. คลิกปุ่มสีดำ **Admin Dashboard 📊** ที่มุมล่างซ้าย
-3. ในกล่องหัวข้อ **"ตั้งค่าเชื่อมต่อ Google Sheets 📊"**
-4. วางลิงก์ Web App URL ที่คุณคัดลอกมาลงในช่องกรอก
-5. กดปิดหน้าต่างแดชบอร์ด ระบบจะบันทึกการตั้งค่าของคุณลงในเบราว์เซอร์อัตโนมัติ
-
-**🎉 เสร็จเรียบร้อย!** เมื่อมีลูกค้าตอบแบบประเมินและกดส่ง ระบบจะส่งข้อมูลไปบันทึกลงในแท็บชีต `GFS_Care_Quest` ทันทีแบบ Real-time พร้อมแสดงผลลัพธ์ในตารางสวยงาม
