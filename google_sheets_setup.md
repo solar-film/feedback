@@ -233,7 +233,7 @@ function handleGetAllCustomersDetailed() {
       name: r["Name"] || r["ชื่อผู้ติดต่อ"] || r["ชื่อลูกค้า"] || "",
       phone: r["Phone"] || r["เบอร์โทรศัพท์"] || r["เบอร์ติดต่อ"] || "",
       lineAt: r["Line@"] || r["LINE"] || r["Line @"] || "-",
-      siteType: r["SiteType"] || r["ประเภทหน้างาน"] || "",
+      siteType: r["_col_16"] || r["SiteType"] || r["ประเภทหน้างาน"] || r["สถานที่"] || "",
       installDate: r["InstallDate"] || r["วันที่ติดตั้ง"] || "",
       filmModel: r["FilmModel"] || r["รุ่นฟิล์ม"] || r["รุ่นฟิล์ม / พื้นที่ติดตั้ง"] || "",
       sales: r["Sales"] || r["เซลล์ผู้ดูแล"] || r["ฝ่ายขาย"] || "-",
