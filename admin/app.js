@@ -1717,9 +1717,9 @@ function renderPresentationSlide() {
     // Build tags for benefits/details
     const positiveTags = (fb.benefits || []).map(b => `<span class="slide-tag positive"><i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-top:-2px;"></i> ${b}</span>`).join('');
     
-    let adminPos = (fb.details?.admin || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
-    let salesPos = (fb.details?.sales || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
-    let techPos = (fb.details?.tech || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
+    let adminPos = (fb.details?.admin || []).map(b => `<span class="slide-tag slide-tag-admin">${b}</span>`).join('');
+    let salesPos = (fb.details?.sales || []).map(b => `<span class="slide-tag slide-tag-sales">${b}</span>`).join('');
+    let techPos = (fb.details?.tech || []).map(b => `<span class="slide-tag slide-tag-tech">${b}</span>`).join('');
     
     let supportTags = (fb.supportNeeds || []).map(b => `<span class="slide-tag negative"><i data-lucide="alert-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-top:-2px;"></i> ${b}</span>`).join('');
     
@@ -1753,7 +1753,6 @@ function renderPresentationSlide() {
                         <span><i data-lucide="building" style="width:16px;height:16px;"></i> <b>สถานที่:</b> ${c.siteType || c.company || '-'}</span>
                         <div style="display: flex; gap: 16px;">
                             <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่:</b> ${c.installDate}</span>
-                            <span><i data-lucide="package" style="width:16px;height:16px;"></i> <b>ฟิล์ม:</b> ${c.filmModel}</span>
                         </div>
                     </div>
                 </div>

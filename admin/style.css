@@ -1022,6 +1022,24 @@ body {
     color: var(--success);
 }
 
+.slide-tag-admin {
+    background: #e0e7ff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+}
+
+.slide-tag-sales {
+    background: #ffedd5;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+.slide-tag-tech {
+    background: #ccfbf1;
+    color: #0f766e;
+    border: 1px solid #99f6e4;
+}
+
 .slide-tag.negative {
     background: #feeceb;
     color: var(--danger);
