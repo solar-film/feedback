@@ -1974,7 +1974,7 @@ function renderPresentationSlide() {
                         <i data-lucide="user" style="width: 40px; height: 40px;" stroke-width="1.5"></i>
                     </div>
                     <div class="pp-cust-info">
-                        <h3>คุณ${c.name.split(' ')[0]}</h3>
+                        <h3>คุณ${c.name.replace(/^คุณ/, '').split(' ')[0]}</h3>
                         <div class="pp-meta-row">
                             <i data-lucide="map-pin" class="pp-meta-icon"></i>
                             <span>สถานที่: ${c.siteType || c.company || '-'}</span>
@@ -1998,22 +1998,28 @@ function renderPresentationSlide() {
             </div>
 
             <!-- MVP Banner -->
+            ${(fb.mvp || customerComment) ? `
             <div class="pp-mvp-banner">
                 <div class="pp-banner-bg"></div>
                 <div class="pp-banner-content">
+                    ${fb.mvp ? `
                     <div class="pp-trophy">🏆</div>
                     <div class="pp-ribbon">⭐ MVP ประจำงานนี้</div>
                     <div class="pp-mvp-title">
-                        ขอมอบมงให้แก่... <span class="pp-mvp-highlight">ทีมช่าง (Technician) 🔧 🎉</span>
+                        ขอมอบมงให้แก่... <span class="pp-mvp-highlight">${fb.mvp} 🎉</span>
                     </div>
+                    ` : ''}
+                    ${customerComment ? `
                     <div class="pp-quote-subtext">ข้อความฝากถึงทีมงาน</div>
                     <div class="pp-quote-text">
                         <span class="pp-quote-mark">“</span>
-                        ${customerComment || 'บริการดีมาก ประทับใจ'}
+                        ${customerComment}
                         <span class="pp-quote-mark">”</span>
                     </div>
+                    ` : ''}
                 </div>
             </div>
+            ` : ''}
 
             <!-- Team Cards -->
             <div class="pp-team-grid">
