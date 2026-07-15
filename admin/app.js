@@ -2459,13 +2459,17 @@ function printGiftLabel(id) {
                     top: 0;
                     width: 210mm;
                     height: 148mm;
-                    background-image: url('${bgImage}');
-                    background-size: cover;
-                    background-position: center;
-                    background-repeat: no-repeat;
                     font-family: 'Prompt', 'Sarabun', sans-serif;
-                    -webkit-print-color-adjust: exact !important;
-                    print-color-adjust: exact !important;
+                }
+                
+                .print-bg {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 210mm;
+                    height: 148mm;
+                    z-index: -1;
+                    object-fit: cover;
                 }
                 
                 .print-name {
@@ -2478,6 +2482,7 @@ function printGiftLabel(id) {
                     width: 140mm;
                     white-space: nowrap;
                     overflow: hidden;
+                    z-index: 1;
                 }
                 
                 .print-phone {
@@ -2488,6 +2493,7 @@ function printGiftLabel(id) {
                     font-weight: 500;
                     color: #1e293b;
                     width: 140mm;
+                    z-index: 1;
                 }
                 
                 .print-address {
@@ -2501,9 +2507,11 @@ function printGiftLabel(id) {
                     line-height: 15.5mm;
                     height: 32mm;
                     overflow: hidden;
+                    z-index: 1;
                 }
             }
         </style>
+        <img class="print-bg" src="${bgImage}" alt="Background" />
         <div class="print-name">${receiverName}</div>
         <div class="print-phone">${c.phone || '-'}</div>
         <div class="print-address">${addr}</div>
@@ -2518,10 +2526,20 @@ function printGiftLabel(id) {
         document.head.appendChild(font);
     }
     
-    // Trigger print
-    setTimeout(() => {
-        window.print();
-    }, 500);
+    // Trigger print after image loads
+    const img = layout.querySelector('.print-bg');
+    let printed = false;
+    const doPrint = () => {
+        if (printed) return;
+        printed = true;
+        setTimeout(() => window.print(), 100);
+    };
+    if (img) {
+        img.onload = doPrint;
+        setTimeout(doPrint, 1000); // fallback
+    } else {
+        setTimeout(doPrint, 500);
+    }
 }
 
 
