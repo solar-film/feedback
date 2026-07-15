@@ -1769,6 +1769,7 @@ function renderPresentationSlide() {
             
             <!-- Customer Quote Area -->
             <div class="slide-quote-container">
+                <div class="slide-quote-label">ข้อความประทับใจฝากถึงทีมงาน</div>
                 ${quoteHtml}
             </div>
             

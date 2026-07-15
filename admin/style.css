@@ -1183,6 +1183,16 @@ body {
     line-height: 1;
 }
 
+.slide-quote-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+}
+
 .slide-quote-text {
     font-size: 1.8rem;
     font-weight: 600;
