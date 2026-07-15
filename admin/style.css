@@ -1134,3 +1134,75 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Presentation Customer Quote */
+.slide-quote-container {
+    background: linear-gradient(135deg, #1e293b, #3b82f6);
+    border-radius: 20px;
+    padding: 30px 40px;
+    color: white;
+    margin-bottom: 24px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.25);
+    overflow: hidden;
+}
+
+.slide-quote-container::before {
+    content: '"';
+    position: absolute;
+    top: -20px;
+    left: 20px;
+    font-size: 160px;
+    color: rgba(255, 255, 255, 0.1);
+    font-family: Georgia, serif;
+    line-height: 1;
+}
+
+.slide-quote-text {
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.slide-quote-empty {
+    font-size: 1.3rem;
+    color: rgba(255,255,255,0.6);
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+.slide-quote-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.slide-mvp-badge {
+    background: linear-gradient(to right, #f59e0b, #fbbf24);
+    color: #78350f;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.slide-team-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+.slide-team-card {
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}

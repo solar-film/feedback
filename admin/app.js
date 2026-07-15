@@ -1730,30 +1730,37 @@ function renderPresentationSlide() {
     if (fb.supportDetails) additionalComments.push(`<b style="color:var(--danger)">รายละเอียดเพิ่มเติม (ปรับปรุง):</b> ${fb.supportDetails}`);
     
     
-    const commentsHtml = additionalComments.length > 0 
-        ? `<div style="margin-top: 20px; padding: 16px; background: #fff5f5; border-left: 4px solid var(--primary); border-radius: 8px;">
-            <div style="font-weight: 700; margin-bottom: 8px; color: var(--primary);">รายละเอียดเพิ่มเติม (ปรับปรุง):</div>
-            ${fb.supportDetails ? `<div>${fb.supportDetails}</div>` : ''}
-           </div>`
-        : '';
+    
+    const customerComment = fb.mvpComment ? fb.mvpComment.trim() : '';
+    const quoteHtml = customerComment 
+        ? `<div class="slide-quote-text">${customerComment}</div>`
+        : `<div class="slide-quote-empty">ลูกค้าประเมินคะแนนเรียบร้อย แต่ไม่ได้ระบุข้อความเพิ่มเติม</div>`;
+        
+    const mvpHtml = fb.mvp ? `<div class="slide-mvp-badge"><i data-lucide="award"></i> MVP: ${fb.mvp}</div>` : '';
         
     container.innerHTML = `
-        <div class="slide-card">
-            <div class="slide-header">
+        <div class="slide-card" style="display: flex; flex-direction: column; gap: 0;">
+            <div class="slide-header" style="margin-bottom: 20px;">
                 <div class="slide-cust-info">
                     <h3>${c.name}</h3>
                     <div class="slide-cust-meta" style="flex-wrap: wrap;">
                         <span><i data-lucide="building" style="width:16px;height:16px;"></i> <b>สถานที่:</b> ${c.siteType || c.company || '-'}</span>
-                        <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่ติดตั้ง:</b> ${c.installDate}</span>
-                        <span><i data-lucide="hash" style="width:16px;height:16px;"></i> <b>รหัส:</b> ${c.id}</span>
-                        <span><i data-lucide="package" style="width:16px;height:16px;"></i> <b>รุ่นฟิล์ม:</b> ${c.filmModel}</span>
+                        <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่:</b> ${c.installDate}</span>
+                        <span><i data-lucide="package" style="width:16px;height:16px;"></i> <b>ฟิล์ม:</b> ${c.filmModel}</span>
                     </div>
                 </div>
-                <div class="slide-mood-big">
+                <div class="slide-mood-big" style="background: #f1f5f9; padding: 12px 24px; border-radius: 100px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
                     ${fb.overallMood || '😊'}
                 </div>
             </div>
             
+            <!-- Customer Quote Area -->
+            <div class="slide-quote-container">
+                ${quoteHtml}
+                ${mvpHtml ? `<div class="slide-quote-footer">${mvpHtml}</div>` : ''}
+            </div>
+            
+            <!-- Team Scores Area -->
             <div class="slide-team-grid">
                 <!-- Admin -->
                 <div class="slide-team-card">
@@ -1761,11 +1768,10 @@ function renderPresentationSlide() {
                         <img src="../images/admin.png" alt="Admin" class="slide-score-img-small">
                         <div class="slide-team-card-title">
                             <h4>แอดมิน (${c.adminName || '-'})</h4>
-                            <div class="slide-team-score">${fb.ratings?.admin || '-'} <span style="font-size:1.2rem; color:var(--text-muted);">/ 5</span></div>
+                            <div class="slide-team-score">${fb.ratings?.admin || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
                         </div>
                     </div>
                     <div class="slide-team-tags">${adminPos || '<span style="color:#ccc;">-</span>'}</div>
-                    ${fb.comments?.admin ? `<div class="slide-team-comment">${fb.comments.admin}</div>` : ''}
                 </div>
                 
                 <!-- Sales -->
@@ -1774,11 +1780,10 @@ function renderPresentationSlide() {
                         <img src="../images/sales.png" alt="Sales" class="slide-score-img-small">
                         <div class="slide-team-card-title">
                             <h4>ฝ่ายขาย (${c.sales || '-'})</h4>
-                            <div class="slide-team-score">${fb.ratings?.sales || '-'} <span style="font-size:1.2rem; color:var(--text-muted);">/ 5</span></div>
+                            <div class="slide-team-score">${fb.ratings?.sales || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
                         </div>
                     </div>
                     <div class="slide-team-tags">${salesPos || '<span style="color:#ccc;">-</span>'}</div>
-                    ${fb.comments?.sales ? `<div class="slide-team-comment">${fb.comments.sales}</div>` : ''}
                 </div>
                 
                 <!-- Tech -->
@@ -1787,30 +1792,20 @@ function renderPresentationSlide() {
                         <img src="../images/tech.png" alt="Tech" class="slide-score-img-small">
                         <div class="slide-team-card-title">
                             <h4>ทีมช่าง (${c.tech || '-'})</h4>
-                            <div class="slide-team-score">${fb.ratings?.tech || '-'} <span style="font-size:1.2rem; color:var(--text-muted);">/ 5</span></div>
+                            <div class="slide-team-score">${fb.ratings?.tech || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
                         </div>
                     </div>
                     <div class="slide-team-tags">${techPos || '<span style="color:#ccc;">-</span>'}</div>
-                    ${fb.comments?.tech ? `<div class="slide-team-comment">${fb.comments.tech}</div>` : ''}
                 </div>
             </div>
             
-            <div class="slide-grid">
-                <div class="slide-section">
-                    <div class="slide-section-title">
-                        <i data-lucide="thumbs-up"></i> ผลลัพธ์ของฟิล์ม
-                    </div>
-                    <div>${positiveTags || '<span style="color: var(--text-muted); font-size: 0.9rem;">-</span>'}</div>
-                </div>
-                
-                <div class="slide-section">
-                    <div class="slide-section-title" style="color: var(--danger);">
-                        <i data-lucide="alert-triangle"></i> สิ่งที่ควรปรับปรุง
-                    </div>
-                    <div>${supportTags || '<span style="color: var(--text-muted); font-size: 0.9rem;">ไม่มีข้อเสนอแนะให้ปรับปรุง</span>'}</div>
-                    ${fb.supportDetails ? `<div style="margin-top:8px; font-size:0.95rem;">${fb.supportDetails}</div>` : ''}
-                </div>
+            ${fb.supportDetails || fb.supportNeeds?.length > 0 ? `
+            <div style="margin-top: 20px; padding: 16px; background: #fff5f5; border-left: 4px solid var(--danger); border-radius: 8px;">
+                <div style="font-weight: 700; margin-bottom: 8px; color: var(--danger);"><i data-lucide="alert-triangle" style="width:18px; display:inline-block; vertical-align:-3px;"></i> สิ่งที่ควรปรับปรุง:</div>
+                <div style="margin-bottom: 4px; font-weight: 600;">${supportTags}</div>
+                <div>${fb.supportDetails || ''}</div>
             </div>
+            ` : ''}
         </div>
     `;
     lucide.createIcons();
