@@ -1924,22 +1924,6 @@ function renderPresentationSlide() {
                 showMvp = true;
                 mvpText = mvpRaw.toLowerCase() === 'all' ? 'ทุกทีม' : mvpRaw;
             }
-            
-            let mvpRaw = fb.mvp ? fb.mvp.trim() : '';
-            let showMvp = false;
-            let mvpText = '';
-            if (mvpRaw && mvpRaw.toLowerCase() !== 'none') {
-                showMvp = true;
-                mvpText = mvpRaw.toLowerCase() === 'all' ? 'ทุกทีม' : mvpRaw;
-            }
-            
-            let mvpRaw = fb.mvp ? fb.mvp.trim() : '';
-            let showMvp = false;
-            let mvpText = '';
-            if (mvpRaw && mvpRaw.toLowerCase() !== 'none') {
-                showMvp = true;
-                mvpText = mvpRaw.toLowerCase() === 'all' ? 'ทุกทีม' : mvpRaw;
-            }
         
     // Calculate scores
     let totalScore = 0;
