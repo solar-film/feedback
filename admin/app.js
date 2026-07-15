@@ -2244,11 +2244,11 @@ function openGiftModal(id) {
         document.getElementById('btn-delete-gift').style.display = 'none';
     }
     
-    document.getElementById('modal-gift').classList.add('open');
+    document.getElementById('modal-gift').style.display = 'flex';
 }
 
 function closeGiftModal() {
-    document.getElementById('modal-gift').classList.remove('open');
+    document.getElementById('modal-gift').style.display = 'none';
 }
 
 async function saveGiftStatus() {
