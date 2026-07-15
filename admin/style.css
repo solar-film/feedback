@@ -1381,7 +1381,7 @@ body {
 
 .pp-cust-info h3 {
     margin: 0 0 8px 0;
-    font-size: 1.6rem;
+    font-size: 2.0rem;
     color: #1e3a8a;
     font-weight: 700;
 }
@@ -1389,17 +1389,19 @@ body {
 .pp-meta-row {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 10px;
     color: #475569;
-    font-size: 0.95rem;
-    margin-bottom: 4px;
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+    line-height: 1.5;
 }
 
 .pp-meta-icon {
-    width: 16px;
-    height: 16px;
+    width: 22px;
+    height: 22px;
     color: #64748b;
-    margin-top: 2px;
+    margin-top: 4px;
+    flex-shrink: 0;
 }
 
 .pp-score-right {
