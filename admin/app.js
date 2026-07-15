@@ -1974,7 +1974,7 @@ function renderPresentationSlide() {
                         <i data-lucide="user" style="width: 40px; height: 40px;" stroke-width="1.5"></i>
                     </div>
                     <div class="pp-cust-info">
-                        <h3>คุณ${c.name.replace(/^คุณ/, '').split(' ')[0]}</h3>
+                        <h3>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]}</h3>
                         <div class="pp-meta-row">
                             <i data-lucide="map-pin" class="pp-meta-icon"></i>
                             <span>สถานที่: ${c.siteType || c.company || '-'}</span>
