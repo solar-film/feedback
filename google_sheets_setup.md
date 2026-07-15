@@ -314,7 +314,9 @@ function handleGetAllCustomersDetailed() {
           mvpComment: f["Customer Comment"] || "",
           overallMood: f["Overall Mood"] || "",
           supportNeeds: f["Follow-up Issue"] ? f["Follow-up Issue"].split(', ') : [],
-          supportDetails: f["Follow-up Details"] || ""
+          supportDetails: f["Follow-up Details"] || "",
+          googleReviewClicked: f["Google Review Clicked"] || "",
+          rewardEligible: f["Reward Eligible"] || ""
         };
       }
     }
