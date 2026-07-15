@@ -2424,12 +2424,25 @@ function printGiftLabel(id) {
         bgImage = '../images/MHL-A5.png';
     }
     
-    // Format Receiver Name (use remark if available, fallback to c.name)
-    let receiverName = gift.remark || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
-    if (receiverName && !receiverName.startsWith('คุณ')) {
-        receiverName = 'คุณ' + receiverName;
-    }
+    // Parse Address multi-line format if provided (Name, Phone, Address...)
+    let receiverName = '';
+    let receiverPhone = '';
+    let receiverAddress = '';
     
+    const addrLines = addr.split('\\n').map(l => l.trim()).filter(l => l !== '');
+    if (addrLines.length >= 3) {
+        receiverName = addrLines[0];
+        receiverPhone = addrLines[1];
+        receiverAddress = addrLines.slice(2).join(' ');
+    } else {
+        receiverName = gift.remark || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
+        if (receiverName && !receiverName.startsWith('คุณ')) {
+            receiverName = 'คุณ' + receiverName;
+        }
+        receiverPhone = c.phone || '-';
+        receiverAddress = addr.replace(/\\n/g, ' ') || '-';
+    }
+
     const layout = document.getElementById('print-layout');
     
     // Create print HTML layout (Responsive Landscape)
@@ -2472,7 +2485,7 @@ function printGiftLabel(id) {
                 
                 .print-name {
                     position: absolute;
-                    top: 27vh;
+                    top: 47.5vh;
                     left: 22.8vw;
                     font-size: 2.5vw;
                     font-weight: 500;
@@ -2485,7 +2498,7 @@ function printGiftLabel(id) {
                 
                 .print-phone {
                     position: absolute;
-                    top: 37.1vh;
+                    top: 58vh;
                     left: 22.8vw;
                     font-size: 2.5vw;
                     font-weight: 500;
@@ -2496,7 +2509,7 @@ function printGiftLabel(id) {
                 
                 .print-address {
                     position: absolute;
-                    top: 47.3vh;
+                    top: 68.5vh;
                     left: 17.1vw;
                     font-size: 2.3vw;
                     font-weight: 400;
@@ -2511,8 +2524,8 @@ function printGiftLabel(id) {
         </style>
         <img class="print-bg" src="${bgImage}" alt="Background" />
         <div class="print-name">${receiverName}</div>
-        <div class="print-phone">${c.phone || '-'}</div>
-        <div class="print-address">${addr}</div>
+        <div class="print-phone">${receiverPhone}</div>
+        <div class="print-address">${receiverAddress}</div>
     `;
     
     // Add font for print if missing
