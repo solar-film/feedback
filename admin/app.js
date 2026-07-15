@@ -1545,6 +1545,8 @@ function renderDashboardCharts() {
             }
         });
     }
+    
+    renderReportCharts();
 }
 
 function renderReportCharts() {
