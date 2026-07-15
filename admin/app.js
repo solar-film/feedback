@@ -1931,10 +1931,15 @@ function renderPresentationSlide() {
     const avgScorePercent = avgScore > 0 ? (avgScore / 5 * 100) : 0;
     
     // Tag generation helper
-    const makeTags = (tagsStr) => {
-        if (!tagsStr) return '';
-        const tags = tagsStr.split(',').map(t => t.trim()).filter(t => t);
-        return tags.map(t => `<span class="pp-tag">${t}</span>`).join('');
+    const makeTags = (tagsData) => {
+        if (!tagsData) return '';
+        let tags = [];
+        if (Array.isArray(tagsData)) {
+            tags = tagsData;
+        } else if (typeof tagsData === 'string') {
+            tags = tagsData.split(',').map(t => t.trim());
+        }
+        return tags.filter(t => t).map(t => `<span class="pp-tag">${t}</span>`).join('');
     };
     const adminTagsHtml = makeTags(fb.details?.admin);
     const salesTagsHtml = makeTags(fb.details?.sales);
