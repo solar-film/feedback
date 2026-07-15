@@ -89,6 +89,10 @@
                         <input type="date" id="global-filter-start" onchange="applyGlobalFilter()" style="border: none; background: transparent; outline: none; cursor: pointer; color: var(--text-main); font-family: inherit; font-size: 0.75rem;">
                         <span style="color: var(--text-muted); font-size: 0.75rem;">ถึง</span>
                         <input type="date" id="global-filter-end" onchange="applyGlobalFilter()" style="border: none; background: transparent; outline: none; cursor: pointer; color: var(--text-main); font-family: inherit; font-size: 0.75rem;">
+                        <span style="color: var(--border);">|</span>
+                        <button onclick="clearAllFilters()" style="background: none; border: none; cursor: pointer; color: var(--danger); display: flex; align-items: center; justify-content: center; padding: 0 4px;" title="ล้างตัวกรองทั้งหมด">
+                            <i data-lucide="filter-x" style="width: 14px; height: 14px;"></i>
+                        </button>
                     </div>
                     
                     <button id="btn-refresh-data" class="btn-primary" onclick="forceRefreshData()" style="padding: 6px 12px; font-size: 0.8rem; height: 32px; display: flex; align-items: center; gap: 6px; border-radius: 6px; background-color: var(--surface); color: var(--text-main); border: 1px solid var(--border); box-shadow: none;">
