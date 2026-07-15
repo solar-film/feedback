@@ -1345,8 +1345,6 @@ function renderDashboardCharts() {
         let benefitsData = Object.keys(benefitsTally).map(k => ({ name: k, count: benefitsTally[k] }));
         benefitsData.sort((a, b) => b.count - a.count); // Sort by highest
         
-        ctxBenefits.parentElement.style.height = Math.max(150, benefitsData.length * 40 + 60) + 'px';
-        
         if (state.charts.benefitsBar) state.charts.benefitsBar.destroy();
         state.charts.benefitsBar = new Chart(ctxBenefits, {
             type: 'bar',
@@ -1362,23 +1360,22 @@ function renderDashboardCharts() {
                 }]
             },
             options: {
-                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
                     legend: { display: false },
                     datalabels: {
                         anchor: 'end',
-                        align: 'right',
+                        align: 'top',
                         formatter: (value) => value > 0 ? value : '',
                         font: { weight: 'bold' }
                     }
                 },
                 scales: {
-                    x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
-                    y: { grid: { display: false } }
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } }
                 },
-                layout: { padding: { right: 30 } }
+                layout: { padding: { top: 20 } }
             }
         });
     }
@@ -1398,8 +1395,6 @@ function renderDashboardCharts() {
         let adminData = Object.keys(adminTally).map(k => ({ name: k, count: adminTally[k] }));
         adminData.sort((a, b) => b.count - a.count);
         
-        ctxTagsAdmin.parentElement.style.height = Math.max(150, adminData.length * 40 + 60) + 'px';
-        
         if (state.charts.tagsAdminBar) state.charts.tagsAdminBar.destroy();
         state.charts.tagsAdminBar = new Chart(ctxTagsAdmin, {
             type: 'bar',
@@ -1415,15 +1410,14 @@ function renderDashboardCharts() {
                 }]
             },
             options: {
-                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
                     legend: { display: false },
-                    datalabels: { anchor: 'end', align: 'right', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
+                    datalabels: { anchor: 'end', align: 'top', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
                 },
-                scales: { x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, y: { grid: { display: false } } },
-                layout: { padding: { right: 30 } }
+                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } } },
+                layout: { padding: { top: 20 } }
             }
         });
     }
@@ -1443,8 +1437,6 @@ function renderDashboardCharts() {
         let salesData = Object.keys(salesTally).map(k => ({ name: k, count: salesTally[k] }));
         salesData.sort((a, b) => b.count - a.count);
         
-        ctxTagsSales.parentElement.style.height = Math.max(150, salesData.length * 40 + 60) + 'px';
-        
         if (state.charts.tagsSalesBar) state.charts.tagsSalesBar.destroy();
         state.charts.tagsSalesBar = new Chart(ctxTagsSales, {
             type: 'bar',
@@ -1460,15 +1452,14 @@ function renderDashboardCharts() {
                 }]
             },
             options: {
-                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
                     legend: { display: false },
-                    datalabels: { anchor: 'end', align: 'right', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
+                    datalabels: { anchor: 'end', align: 'top', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
                 },
-                scales: { x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, y: { grid: { display: false } } },
-                layout: { padding: { right: 30 } }
+                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } } },
+                layout: { padding: { top: 20 } }
             }
         });
     }
@@ -1488,8 +1479,6 @@ function renderDashboardCharts() {
         let techData = Object.keys(techTally).map(k => ({ name: k, count: techTally[k] }));
         techData.sort((a, b) => b.count - a.count);
         
-        ctxTagsTech.parentElement.style.height = Math.max(150, techData.length * 40 + 60) + 'px';
-        
         if (state.charts.tagsTechBar) state.charts.tagsTechBar.destroy();
         state.charts.tagsTechBar = new Chart(ctxTagsTech, {
             type: 'bar',
@@ -1505,15 +1494,14 @@ function renderDashboardCharts() {
                 }]
             },
             options: {
-                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
                     legend: { display: false },
-                    datalabels: { anchor: 'end', align: 'right', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
+                    datalabels: { anchor: 'end', align: 'top', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
                 },
-                scales: { x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, y: { grid: { display: false } } },
-                layout: { padding: { right: 30 } }
+                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } } },
+                layout: { padding: { top: 20 } }
             }
         });
     }
@@ -1527,9 +1515,6 @@ function renderDashboardCharts() {
                 mvps[c.feedback.mvp]++;
             }
         });
-
-        // mvp labels length is 4
-        ctxMvp.parentElement.style.height = Math.max(150, 4 * 40 + 60) + 'px';
 
         if (state.charts.mvpsBar) state.charts.mvpsBar.destroy();
         state.charts.mvpsBar = new Chart(ctxMvp, {
@@ -1546,18 +1531,17 @@ function renderDashboardCharts() {
                 }]
             },
             options: {
-                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
                     legend: { display: false },
-                    datalabels: { anchor: 'end', align: 'right', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
+                    datalabels: { anchor: 'end', align: 'top', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
                 },
                 scales: {
-                    x: { grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
-                    y: { grid: { display: false } }
+                    y: { grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } }
                 },
-                layout: { padding: { right: 30 } }
+                layout: { padding: { top: 20 } }
             }
         });
     }
