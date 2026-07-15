@@ -598,6 +598,7 @@ function renderCustomerTable() {
             <td>${c.lineAt || '-'}</td>
             <td>${c.installDate || '-'}</td>
             <td>${c.sales || '-'}</td>
+            <td>${c.tech || '-'}</td>
             <td>
                 <span class="status-badge ${statusClass}">${statusText}</span>
             </td>
