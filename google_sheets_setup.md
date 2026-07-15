@@ -93,7 +93,7 @@ function doPost(e) {
       var giftSheet = doc.getSheetByName(giftSheetName);
       if (!giftSheet) {
         giftSheet = doc.insertSheet(giftSheetName);
-        var giftHeaders = ["ID", "Status", "Address", "Gift", "Remark", "Timestamp"];
+        var giftHeaders = ["ID", "Timestamp", "Status", "Address", "Gift", "Remark"];
         giftSheet.appendRow(giftHeaders);
         giftSheet.getRange(1, 1, 1, giftHeaders.length).setFontWeight("bold").setBackground("#eef3f8");
       }
@@ -103,17 +103,17 @@ function doPost(e) {
       var found = false;
       for (var i = 1; i < values.length; i++) {
         if (values[i][0] === data.id) {
-          giftSheet.getRange(i + 1, 2).setValue(data.status);
-          giftSheet.getRange(i + 1, 3).setValue(data.address);
-          giftSheet.getRange(i + 1, 4).setValue(data.gift);
-          giftSheet.getRange(i + 1, 5).setValue(data.remark);
-          giftSheet.getRange(i + 1, 6).setValue(new Date());
+          giftSheet.getRange(i + 1, 2).setValue(new Date()); // Col B
+          giftSheet.getRange(i + 1, 3).setValue(data.status); // Col C
+          giftSheet.getRange(i + 1, 4).setValue(data.address); // Col D
+          giftSheet.getRange(i + 1, 5).setValue(data.gift); // Col E
+          giftSheet.getRange(i + 1, 6).setValue(data.remark); // Col F
           found = true;
           break;
         }
       }
       if (!found) {
-        giftSheet.appendRow([data.id, data.status, data.address, data.gift, data.remark, new Date()]);
+        giftSheet.appendRow([data.id, new Date(), data.status, data.address, data.gift, data.remark]);
       }
       return ContentService.createTextOutput(JSON.stringify({
         status: "success",

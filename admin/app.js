@@ -2211,7 +2211,12 @@ function renderGiftTable() {
             <td>${c.id}</td>
             <td>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]}</td>
             <td>${c.company || '-'}</td>
-            <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${gift.address || c.addressFromData || '-'}">${gift.address || c.addressFromData || '-'}</td>
+            <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไข: ${gift.address || c.addressFromData || '-'}" onclick="promptEditAddress('${c.id}')">
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <i data-lucide="edit-3" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+                    <span style="overflow: hidden; text-overflow: ellipsis;">${gift.address || c.addressFromData || '-'}</span>
+                </div>
+            </td>
             <td>
                 <select class="form-input" style="padding: 4px 8px; width: 140px; font-size: 0.85rem; color: var(--text-main);" onchange="quickChangeGiftData('${c.id}', 'gift', this.value)">
                     <option value="" ${!item || item === '-' ? 'selected' : ''}>-</option>
@@ -2513,11 +2518,12 @@ async function quickChangeGiftData(id, field, value) {
     const gift = c.giftData || {};
     let item = gift.gift || '-';
     let status = gift.status || '';
-    const addr = gift.address || c.addressFromData || '';
+    let addr = gift.address || c.addressFromData || '';
     const remark = gift.remark || '';
     
     if (field === 'status') status = value;
     if (field === 'gift') item = value;
+    if (field === 'address') addr = value;
     
     try {
         const payload = {
@@ -2542,5 +2548,16 @@ async function quickChangeGiftData(id, field, value) {
     } catch (error) {
         console.error('Error quick updating gift data:', error);
         alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    }
+}
+
+function promptEditAddress(id) {
+    const c = state.customers.find(x => x.id === id);
+    if (!c) return;
+    const gift = c.giftData || {};
+    const currentAddr = gift.address || c.addressFromData || '';
+    const newAddr = prompt("แก้ไขที่อยู่สำหรับจัดส่ง:", currentAddr);
+    if (newAddr !== null && newAddr !== currentAddr) {
+        quickChangeGiftData(id, 'address', newAddr);
     }
 }
