@@ -1485,68 +1485,68 @@ body {
 .pp-ribbon {
     background: linear-gradient(180deg, #fbbf24, #d97706);
     color: #fff;
-    padding: 6px 30px;
+    padding: 8px 36px;
     font-weight: 800;
-    font-size: 1.2rem;
-    border-radius: 4px;
+    font-size: 1.5rem;
+    border-radius: 6px;
     position: relative;
     box-shadow: 0 4px 12px rgba(217,119,6,0.4);
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 .pp-ribbon::before, .pp-ribbon::after {
     content: '';
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    border: 16px solid transparent;
+    border: 20px solid transparent;
 }
 .pp-ribbon::before {
-    left: -20px;
+    left: -24px;
     border-right-color: #d97706;
 }
 .pp-ribbon::after {
-    right: -20px;
+    right: -24px;
     border-left-color: #d97706;
 }
 
 .pp-mvp-title {
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: 700;
     color: #1e293b;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .pp-mvp-highlight {
     color: #d97706;
-    font-weight: 800;
-    font-size: 2.2rem;
+    font-weight: 900;
+    font-size: 2.8rem;
 }
 
 .pp-quote-subtext {
-    font-size: 0.95rem;
+    font-size: 1.2rem;
     color: #64748b;
-    margin-top: 12px;
-    margin-bottom: 4px;
+    margin-top: 16px;
+    margin-bottom: 8px;
 }
 
 .pp-quote-text {
-    font-size: 2rem;
+    font-size: 2.6rem;
     font-weight: 800;
     color: #1e3a8a;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .pp-quote-mark {
     color: #60a5fa;
-    font-size: 3rem;
+    font-size: 4rem;
     line-height: 0;
     position: relative;
-    top: 10px;
+    top: 15px;
 }
 
 /* Team Cards Grid */
@@ -1768,10 +1768,10 @@ body {
 }
 
 .pp-trophy {
-    font-size: 3.5rem !important;
+    font-size: 5rem !important;
     position: relative;
     z-index: 2;
-    filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.8));
+    filter: drop-shadow(0 0 20px rgba(250, 204, 21, 0.9));
     animation: floatTrophy 2s infinite ease-in-out;
     margin: 0 !important;
 }
