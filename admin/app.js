@@ -2432,19 +2432,17 @@ function printGiftLabel(id) {
     
     const layout = document.getElementById('print-layout');
     
-    // Create print HTML layout (A5 Landscape: 210 x 148 mm)
+    // Create print HTML layout (Responsive Landscape)
     layout.innerHTML = `
         <style>
             @media print {
                 @page {
-                    size: A5 landscape;
+                    size: landscape;
                     margin: 0;
                 }
                 body {
                     margin: 0;
                     padding: 0;
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust: exact;
                 }
                 body * {
                     visibility: hidden;
@@ -2457,8 +2455,8 @@ function printGiftLabel(id) {
                     position: absolute;
                     left: 0;
                     top: 0;
-                    width: 210mm;
-                    height: 148mm;
+                    width: 100vw;
+                    height: 100vh;
                     font-family: 'Prompt', 'Sarabun', sans-serif;
                 }
                 
@@ -2466,20 +2464,20 @@ function printGiftLabel(id) {
                     position: absolute;
                     top: 0;
                     left: 0;
-                    width: 210mm;
-                    height: 148mm;
+                    width: 100vw;
+                    height: 100vh;
                     z-index: -1;
-                    object-fit: cover;
+                    object-fit: fill;
                 }
                 
                 .print-name {
                     position: absolute;
-                    top: 40mm;
-                    left: 48mm;
-                    font-size: 15pt;
+                    top: 27vh;
+                    left: 22.8vw;
+                    font-size: 2.5vw;
                     font-weight: 500;
                     color: #1e293b;
-                    width: 140mm;
+                    width: 66vw;
                     white-space: nowrap;
                     overflow: hidden;
                     z-index: 1;
@@ -2487,25 +2485,25 @@ function printGiftLabel(id) {
                 
                 .print-phone {
                     position: absolute;
-                    top: 55mm;
-                    left: 48mm;
-                    font-size: 15pt;
+                    top: 37.1vh;
+                    left: 22.8vw;
+                    font-size: 2.5vw;
                     font-weight: 500;
                     color: #1e293b;
-                    width: 140mm;
+                    width: 66vw;
                     z-index: 1;
                 }
                 
                 .print-address {
                     position: absolute;
-                    top: 70mm;
-                    left: 36mm;
-                    font-size: 14pt;
+                    top: 47.3vh;
+                    left: 17.1vw;
+                    font-size: 2.3vw;
                     font-weight: 400;
                     color: #1e293b;
-                    width: 155mm;
-                    line-height: 15.5mm;
-                    height: 32mm;
+                    width: 73.8vw;
+                    line-height: 10.5vh;
+                    height: 22vh;
                     overflow: hidden;
                     z-index: 1;
                 }
