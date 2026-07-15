@@ -2532,4 +2532,3 @@ async function quickChangeGiftData(id, field, value) {
         alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
     }
 }
-}
