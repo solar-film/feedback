@@ -176,7 +176,7 @@
 
                         <div class="chart-card">
                             <div class="chart-card-header">
-                                <h3 class="chart-card-title">สรุป Mood อารมณ์โดยรวม</h3>
+                                <h3 class="chart-card-title">ความรู้สึกหลังติดตั้ง (Overall Mood)</h3>
                                 <i data-lucide="pie-chart" class="text-muted" style="width: 18px;"></i>
                             </div>
                             <div class="chart-container">
@@ -219,13 +219,48 @@
                                 <canvas id="chart-benefits-bar"></canvas>
                             </div>
                         </div>
+
+                    </div>
+                    
+                    <!-- Additional Charts row for Tags -->
+                    <div class="charts-grid-3" style="margin-top: 24px;">
                         <div class="chart-card">
                             <div class="chart-card-header">
-                                <h3 class="chart-card-title">การบริการหลังการขาย (Support Needs)</h3>
-                                <i data-lucide="life-buoy" class="text-muted" style="width: 18px;"></i>
+                                <h3 class="chart-card-title">สถิติการติดต่อแอดมิน (Admin Tags)</h3>
+                                <i data-lucide="headset" class="text-muted" style="width: 18px;"></i>
                             </div>
                             <div class="chart-container">
-                                <canvas id="chart-issues-bar"></canvas>
+                                <canvas id="chart-tags-admin"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-card-header">
+                                <h3 class="chart-card-title">สถิติการติดต่อฝ่ายขาย (Sales Tags)</h3>
+                                <i data-lucide="briefcase" class="text-muted" style="width: 18px;"></i>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-tags-sales"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-card-header">
+                                <h3 class="chart-card-title">สถิติการติดต่อช่างติดตั้ง (Tech Tags)</h3>
+                                <i data-lucide="wrench" class="text-muted" style="width: 18px;"></i>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-tags-tech"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Charts row for MVP -->
+                    <div class="charts-grid" style="margin-top: 24px;">
+                        <div class="chart-card" style="grid-column: 1 / -1;">
+                            <div class="chart-card-header">
+                                <h3 class="chart-card-title">สรุปคะแนนสัดส่วนโหวตทีมผู้ครอง MVP 🏆</h3>
+                            </div>
+                            <div class="chart-container" style="height: 220px;">
+                                <canvas id="chart-mvps-bar"></canvas>
                             </div>
                         </div>
                     </div>
@@ -366,14 +401,7 @@
                             </div>
                         </div>
 
-                        <div class="chart-card">
-                            <div class="chart-card-header">
-                                <h3 class="chart-card-title">สรุปคะแนนสัดส่วนโหวตทีมผู้ครอง MVP 🏆</h3>
-                            </div>
-                            <div class="chart-container" style="height: 220px;">
-                                <canvas id="chart-mvps-bar"></canvas>
-                            </div>
-                        </div>
+
 
                     </div>
                 </div>

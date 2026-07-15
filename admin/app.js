@@ -13,7 +13,10 @@ const state = {
         techBar: null,
         mvpsBar: null,
         benefitsBar: null,
-        issuesBar: null
+        issuesBar: null,
+        tagsAdminBar: null,
+        tagsSalesBar: null,
+        tagsTechBar: null
     },
     filterInitialized: false
 };
@@ -1377,31 +1380,31 @@ function renderDashboardCharts() {
         });
     }
 
-    // 5. Support Needs Chart
-    const ctxIssues = document.getElementById('chart-issues-bar');
-    if (ctxIssues) {
-        let issuesTally = {};
+    // 5. Admin Tags Chart
+    const ctxTagsAdmin = document.getElementById('chart-tags-admin');
+    if (ctxTagsAdmin) {
+        let adminTally = {};
         state.customers.forEach(c => {
-            if (c.feedback && c.feedback.supportNeeds) {
-                c.feedback.supportNeeds.forEach(b => {
-                    issuesTally[b] = (issuesTally[b] || 0) + 1;
+            if (c.feedback && c.feedback.details && c.feedback.details.admin) {
+                c.feedback.details.admin.forEach(tag => {
+                    adminTally[tag] = (adminTally[tag] || 0) + 1;
                 });
             }
         });
         
-        let issuesData = Object.keys(issuesTally).map(k => ({ name: k, count: issuesTally[k] }));
-        issuesData.sort((a, b) => b.count - a.count); // Sort by highest
+        let adminData = Object.keys(adminTally).map(k => ({ name: k, count: adminTally[k] }));
+        adminData.sort((a, b) => b.count - a.count);
         
-        if (state.charts.issuesBar) state.charts.issuesBar.destroy();
-        state.charts.issuesBar = new Chart(ctxIssues, {
+        if (state.charts.tagsAdminBar) state.charts.tagsAdminBar.destroy();
+        state.charts.tagsAdminBar = new Chart(ctxTagsAdmin, {
             type: 'bar',
             plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
             data: {
-                labels: issuesData.map(d => d.name),
+                labels: adminData.map(d => d.name),
                 datasets: [{
                     label: 'จำนวนลูกค้าที่เลือก',
-                    data: issuesData.map(d => d.count),
-                    backgroundColor: '#f43f5e',
+                    data: adminData.map(d => d.count),
+                    backgroundColor: '#3b82f6',
                     borderRadius: 4,
                     barThickness: 24
                 }]
@@ -1411,59 +1414,142 @@ function renderDashboardCharts() {
                 maintainAspectRatio: false,
                 plugins: { 
                     legend: { display: false },
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'top',
-                        formatter: (value) => value > 0 ? value : '',
-                        font: { weight: 'bold' }
-                    }
+                    datalabels: { anchor: 'end', align: 'top', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
+                },
+                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, x: { grid: { display: false } } },
+                layout: { padding: { top: 20 } }
+            }
+        });
+    }
+
+    // 6. Sales Tags Chart
+    const ctxTagsSales = document.getElementById('chart-tags-sales');
+    if (ctxTagsSales) {
+        let salesTally = {};
+        state.customers.forEach(c => {
+            if (c.feedback && c.feedback.details && c.feedback.details.sales) {
+                c.feedback.details.sales.forEach(tag => {
+                    salesTally[tag] = (salesTally[tag] || 0) + 1;
+                });
+            }
+        });
+        
+        let salesData = Object.keys(salesTally).map(k => ({ name: k, count: salesTally[k] }));
+        salesData.sort((a, b) => b.count - a.count);
+        
+        if (state.charts.tagsSalesBar) state.charts.tagsSalesBar.destroy();
+        state.charts.tagsSalesBar = new Chart(ctxTagsSales, {
+            type: 'bar',
+            plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
+            data: {
+                labels: salesData.map(d => d.name),
+                datasets: [{
+                    label: 'จำนวนลูกค้าที่เลือก',
+                    data: salesData.map(d => d.count),
+                    backgroundColor: '#8b5cf6',
+                    borderRadius: 4,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    datalabels: { anchor: 'end', align: 'top', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
+                },
+                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, x: { grid: { display: false } } },
+                layout: { padding: { top: 20 } }
+            }
+        });
+    }
+
+    // 7. Tech Tags Chart
+    const ctxTagsTech = document.getElementById('chart-tags-tech');
+    if (ctxTagsTech) {
+        let techTally = {};
+        state.customers.forEach(c => {
+            if (c.feedback && c.feedback.details && c.feedback.details.tech) {
+                c.feedback.details.tech.forEach(tag => {
+                    techTally[tag] = (techTally[tag] || 0) + 1;
+                });
+            }
+        });
+        
+        let techData = Object.keys(techTally).map(k => ({ name: k, count: techTally[k] }));
+        techData.sort((a, b) => b.count - a.count);
+        
+        if (state.charts.tagsTechBar) state.charts.tagsTechBar.destroy();
+        state.charts.tagsTechBar = new Chart(ctxTagsTech, {
+            type: 'bar',
+            plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
+            data: {
+                labels: techData.map(d => d.name),
+                datasets: [{
+                    label: 'จำนวนลูกค้าที่เลือก',
+                    data: techData.map(d => d.count),
+                    backgroundColor: '#10b981',
+                    borderRadius: 4,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    datalabels: { anchor: 'end', align: 'top', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
+                },
+                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, x: { grid: { display: false } } },
+                layout: { padding: { top: 20 } }
+            }
+        });
+    }
+
+    // 8. MVP Chart (Moved from Reports)
+    const ctxMvp = document.getElementById('chart-mvps-bar');
+    if (ctxMvp) {
+        let mvps = { admin: 0, sales: 0, tech: 0, all: 0, none: 0 };
+        state.customers.forEach(c => {
+            if (c.feedback && c.feedback.mvp) {
+                mvps[c.feedback.mvp]++;
+            }
+        });
+
+        if (state.charts.mvpsBar) state.charts.mvpsBar.destroy();
+        state.charts.mvpsBar = new Chart(ctxMvp, {
+            type: 'bar',
+            plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
+            data: {
+                labels: ['ทีมช่าง 🧰', 'ฝ่ายขาย 🧭', 'แอดมิน 💬', 'ทุกทีม 💙'],
+                datasets: [{
+                    label: 'คะแนนเสียงโหวต MVP',
+                    data: [mvps.tech, mvps.sales, mvps.admin, mvps.all],
+                    backgroundColor: ['#10b981', '#005eb8', '#1b437c', '#ec4899'],
+                    borderRadius: 6,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    datalabels: { anchor: 'end', align: 'right', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
                 },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
-                    x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } }
+                    x: { grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
+                    y: { grid: { display: false } }
                 },
-                layout: { padding: { top: 20 } }
+                layout: { padding: { right: 30 } }
             }
         });
     }
 }
 
 function renderReportCharts() {
-    const ctxMvp = document.getElementById('chart-mvps-bar');
-    if (!ctxMvp) return;
 
-    let mvps = { admin: 0, sales: 0, tech: 0, all: 0, none: 0 };
-    state.customers.forEach(c => {
-        if (c.feedback && c.feedback.mvp) {
-            mvps[c.feedback.mvp]++;
-        }
-    });
-
-    // Render horizontal Bar chart
-    if (state.charts.mvpsBar) state.charts.mvpsBar.destroy();
-    state.charts.mvpsBar = new Chart(ctxMvp, {
-        type: 'bar',
-        data: {
-            labels: ['ทีมช่าง 🧰', 'ฝ่ายขาย 🧭', 'แอดมิน 💬', 'ทุกทีม 💙'],
-            datasets: [{
-                label: 'คะแนนเสียงโหวต MVP',
-                data: [mvps.tech, mvps.sales, mvps.admin, mvps.all],
-                backgroundColor: ['#10b981', '#005eb8', '#1b437c', '#ec4899'],
-                borderRadius: 6,
-                barThickness: 24
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
-                y: { grid: { display: false } }
-            }
-        }
-    });
 
     // Fill detailed averages
     let sumAdmin = 0, sumSales = 0, sumTech = 0, count = 0;

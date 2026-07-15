@@ -323,6 +323,12 @@ body {
     gap: 24px;
     margin-bottom: 32px;
 }
+.charts-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+}
 
 .chart-card {
     background-color: var(--bg-card);
@@ -809,7 +815,7 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
     
-    .charts-grid {
+    .charts-grid, .charts-grid-3 {
         grid-template-columns: 1fr;
     }
     
