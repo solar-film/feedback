@@ -782,7 +782,7 @@ function markAsSent(id) {
 // Copy link action helper
 function copySurveyLink(id, btn) {
     const baseUrl = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(id)}`;
-    const surveyMessage = `รบกวนคุณลูกค้าสละเวลาสัก 2 นาที ช่วยทำแบบประเมินความพึงพอใจ เพื่อลุ้นรับของรางวัลและช่วยให้เราพัฒนาบริการให้ดียิ่งขึ้นนะคะ 😊\n\nสามารถคลิกที่ลิงก์ด้านล่างได้เลยค่ะ👇\n${baseUrl}\n\nขอบพระคุณที่ใช้บริการค่ะ 🙏`;
+    const surveyMessage = `มีบางอย่างที่อยากบอก... แต่ขอฟังความเห็นคุณก่อนครับ 🤫\nไขความลับเพื่อบริการที่เหนือระดับ พร้อมลุ้นรับ 'ของรางวัลปริศนา' ที่เตรียมไว้ให้คุณ! \nเข้ามาที่นี่เลยครับ 👇\n${baseUrl}\n\nขอบคุณที่มาร่วมเปิดเผยความประทับใจไปกับเรานะครับ 🙏`;
     const copyPromise = copyTextRobust(surveyMessage);
 
     copyPromise.then(() => {
