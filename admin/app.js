@@ -11,7 +11,9 @@ const state = {
         moodsPie: null,
         salesBar: null,
         techBar: null,
-        mvpsBar: null
+        mvpsBar: null,
+        benefitsBar: null,
+        issuesBar: null
     },
     filterInitialized: false
 };
@@ -1324,6 +1326,106 @@ function renderDashboardCharts() {
             }
         });
     }
+
+    // 4. Benefits Chart
+    const ctxBenefits = document.getElementById('chart-benefits-bar');
+    if (ctxBenefits) {
+        let benefitsTally = {};
+        state.customers.forEach(c => {
+            if (c.feedback && c.feedback.benefits) {
+                c.feedback.benefits.forEach(b => {
+                    benefitsTally[b] = (benefitsTally[b] || 0) + 1;
+                });
+            }
+        });
+        
+        let benefitsData = Object.keys(benefitsTally).map(k => ({ name: k, count: benefitsTally[k] }));
+        benefitsData.sort((a, b) => b.count - a.count); // Sort by highest
+        
+        if (state.charts.benefitsBar) state.charts.benefitsBar.destroy();
+        state.charts.benefitsBar = new Chart(ctxBenefits, {
+            type: 'bar',
+            plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
+            data: {
+                labels: benefitsData.map(d => d.name),
+                datasets: [{
+                    label: 'จำนวนลูกค้าที่เลือก',
+                    data: benefitsData.map(d => d.count),
+                    backgroundColor: '#0ea5e9',
+                    borderRadius: 4,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        formatter: (value) => value > 0 ? value : '',
+                        font: { weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false } }
+                },
+                layout: { padding: { top: 20 } }
+            }
+        });
+    }
+
+    // 5. Support Needs Chart
+    const ctxIssues = document.getElementById('chart-issues-bar');
+    if (ctxIssues) {
+        let issuesTally = {};
+        state.customers.forEach(c => {
+            if (c.feedback && c.feedback.supportNeeds) {
+                c.feedback.supportNeeds.forEach(b => {
+                    issuesTally[b] = (issuesTally[b] || 0) + 1;
+                });
+            }
+        });
+        
+        let issuesData = Object.keys(issuesTally).map(k => ({ name: k, count: issuesTally[k] }));
+        issuesData.sort((a, b) => b.count - a.count); // Sort by highest
+        
+        if (state.charts.issuesBar) state.charts.issuesBar.destroy();
+        state.charts.issuesBar = new Chart(ctxIssues, {
+            type: 'bar',
+            plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
+            data: {
+                labels: issuesData.map(d => d.name),
+                datasets: [{
+                    label: 'จำนวนลูกค้าที่เลือก',
+                    data: issuesData.map(d => d.count),
+                    backgroundColor: '#f43f5e',
+                    borderRadius: 4,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        formatter: (value) => value > 0 ? value : '',
+                        font: { weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } }
+                },
+                layout: { padding: { top: 20 } }
+            }
+        });
+    }
 }
 
 function renderReportCharts() {
@@ -1732,6 +1834,20 @@ function renderPresentationSlide() {
     
     
         const customerComment = fb.mvpComment ? fb.mvpComment.trim() : '';
+        
+        let mvpName = '';
+        if (fb.mvp === 'admin') mvpName = 'แอดมิน (Admin) 🎧';
+        else if (fb.mvp === 'sales') mvpName = 'ฝ่ายขาย (Sales) 💼';
+        else if (fb.mvp === 'tech') mvpName = 'ทีมช่าง (Technician) 🔧';
+        else if (fb.mvp === 'all') mvpName = 'ทุกคนเลยจ้า (Everyone) 💖';
+        
+        const mvpBannerHtml = mvpName ? `
+            <div class="slide-mvp-grand">
+                <div class="slide-mvp-badge">🏆 MVP ประจำงานนี้</div>
+                <div class="slide-mvp-text">ขอมอบมงให้แก่... <span>${mvpName}</span> 🎉</div>
+            </div>
+        ` : '';
+
     const quoteHtml = customerComment 
         ? `<div class="slide-quote-text">${customerComment}</div>`
         : `<div class="slide-quote-empty">ลูกค้าประเมินคะแนนเรียบร้อย แต่ไม่ได้ระบุข้อความเพิ่มเติม</div>`;
@@ -1769,6 +1885,7 @@ function renderPresentationSlide() {
             
             <!-- Customer Quote Area -->
             <div class="slide-quote-container">
+                ${mvpBannerHtml}
                 <div class="slide-quote-label">ข้อความฝากถึงทีมงาน</div>
                 ${quoteHtml}
             </div>
