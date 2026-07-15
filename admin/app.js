@@ -2562,7 +2562,8 @@ async function quickChangeGiftData(id, field, value) {
     let item = gift.gift || '-';
     let status = gift.status || '';
     let addr = gift.address || c.addressFromData || '';
-    const remark = gift.remark || '';
+    let remark = gift.remark || '';
+    if (field === 'remark') remark = value;
     
     if (field === 'status') status = value;
     if (field === 'gift') item = value;
