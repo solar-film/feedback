@@ -264,7 +264,7 @@ function handleGetAllCustomersDetailed() {
           status: giftRows[i]["Status"] || "",
           address: giftRows[i]["Address"] || "",
           gift: giftRows[i]["Gift"] || "",
-          remark: giftRows[i]["Remark"] || "",
+          remark: giftRows[i]["ชื่อที่ใช้รีวิว"] || giftRows[i]["Review Name"] || giftRows[i]["Remark"] || giftRows[i]["หมายเหตุ"] || "",
           timestamp: giftRows[i]["Timestamp"] || ""
         };
       }
