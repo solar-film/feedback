@@ -69,6 +69,25 @@ function doPost(e) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
     
+    // ตรวจสอบว่าเป็นการส่งอัปเดตการกดรีวิว Google Maps หรือไม่
+    if (data.action === "updateReviewStatus") {
+      var fbSheet = doc.getSheetByName(sheetName);
+      if (fbSheet) {
+        var dataRange = fbSheet.getDataRange();
+        var values = dataRange.getValues();
+        for (var i = 1; i < values.length; i++) {
+          if (values[i][0] === data.id) {
+            fbSheet.getRange(i + 1, 16).setValue("Yes"); // Column P
+            break;
+          }
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        message: "Review status updated successfully"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
     // ดึงค่าแยกตามหมวดหมู่โครงสร้างเว็บแอปพลิเคชัน
     var id = data.id || "";
     
