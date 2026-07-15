@@ -2211,7 +2211,7 @@ function renderGiftTable() {
             <td>${c.id}</td>
             <td>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]}</td>
             <td>${c.company || '-'}</td>
-            <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไข: ${gift.address || c.addressFromData || '-'}" onclick="promptEditAddress('${c.id}')">
+            <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไข: ${gift.address || c.addressFromData || '-'}" onclick="promptEditAddress('${c.id}')">
                 <div style="display: flex; align-items: center; gap: 4px;">
                     <i data-lucide="edit-3" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
                     <span style="overflow: hidden; text-overflow: ellipsis;">${gift.address || c.addressFromData || '-'}</span>
@@ -2233,7 +2233,12 @@ function renderGiftTable() {
                 </select>
             </td>
             <td>
-                <input type="text" class="form-control" style="width: 150px; padding: 6px; font-size: 0.85rem;" placeholder="ระบุชื่อที่ใช้รีวิว..." value="${gift.remark || ''}" onchange="quickChangeGiftData('${c.id}', 'remark', this.value)">
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <input type="text" id="remark-input-${c.id}" class="form-control" style="width: 130px; padding: 6px; font-size: 0.85rem;" placeholder="ระบุชื่อที่ใช้รีวิว..." value="${gift.remark || ''}" onkeydown="if(event.key==='Enter') quickChangeGiftData('${c.id}', 'remark', this.value)">
+                    <button class="btn-primary" style="padding: 4px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background-color: var(--primary); color: white; border: none; cursor: pointer; flex-shrink: 0;" onclick="quickChangeGiftData('${c.id}', 'remark', document.getElementById('remark-input-${c.id}').value)" title="บันทึก">
+                        <i data-lucide="save" style="width: 14px; height: 14px; margin: 0;"></i>
+                    </button>
+                </div>
             </td>
             <td style="text-align: center;">
                 <button class="btn-primary" style="padding: 8px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background-color: var(--primary); color: white; border: none; cursor: pointer; width: 32px; height: 32px;" onclick="printGiftLabel('${c.id}')" title="พิมพ์จ่าหน้าซอง">
