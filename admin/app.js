@@ -1922,9 +1922,19 @@ function renderPresentationSlide() {
             let mvpText = '';
             if (mvpRaw && mvpRaw.toLowerCase() !== 'none') {
                 showMvp = true;
-                mvpText = mvpRaw.toLowerCase() === 'all' ? 'ทุกทีม' : mvpRaw;
+                let mvpLower = mvpRaw.toLowerCase();
+                if (mvpLower === 'all') {
+                    mvpText = 'ทุกทีม';
+                } else if (mvpLower === 'admin') {
+                    mvpText = `แอดมิน${c.adminName ? ' (' + c.adminName + ')' : ''}`;
+                } else if (mvpLower === 'sale' || mvpLower === 'sales') {
+                    mvpText = `ฝ่ายขาย${c.sales ? ' (' + c.sales + ')' : ''}`;
+                } else if (mvpLower === 'tech') {
+                    mvpText = `ทีมช่าง${c.tech ? ' (' + c.tech + ')' : ''}`;
+                } else {
+                    mvpText = mvpRaw;
+                }
             }
-        
     // Calculate scores
     let totalScore = 0;
     let scoreCount = 0;
