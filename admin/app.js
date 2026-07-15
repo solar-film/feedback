@@ -1739,14 +1739,16 @@ function renderPresentationSlide() {
             <div class="slide-header">
                 <div class="slide-cust-info">
                     <h3>${c.name}</h3>
-                    <div class="slide-cust-meta">
-                        <span><i data-lucide="building" style="width:16px;height:16px;"></i> ${c.company}</span>
-                        <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> ${c.installDate}</span>
-                        <span><i data-lucide="hash" style="width:16px;height:16px;"></i> ${c.id}</span>
+                    <div class="slide-cust-meta" style="flex-wrap: wrap;">
+                        <span><i data-lucide="building" style="width:16px;height:16px;"></i> <b>สถานที่:</b> ${c.siteType || c.company || '-'}</span>
+                        <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่ติดตั้ง:</b> ${c.installDate}</span>
+                        <span><i data-lucide="hash" style="width:16px;height:16px;"></i> <b>รหัส:</b> ${c.id}</span>
+                        <span><i data-lucide="user" style="width:16px;height:16px;"></i> <b>ฝ่ายขาย:</b> ${c.sales || '-'}</span>
+                        <span><i data-lucide="wrench" style="width:16px;height:16px;"></i> <b>ทีมช่าง:</b> ${c.tech || '-'}</span>
                     </div>
                 </div>
                 <div class="slide-mood-big">
-                    ${fb.overallMood}
+                    ${fb.overallMood || '😊'}
                 </div>
             </div>
             

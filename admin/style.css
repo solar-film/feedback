@@ -937,9 +937,9 @@ body {
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     width: 100%;
-    max-width: 900px;
-    min-height: 500px;
-    padding: 40px;
+    max-width: 1400px;
+    min-height: 70vh;
+    padding: 50px;
     display: flex;
     flex-direction: column;
     gap: 30px;
