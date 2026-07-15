@@ -2206,20 +2206,26 @@ function renderGiftTable() {
             <td>${c.id}</td>
             <td>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]}</td>
             <td>${c.company || '-'}</td>
-            <td>${item}</td>
             <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${gift.address || c.addressFromData || '-'}">${gift.address || c.addressFromData || '-'}</td>
             <td>
-                <button class="btn-primary" style="padding: 8px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background-color: var(--primary); color: white; border: none; cursor: pointer; width: 32px; height: 32px;" onclick="printGiftLabel('${c.id}')" title="พิมพ์จ่าหน้าซอง">
-                    <i data-lucide="printer" style="width: 16px; height: 16px; margin: 0;"></i>
-                </button>
+                <select class="form-input" style="padding: 4px 8px; width: 140px; font-size: 0.85rem; color: var(--text-main);" onchange="quickChangeGiftData('${c.id}', 'gift', this.value)">
+                    <option value="" ${!item || item === '-' ? 'selected' : ''}>-</option>
+                    <option value="ร่ม3M" ${item === 'ร่ม3M' ? 'selected' : ''}>ร่ม3M</option>
+                    <option value="ผ้าไมโครไฟเบอร์ 2 ผืน" ${item === 'ผ้าไมโครไฟเบอร์ 2 ผืน' ? 'selected' : ''}>ผ้าไมโครไฟเบอร์ 2 ผืน</option>
+                </select>
             </td>
-            <td style="text-align: right;">
-                <select class="form-input" style="padding: 4px 8px; width: 120px; font-size: 0.85rem; ${status === 'เตรียมจัดส่ง' ? 'color: var(--warning); border-color: var(--warning);' : (status === 'จัดส่งแล้ว' ? 'color: var(--success); border-color: var(--success);' : (status === 'ของตีกลับ' ? 'color: var(--danger); border-color: var(--danger);' : ''))}" onchange="quickChangeGiftStatus('${c.id}', this.value)">
+            <td>
+                <select class="form-input" style="padding: 4px 8px; width: 120px; font-size: 0.85rem; ${status === 'เตรียมจัดส่ง' ? 'color: var(--warning); border-color: var(--warning);' : (status === 'จัดส่งแล้ว' ? 'color: var(--success); border-color: var(--success);' : (status === 'ของตีกลับ' ? 'color: var(--danger); border-color: var(--danger);' : ''))}" onchange="quickChangeGiftData('${c.id}', 'status', this.value)">
                     <option value="" ${!status ? 'selected' : ''}>-</option>
                     <option value="เตรียมจัดส่ง" ${status === 'เตรียมจัดส่ง' ? 'selected' : ''}>เตรียมจัดส่ง</option>
                     <option value="จัดส่งแล้ว" ${status === 'จัดส่งแล้ว' ? 'selected' : ''}>จัดส่งแล้ว</option>
                     <option value="ของตีกลับ" ${status === 'ของตีกลับ' ? 'selected' : ''}>ของตีกลับ</option>
                 </select>
+            </td>
+            <td style="text-align: center;">
+                <button class="btn-primary" style="padding: 8px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background-color: var(--primary); color: white; border: none; cursor: pointer; width: 32px; height: 32px;" onclick="printGiftLabel('${c.id}')" title="พิมพ์จ่าหน้าซอง">
+                    <i data-lucide="printer" style="width: 16px; height: 16px; margin: 0;"></i>
+                </button>
             </td>
         `;
         tbody.appendChild(tr);
