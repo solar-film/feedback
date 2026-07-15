@@ -724,22 +724,25 @@ function validateM5() {
 // Reviews handling
 function clickGoogleMaps() {
     state.formData.googleMapsVisited = true;
-    const sheetsUrl = 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec';
+    const sheetsUrl = localStorage.getItem('google_sheets_apps_script_url') || 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec';
     
     // Get ID from URL or formData
     const urlParams = new URLSearchParams(window.location.search);
     const currentId = state.formData.id || urlParams.get('id') || '';
     
     if (sheetsUrl && currentId) {
-        fetch(sheetsUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'updateReviewStatus',
-                id: currentId
-            })
-        }).catch(err => console.error('Error updating review status:', err));
+        // Delay to ensure row is created by submitSurvey first
+        setTimeout(() => {
+            fetch(sheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'updateReviewStatus',
+                    id: currentId
+                })
+            }).catch(err => console.error('Error updating review status:', err));
+        }, 2500);
     }
     
     // Update localStorage for internal Dashboard
@@ -876,7 +879,7 @@ function submitSurvey() {
     }
 
     // Google Sheets apps script fetch integration
-    const sheetsUrl = 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec';
+    const sheetsUrl = localStorage.getItem('google_sheets_apps_script_url') || 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec';
     const submitBtn = document.getElementById('btn-submit-survey');
     
     if (sheetsUrl) {
