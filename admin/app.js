@@ -1786,7 +1786,7 @@ function renderPresentationSlide() {
                         </div>
                     </div>
                     <div class="slide-team-tags">${adminPos || '<span style="color:#ccc;">-</span>'}</div>
-                    ${fb.comments?.admin ? `<div class="slide-team-comment">${fb.comments.admin}</div>` : ''}
+                    ${fb.comments?.admin ? `<div class="slide-team-comment comment-admin">${fb.comments.admin}</div>` : ''}
                 </div>
                 
                 <!-- Sales -->
@@ -1801,7 +1801,7 @@ function renderPresentationSlide() {
                         </div>
                     </div>
                     <div class="slide-team-tags">${salesPos || '<span style="color:#ccc;">-</span>'}</div>
-                    ${fb.comments?.sales ? `<div class="slide-team-comment">${fb.comments.sales}</div>` : ''}
+                    ${fb.comments?.sales ? `<div class="slide-team-comment comment-sales">${fb.comments.sales}</div>` : ''}
                 </div>
                 
                 <!-- Tech -->
@@ -1816,7 +1816,7 @@ function renderPresentationSlide() {
                         </div>
                     </div>
                     <div class="slide-team-tags">${techPos || '<span style="color:#ccc;">-</span>'}</div>
-                    ${fb.comments?.tech ? `<div class="slide-team-comment">${fb.comments.tech}</div>` : ''}
+                    ${fb.comments?.tech ? `<div class="slide-team-comment comment-tech">${fb.comments.tech}</div>` : ''}
                 </div>
             </div>
             

@@ -1136,6 +1136,8 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    flex-grow: 1;
+    align-content: flex-start;
 }
 .slide-team-comment {
     background: #ffffff;
@@ -1146,10 +1148,12 @@ body {
     border: 1px solid #cbd5e1;
     font-style: normal;
     font-weight: 500;
-    flex-grow: 1;
     margin-top: 16px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
+.comment-admin { background-color: #f8fafc; border-color: #c7d2fe; }
+.comment-sales { background-color: #fffaf5; border-color: #fed7aa; }
+.comment-tech { background-color: #f0fdfa; border-color: #99f6e4; }
 @media (max-width: 900px) {
     .slide-team-grid {
         grid-template-columns: 1fr;
