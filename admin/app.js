@@ -2096,6 +2096,17 @@ function renderPresentationSlide() {
                 </div>
             </div>
             
+            ${fb.supportDetails ? `
+            <div class="pp-support-details">
+                <div class="pp-sd-header">
+                    <i data-lucide="alert-circle" style="color: #ef4444; width: 20px; height: 20px;"></i>
+                    <span style="color: #ef4444; font-weight: 700; font-size: 1.1rem;">รายละเอียดเพิ่มเติม (Follow-up Details)</span>
+                </div>
+                <div class="pp-sd-content">
+                    ${fb.supportDetails}
+                </div>
+            </div>
+            ` : ''}
             <div class="pp-nav-buttons">
                 <button class="pp-btn pp-btn-prev" onclick="prevSlide()">
                     <i data-lucide="chevron-left" style="width: 18px;"></i> ก่อนหน้า

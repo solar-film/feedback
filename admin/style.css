@@ -1784,3 +1784,8 @@ body {
     0%, 100% { transform: translateY(0) scale(1); }
     50% { transform: translateY(-8px) scale(1.15); }
 }
+
+
+.pp-support-details { background: #fef2f2; border-left: 4px solid #ef4444; border-radius: 8px; padding: 16px; margin-top: 24px; margin-bottom: 8px; }
+.pp-sd-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.pp-sd-content { color: #1e293b; font-size: 1.1rem; line-height: 1.6; }
