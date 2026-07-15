@@ -1877,3 +1877,56 @@ body {
     0% { transform: rotate(-15deg) scale(1.1); }
     100% { transform: rotate(15deg) scale(1.1); }
 }
+\n
+/* --- Beautiful Select Dropdowns --- */
+.beautiful-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: var(--bg-main, #ffffff);
+    border: 1px solid var(--border, #e0e0e0);
+    border-radius: 20px;
+    padding: 6px 30px 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-main, #333);
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.beautiful-select:hover {
+    border-color: var(--primary, #0056b3);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+}
+
+.beautiful-select:focus {
+    border-color: var(--primary, #0056b3);
+    box-shadow: 0 0 0 3px rgba(0, 94, 184, 0.15);
+}
+
+.beautiful-select.status-warning {
+    background-color: var(--warning-light, #fff9e6);
+    color: var(--warning, #cc8b00);
+    border-color: rgba(204, 139, 0, 0.3);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23cc8b00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.beautiful-select.status-success {
+    background-color: var(--success-light, #e6f9f0);
+    color: var(--success, #008a4b);
+    border-color: rgba(0, 138, 75, 0.3);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23008a4b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.beautiful-select.status-danger {
+    background-color: var(--danger-light, #fde8e8);
+    color: var(--danger, #c81e1e);
+    border-color: rgba(200, 30, 30, 0.3);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c81e1e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
