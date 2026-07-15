@@ -1733,3 +1733,54 @@ body {
     font-weight: 700;
     color: #1e293b;
 }
+
+.pp-trophy-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    margin: -10px auto 10px;
+}
+
+.pp-light-rays {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    margin-top: -100px;
+    margin-left: -100px;
+    background: repeating-conic-gradient(
+        from 0deg,
+        rgba(250, 204, 21, 0) 0deg,
+        rgba(250, 204, 21, 0) 10deg,
+        rgba(253, 224, 71, 0.4) 10deg,
+        rgba(253, 224, 71, 0.4) 20deg
+    );
+    border-radius: 50%;
+    z-index: 1;
+    animation: spinRays 8s linear infinite;
+    -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 65%);
+    mask-image: radial-gradient(circle, #000 30%, transparent 65%);
+    pointer-events: none;
+}
+
+.pp-trophy {
+    font-size: 3.5rem !important;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.8));
+    animation: floatTrophy 2s infinite ease-in-out;
+    margin: 0 !important;
+}
+
+@keyframes spinRays {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes floatTrophy {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.15); }
+}
