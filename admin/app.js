@@ -290,7 +290,9 @@ function loadData() {
                         adminName: item._col_17 || item.adminName || '-',
                         bill: item.bill || '-',
                         status: status,
-                        feedback: item.feedback || null
+                        feedback: item.feedback || null,
+                        giftData: item.giftData || null,
+                        addressFromData: item.addressFromData || ''
                     };
                 });
                 
@@ -400,7 +402,9 @@ function forceRefreshData() {
                         adminName: item._col_17 || item.adminName || '-',
                         bill: item.bill || '-',
                         status: status,
-                        feedback: item.feedback || null
+                        feedback: item.feedback || null,
+                        giftData: item.giftData || null,
+                        addressFromData: item.addressFromData || ''
                     };
                 });
                 
