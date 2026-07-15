@@ -1991,7 +1991,7 @@ function renderPresentationSlide() {
                         <i data-lucide="user" style="width: 40px; height: 40px;" stroke-width="1.5"></i>
                     </div>
                     <div class="pp-cust-info">
-                        <h3>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]}</h3>
+                        <h3>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]} <span style="font-size: 1rem; color: #94a3b8; font-weight: 500; margin-left: 8px;">#${c.id || ''}</span></h3>
                         <div class="pp-meta-row">
                             <i data-lucide="map-pin" class="pp-meta-icon"></i>
                             <span>สถานที่: ${c.siteType || c.company || '-'}</span>
@@ -2015,7 +2015,7 @@ function renderPresentationSlide() {
             </div>
 
             <!-- MVP Banner -->
-            ${(showMvp && customerComment) ? `
+            ${(showMvp) ? `
             <div class="pp-mvp-banner" style="background-image: url('../images/mvp.png'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: none; padding: 140px 40px 60px; min-height: 350px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
                 <div class="pp-banner-content">
                     <div class="pp-mvp-title" style="margin-top: -10px;">
