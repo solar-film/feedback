@@ -730,6 +730,200 @@ function hideReviewBanner() {
     SoundFX.playClick();
     document.getElementById('thankyou-review-banner').style.display = 'none';
 }
+    if (index > -1) {
+        state.formData.benefits.splice(index, 1);
+    } else {
+        state.formData.benefits.push(chipText);
+    }
+    
+    validateM2();
+}
+
+function validateM2() {
+    const isValid = state.formData.benefits.length > 0;
+    document.getElementById('btn-next').disabled = !isValid;
+    
+    const banner = document.getElementById('unlock-banner-m2');
+    const promptBanner = document.getElementById('prompt-banner-m2');
+    if (isValid) {
+        if (banner.style.display !== 'block') {
+            SoundFX.playLevelUp();
+        }
+        banner.style.display = 'block';
+        if(promptBanner) promptBanner.style.display = 'none';
+    } else {
+        banner.style.display = 'none';
+        if(promptBanner) promptBanner.style.display = 'block';
+    }
+}
+
+// Mission 3: Touchpoints lists
+function openAccordionStep(step) {
+    state.activeAccordion = step;
+    state.historyStack.push('screen-m3');
+    changeScreen('screen-m3-details');
+}
+
+// Collapsible UI trigger for accordion details
+function toggleAccordionUI(step) {
+    SoundFX.playClick();
+    state.activeAccordion = step;
+    
+    const sections = ['admin', 'sales', 'tech'];
+    sections.forEach(s => {
+        const card = document.getElementById(`acc-card-${s}`);
+        const header = card.querySelector('.tp-acc-header');
+        const content = card.querySelector('.tp-acc-content');
+        const icon = header.querySelector('[data-lucide]');
+        
+        if (s === step) {
+            content.style.display = 'block';
+            header.classList.add('active');
+            header.innerHTML = header.innerHTML.replace('chevron-right', 'chevron-down');
+        } else {
+            content.style.display = 'none';
+            header.classList.remove('active');
+            header.innerHTML = header.innerHTML.replace('chevron-down', 'chevron-right');
+        }
+    });
+    lucide.createIcons();
+    validateM3Step(section);
+}
+
+// Select Emoji Mood in touchpoints sub-accordion card
+function selectSubMood(section, score, node) {
+    SoundFX.playClick();
+    
+    const btnRow = node.parentNode;
+    btnRow.querySelectorAll('.emoji-rating-btn').forEach(b => b.classList.remove('selected'));
+    node.classList.add('selected');
+    
+    state.formData.ratings[section] = score;
+
+    // Toggle corresponding sub-chips
+    const good = document.getElementById(`acc-good-${section}`);
+    const bad = document.getElementById(`acc-bad-${section}`);
+    
+    good.querySelectorAll('.mini-chip').forEach(c => c.classList.remove('selected'));
+    bad.querySelectorAll('.mini-chip').forEach(c => c.classList.remove('selected'));
+    state.formData.feedbackDetails[section] = [];
+
+    if (score >= 4) {
+        good.style.display = 'block';
+        bad.style.display = 'none';
+    } else {
+        good.style.display = 'none';
+        bad.style.display = 'block';
+    }
+
+    validateM3Step(section);
+}
+
+function toggleMiniChip(chip, section, text) {
+    SoundFX.playClick();
+    chip.classList.toggle('selected');
+    
+    const index = state.formData.feedbackDetails[section].indexOf(text);
+    if (index > -1) {
+        state.formData.feedbackDetails[section].splice(index, 1);
+    } else {
+        state.formData.feedbackDetails[section].push(text);
+    }
+}
+
+
+
+
+
+
+
+// Mission 4: Select MVP
+
+// Validate touchpoints step Next/Back buttons
+function validateM3Step(section) {
+    const score = state.formData.ratings[section];
+    document.getElementById('btn-next').disabled = score === 0;
+}
+function selectMVP(team, node) {
+    SoundFX.playClick();
+    
+    const grid = node.parentNode;
+    grid.querySelectorAll('.mvp-option-card').forEach(c => c.classList.remove('selected'));
+    node.classList.add('selected');
+    
+    state.formData.mvp = team;
+    validateM4();
+}
+
+function validateM4() {
+    const isValid = state.formData.mvp !== '';
+    document.getElementById('btn-next').disabled = !isValid;
+}
+
+// Mission 5: Overall Mood
+function selectOverallMood(moodKey, node) {
+    SoundFX.playClick();
+    
+    const list = node.parentNode;
+    list.querySelectorAll('.horizontal-mood-card, .img-overlay-m5').forEach(c => c.classList.remove('selected'));
+    node.classList.add('selected');
+    
+    let moodChar = '😐';
+    if (moodKey === 'happy_max') moodChar = '😍';
+    else if (moodKey === 'happy_mid') moodChar = '😊';
+    else if (moodKey === 'unhappy') moodChar = '😟';
+    else if (moodKey === 'danger_alert') moodChar = '🚨';
+    
+    state.formData.overallMood = moodChar;
+
+    const supportBox = document.getElementById('care-mission-support');
+
+    if (moodKey === 'happy_max' || moodKey === 'happy_mid') {
+        supportBox.style.display = 'none';
+        supportBox.querySelectorAll('.chip-option').forEach(c => c.classList.remove('selected'));
+        state.formData.supportNeeds = [];
+        document.getElementById('support-details').value = '';
+    } else {
+        supportBox.style.display = 'block';
+        
+        // Hide "Thank you" text for normal mood
+        const thankYouText = document.getElementById('care-mission-thankyou');
+        if (thankYouText) {
+            thankYouText.style.display = (moodKey === 'normal') ? 'none' : 'block';
+        }
+    }
+
+    validateM5();
+}
+
+function toggleSupportChip(card, key) {
+    SoundFX.playClick();
+    card.classList.toggle('selected');
+    
+    const text = card.querySelector('.chip-text').innerText;
+    const index = state.formData.supportNeeds.indexOf(text);
+    
+    if (index > -1) {
+        state.formData.supportNeeds.splice(index, 1);
+    } else {
+        state.formData.supportNeeds.push(text);
+    }
+}
+
+function validateM5() {
+    const isValid = state.formData.overallMood !== '';
+    document.getElementById('btn-submit-survey').disabled = !isValid;
+}
+
+// Reviews handling
+function clickGoogleMaps() {
+    state.formData.googleMapsVisited = true;
+}
+
+function hideReviewBanner() {
+    SoundFX.playClick();
+    document.getElementById('thankyou-review-banner').style.display = 'none';
+}
 
 function skipGoogleMaps() {
     SoundFX.playClick();
@@ -738,13 +932,11 @@ function skipGoogleMaps() {
 // SUBMIT SURVEY AND INTEGRATIONS
 function submitSurvey() {
     // Read textareas
-    state.formData.mvpComment = document.getElementById('mvp-comment').value.trim();
-    state.formData.supportDetails = document.getElementById('support-details').value.trim();
-    
-    // Save comments per accordion step
     state.formData.feedbackComments.admin = document.getElementById('comment-admin').value.trim();
     state.formData.feedbackComments.sales = document.getElementById('comment-sales').value.trim();
     state.formData.feedbackComments.tech = document.getElementById('comment-tech').value.trim();
+    state.formData.mvpComment = document.getElementById('mvp-comment').value.trim();
+    state.formData.supportDetails = document.getElementById('support-details').value.trim();
 
     const isHappy = state.formData.overallMood === '😍' || state.formData.overallMood === '😊';
     

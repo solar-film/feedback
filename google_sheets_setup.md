@@ -40,7 +40,10 @@ function doPost(e) {
       "Follow-up Issue",
       "Follow-up Details",
       "Google Review Clicked",
-      "Reward Eligible"
+      "Reward Eligible",
+      "Admin Comment",
+      "Sales Comment",
+      "Technician Comment"
     ];
     sheet.appendRow(headers);
     sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#eef3f8");
@@ -79,6 +82,9 @@ function doPost(e) {
     var techTags = data.teamFeedback && data.teamFeedback.technicianTags ? data.teamFeedback.technicianTags.join(", ") : "";
     var mvpTeam = data.teamFeedback ? data.teamFeedback.mvpTeam : "";
     var customerComment = data.teamFeedback ? data.teamFeedback.customerComment : "";
+    var adminComment = data.teamFeedback ? data.teamFeedback.adminComment : "";
+    var salesComment = data.teamFeedback ? data.teamFeedback.salesComment : "";
+    var techComment = data.teamFeedback ? data.teamFeedback.technicianComment : "";
     
     var overallMood = data.overall ? data.overall.overallMood : "";
     var needFollowUp = data.overall ? data.overall.needFollowUp : "";
@@ -106,7 +112,10 @@ function doPost(e) {
       followUpIssue,
       followUpDetails,
       googleReviewClicked,
-      rewardEligible
+      rewardEligible,
+      adminComment,
+      salesComment,
+      techComment
     ];
     
     sheet.appendRow(row);
@@ -207,9 +216,9 @@ function handleGetAllCustomersDetailed() {
             tech: f["Technician Tags"] ? f["Technician Tags"].split(', ') : []
           },
           comments: {
-            admin: "", 
-            sales: "", 
-            tech: "" 
+            admin: f["Admin Comment"] || "", 
+            sales: f["Sales Comment"] || "", 
+            tech: f["Technician Comment"] || "" 
           },
           mvp: f["MVP Team"] || "",
           mvpComment: f["Customer Comment"] || "",
