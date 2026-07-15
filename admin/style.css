@@ -1322,6 +1322,19 @@ body {
 }
 
 /* PIXEL PERFECT PRESENTATION SLIDES */
+#presentation-content::-webkit-scrollbar,
+.slide-container-main::-webkit-scrollbar,
+#presentation-container::-webkit-scrollbar {
+    display: none;
+}
+
+#presentation-content,
+.slide-container-main,
+#presentation-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 .slide-container-main {
     padding: 24px;
     display: flex;
@@ -1330,7 +1343,6 @@ body {
     font-family: 'Inter', 'Prompt', sans-serif;
     background: #f8fafc;
     height: 100%;
-    overflow-y: auto;
 }
 
 /* Card Wrapper */
