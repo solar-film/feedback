@@ -1522,11 +1522,11 @@ function renderDashboardCharts() {
             type: 'bar',
             plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
             data: {
-                labels: ['ทีมช่าง 🧰', 'ฝ่ายขาย 🧭', 'แอดมิน 💬', 'ทุกทีม 💙'],
+                labels: ['แอดมิน 💬', 'ฝ่ายขาย 🧭', 'ทีมช่าง 🧰', 'ทุกทีม 💙'],
                 datasets: [{
                     label: 'คะแนนเสียงโหวต MVP',
-                    data: [mvps.tech, mvps.sales, mvps.admin, mvps.all],
-                    backgroundColor: ['#10b981', '#005eb8', '#1b437c', '#ec4899'],
+                    data: [mvps.admin, mvps.sales, mvps.tech, mvps.all],
+                    backgroundColor: ['#1b437c', '#005eb8', '#10b981', '#ec4899'],
                     borderRadius: 6,
                     barThickness: 24
                 }]
