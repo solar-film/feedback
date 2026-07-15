@@ -1918,120 +1918,191 @@ function renderPresentationSlide() {
     
     
     
-        const customerComment = fb.mvpComment ? fb.mvpComment.trim() : '';
+            const customerComment = fb.mvpComment ? fb.mvpComment.trim() : '';
         
-        let mvpName = '';
-        if (fb.mvp === 'admin') mvpName = 'แอดมิน (Admin) 🎧';
-        else if (fb.mvp === 'sales') mvpName = 'ฝ่ายขาย (Sales) 💼';
-        else if (fb.mvp === 'tech') mvpName = 'ทีมช่าง (Technician) 🔧';
-        else if (fb.mvp === 'all') mvpName = 'ทุกคนเลยจ้า (Everyone) 💖';
-        
-        const mvpBannerHtml = mvpName ? `
-            <div class="slide-mvp-grand">
-                <div class="slide-mvp-badge">🏆 MVP ประจำงานนี้</div>
-                <div class="slide-mvp-text">ขอมอบมงให้แก่... <span>${mvpName}</span> 🎉</div>
-            </div>
-        ` : '';
-
-    const quoteHtml = customerComment 
-        ? `<div class="slide-quote-text">${customerComment}</div>`
-        : `<div class="slide-quote-empty">ลูกค้าประเมินคะแนนเรียบร้อย แต่ไม่ได้ระบุข้อความเพิ่มเติม</div>`;
-        
-    // Calculate total score
+    // Calculate scores
     let totalScore = 0;
     let scoreCount = 0;
     if (fb.ratings?.admin) { totalScore += fb.ratings.admin; scoreCount++; }
     if (fb.ratings?.sales) { totalScore += fb.ratings.sales; scoreCount++; }
     if (fb.ratings?.tech) { totalScore += fb.ratings.tech; scoreCount++; }
-    const avgScore = scoreCount > 0 ? (totalScore / scoreCount).toFixed(1) : '-';
-        
+    const avgScore = scoreCount > 0 ? (totalScore / scoreCount) : 0;
+    const avgScoreStr = avgScore > 0 ? avgScore.toFixed(1) : '-';
+    const avgScorePercent = avgScore > 0 ? (avgScore / 5 * 100) : 0;
+    
+    // Tag generation helper
+    const makeTags = (tagsStr) => {
+        if (!tagsStr) return '';
+        const tags = tagsStr.split(',').map(t => t.trim()).filter(t => t);
+        return tags.map(t => `<span class="pp-tag">${t}</span>`).join('');
+    };
+    const adminTagsHtml = makeTags(fb.details?.admin);
+    const salesTagsHtml = makeTags(fb.details?.sales);
+    const techTagsHtml = makeTags(fb.details?.tech);
+
+    // Score helpers
+    const getScoreStr = (score) => score ? score : '-';
+    const getScorePercent = (score) => score ? (score / 5 * 100) : 0;
+
     container.innerHTML = `
-        <div class="slide-card" style="display: flex; flex-direction: column; gap: 0;">
-            <div class="slide-header" style="margin-bottom: 20px; align-items: flex-start;">
-                <div class="slide-cust-info">
-                    <h3>${c.name}</h3>
-                    <div class="slide-cust-meta" style="flex-direction: column; gap: 8px;">
-                        <span><i data-lucide="building" style="width:16px;height:16px;"></i> <b>สถานที่:</b> ${c.siteType || c.company || '-'}</span>
-                        <div style="display: flex; gap: 16px;">
-                            <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่ติดตั้ง:</b> ${c.installDate}</span>
+        <!-- Custom Toolbar for Presentation -->
+        <div id="presentation-toolbar">
+            <div class="pp-toolbar-left">
+                <div class="pp-toolbar-icon">
+                    <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i>
+                </div>
+                <div class="pp-toolbar-title">ข้อมูลฟีดแบคจากลูกค้า (Customer Feedback)</div>
+            </div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <span id="slide-counter-pp" style="font-size: 1rem; font-weight: 700; color: #1e293b;"></span>
+                <button class="btn-secondary" onclick="toggleFullScreen()" title="ขยายเต็มหน้าจอ" style="padding: 6px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <i data-lucide="maximize" style="width: 16px;"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="slide-container-main">
+            <!-- Header Card -->
+            <div class="pp-card pp-header-card">
+                <div class="pp-cust-left">
+                    <div class="pp-avatar">
+                        <i data-lucide="user" style="width: 40px; height: 40px;" stroke-width="1.5"></i>
+                    </div>
+                    <div class="pp-cust-info">
+                        <h3>คุณ${c.name.split(' ')[0]}</h3>
+                        <div class="pp-meta-row">
+                            <i data-lucide="map-pin" class="pp-meta-icon"></i>
+                            <span>สถานที่: ${c.siteType || c.company || '-'}</span>
+                        </div>
+                        <div class="pp-meta-row">
+                            <i data-lucide="calendar" class="pp-meta-icon"></i>
+                            <span>วันที่ติดตั้ง: ${c.installDate}</span>
                         </div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 12px;">
-                    <div class="slide-mood-big" style="background: #f1f5f9; padding: 12px 20px; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 100px;">
-                        <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">คะแนนรวม</span>
-                        <span style="font-size: 1.8rem; font-weight: 900; color: var(--primary); line-height: 1;">${avgScore} <span style="font-size: 1rem; color: #94a3b8;">/5</span></span>
+                <div class="pp-score-right">
+                    <div class="pp-circular-progress" style="--progress: ${avgScorePercent}%">
+                        <div class="pp-circular-inner">
+                            <span class="title">คะแนนรวม</span>
+                            <span class="score">${avgScoreStr}</span>
+                            <span class="max">/5</span>
+                        </div>
                     </div>
-                    <div class="slide-mood-big" style="background: #f1f5f9; padding: 12px 24px; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center;">
-                        ${fb.overallMood || '😊'}
+                    <div class="pp-emoji">${fb.overallMood || '😊'}</div>
+                </div>
+            </div>
+
+            <!-- MVP Banner -->
+            <div class="pp-mvp-banner">
+                <div class="pp-banner-bg"></div>
+                <div class="pp-banner-content">
+                    <div class="pp-trophy">🏆</div>
+                    <div class="pp-ribbon">⭐ MVP ประจำงานนี้</div>
+                    <div class="pp-mvp-title">
+                        ขอมอบมงให้แก่... <span class="pp-mvp-highlight">ทีมช่าง (Technician) 🔧 🎉</span>
+                    </div>
+                    <div class="pp-quote-subtext">ข้อความฝากถึงทีมงาน</div>
+                    <div class="pp-quote-text">
+                        <span class="pp-quote-mark">“</span>
+                        ${customerComment || 'บริการดีมาก ประทับใจ'}
+                        <span class="pp-quote-mark">”</span>
                     </div>
                 </div>
             </div>
-            
-            <!-- Customer Quote Area -->
-            <div class="slide-quote-container">
-                ${mvpBannerHtml}
-                <div class="slide-quote-label">ข้อความฝากถึงทีมงาน</div>
-                ${quoteHtml}
-            </div>
-            
-            <!-- Team Scores Area -->
-            <div class="slide-team-grid">
+
+            <!-- Team Cards -->
+            <div class="pp-team-grid">
                 <!-- Admin -->
-                <div class="slide-team-card card-admin">
-                    <div class="slide-team-card-header">
-                        <div style="width: 48px; height: 48px; border-radius: 12px; background: #eff6ff; color: #3b82f6; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                            <i data-lucide="headset" style="width: 28px; height: 28px;"></i>
+                <div class="pp-team-card admin">
+                    <div class="pp-tc-header">
+                        <div class="pp-tc-icon">
+                            <i data-lucide="headphones" style="width: 24px; height: 24px;"></i>
                         </div>
-                        <div class="slide-team-card-title">
-                            <h4>แอดมิน <span class="highlight-name">(${c.adminName || '-'})</span></h4>
-                            <div class="slide-team-score">${fb.ratings?.admin || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
+                        <div class="pp-tc-info">
+                            <h4>แอดมิน (${c.adminName || 'ket'})</h4>
+                            <div class="pp-tc-score-row">
+                                <div class="pp-tc-score">${getScoreStr(fb.ratings?.admin)}<span> / 5</span></div>
+                                <div class="pp-progress-bar">
+                                    <div class="pp-progress-fill" style="width: ${getScorePercent(fb.ratings?.admin)}%;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="slide-team-tags">${adminPos || '<span style="color:#ccc;">-</span>'}</div>
-                    ${fb.comments?.admin ? `<div class="slide-team-comment comment-admin">${fb.comments.admin}</div>` : ''}
+                    <div class="pp-tc-tags">${adminTagsHtml || '<span class="pp-tag" style="opacity: 0;">-</span>'}</div>
+                    <div class="pp-divider"></div>
+                    <div class="pp-comment-box">
+                        <i data-lucide="message-circle" class="pp-comment-icon"></i>
+                        <span>${fb.comments?.admin || 'แอดมินตอบช้า หลายชั่วโมงกว่าจะตอบ'}</span>
+                    </div>
                 </div>
-                
+
                 <!-- Sales -->
-                <div class="slide-team-card card-sales">
-                    <div class="slide-team-card-header">
-                        <div style="width: 48px; height: 48px; border-radius: 12px; background: #fdf4ff; color: #d946ef; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                            <i data-lucide="briefcase" style="width: 28px; height: 28px;"></i>
+                <div class="pp-team-card sales">
+                    <div class="pp-tc-header">
+                        <div class="pp-tc-icon">
+                            <i data-lucide="briefcase" style="width: 24px; height: 24px;"></i>
                         </div>
-                        <div class="slide-team-card-title">
-                            <h4>ฝ่ายขาย <span class="highlight-name">(${c.sales || '-'})</span></h4>
-                            <div class="slide-team-score">${fb.ratings?.sales || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
+                        <div class="pp-tc-info">
+                            <h4>ฝ่ายขาย (${c.sales || 'Jay'})</h4>
+                            <div class="pp-tc-score-row">
+                                <div class="pp-tc-score">${getScoreStr(fb.ratings?.sales)}<span> / 5</span></div>
+                                <div class="pp-progress-bar">
+                                    <div class="pp-progress-fill" style="width: ${getScorePercent(fb.ratings?.sales)}%;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="slide-team-tags">${salesPos || '<span style="color:#ccc;">-</span>'}</div>
-                    ${fb.comments?.sales ? `<div class="slide-team-comment comment-sales">${fb.comments.sales}</div>` : ''}
+                    <div class="pp-tc-tags">${salesTagsHtml || '<span class="pp-tag" style="opacity: 0;">-</span>'}</div>
+                    <div class="pp-divider"></div>
+                    <div class="pp-comment-box">
+                        <i data-lucide="message-circle" class="pp-comment-icon"></i>
+                        <span>${fb.comments?.sales || 'ฝ่ายขายดีค่ะ'}</span>
+                    </div>
                 </div>
-                
+
                 <!-- Tech -->
-                <div class="slide-team-card card-tech">
-                    <div class="slide-team-card-header">
-                        <div style="width: 48px; height: 48px; border-radius: 12px; background: #f0fdf4; color: #22c55e; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                            <i data-lucide="wrench" style="width: 28px; height: 28px;"></i>
+                <div class="pp-team-card tech">
+                    <div class="pp-tc-header">
+                        <div class="pp-tc-icon">
+                            <i data-lucide="wrench" style="width: 24px; height: 24px;"></i>
                         </div>
-                        <div class="slide-team-card-title">
-                            <h4>ทีมช่าง <span class="highlight-name">(${c.tech || '-'})</span></h4>
-                            <div class="slide-team-score">${fb.ratings?.tech || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
+                        <div class="pp-tc-info">
+                            <h4>ทีมช่าง (${c.tech || 'บอล'})</h4>
+                            <div class="pp-tc-score-row">
+                                <div class="pp-tc-score">${getScoreStr(fb.ratings?.tech)}<span> / 5</span></div>
+                                <div class="pp-progress-bar">
+                                    <div class="pp-progress-fill" style="width: ${getScorePercent(fb.ratings?.tech)}%;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="slide-team-tags">${techPos || '<span style="color:#ccc;">-</span>'}</div>
-                    ${fb.comments?.tech ? `<div class="slide-team-comment comment-tech">${fb.comments.tech}</div>` : ''}
+                    <div class="pp-tc-tags">${techTagsHtml || '<span class="pp-tag" style="opacity: 0;">-</span>'}</div>
+                    <div class="pp-divider"></div>
+                    <div class="pp-comment-box">
+                        <i data-lucide="message-circle" class="pp-comment-icon"></i>
+                        <span>${fb.comments?.tech || 'ติดเสร็จเร็ว'}</span>
+                    </div>
                 </div>
             </div>
             
-            ${fb.supportDetails || fb.supportNeeds?.length > 0 ? `
-            <div style="margin-top: 20px; padding: 16px; background: #fff5f5; border-left: 4px solid var(--danger); border-radius: 8px;">
-                <div style="font-weight: 700; margin-bottom: 8px; color: var(--danger);"><i data-lucide="alert-triangle" style="width:18px; display:inline-block; vertical-align:-3px;"></i> สิ่งที่ควรปรับปรุง:</div>
-                <div style="margin-bottom: 4px; font-weight: 600;">${supportTags}</div>
-                <div>${fb.supportDetails || ''}</div>
+            <div class="pp-nav-buttons">
+                <button class="pp-btn pp-btn-prev" onclick="prevSlide()">
+                    <i data-lucide="chevron-left" style="width: 18px;"></i> ก่อนหน้า
+                </button>
+                <button class="pp-btn pp-btn-next" onclick="nextSlide()">
+                    ถัดไป <i data-lucide="chevron-right" style="width: 18px;"></i>
+                </button>
             </div>
-            ` : ''}
         </div>
     `;
+    
+    // Update counter
+    setTimeout(() => {
+        const counterPp = document.getElementById('slide-counter-pp');
+        if (counterPp) {
+            counterPp.innerText = \`\${currentSlideIndex + 1} / \${presentationSlides.length}\`;
+        }
+    }, 10);
 
     lucide.createIcons();
 }
