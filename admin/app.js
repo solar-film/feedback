@@ -2207,13 +2207,16 @@ function renderGiftTable() {
             <td>${c.company || '-'}</td>
             <td>${statusBadge}</td>
             <td>${item}</td>
-            <td style="text-align: right; white-space: nowrap;">
-                <button class="btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; margin-right: 4px;" onclick="openGiftModal('${c.id}')">
-                    <i data-lucide="edit" style="width: 14px; height: 14px;"></i> แก้ไข
-                </button>
-                <button class="btn-primary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="printGiftLabel('${c.id}')" title="พิมพ์จ่าหน้าซอง">
-                    <i data-lucide="printer" style="width: 14px; height: 14px;"></i> พิมพ์
-                </button>
+            <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${gift.address || c.addressFromData || '-'}">${gift.address || c.addressFromData || '-'}</td>
+            <td style="text-align: right;">
+                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                    <button class="btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; display: flex; align-items: center; gap: 6px; height: auto; min-height: 32px; font-weight: 500;" onclick="openGiftModal('${c.id}')">
+                        <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> แก้ไข
+                    </button>
+                    <button class="btn-primary" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; display: flex; align-items: center; gap: 6px; height: auto; min-height: 32px; font-weight: 500; background-color: var(--primary); color: white; border: none;" onclick="printGiftLabel('${c.id}')" title="พิมพ์จ่าหน้าซอง">
+                        <i data-lucide="printer" style="width: 14px; height: 14px;"></i> พิมพ์
+                    </button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
