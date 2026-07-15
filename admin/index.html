@@ -582,11 +582,11 @@
     </div>
 
     <!-- Modal for Gift Delivery Status -->
-    <div class="modal" id="modal-gift" onclick="if(event.target===this) closeGiftModal()">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2><i data-lucide="gift"></i> สถานะจัดส่งของรางวัล</h2>
-                <button class="modal-close" onclick="closeGiftModal()"><i data-lucide="x"></i></button>
+    <div class="drawer-modal" id="modal-gift" onclick="if(event.target===this) closeGiftModal()" style="justify-content: center; align-items: center;">
+        <div class="drawer-content" style="max-width: 500px; border-radius: 12px; height: auto; max-height: 90vh;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--border); margin-bottom: 20px;">
+                <h2 style="margin: 0; font-size: 1.25rem; display: flex; align-items: center; gap: 8px;"><i data-lucide="gift"></i> สถานะจัดส่งของรางวัล</h2>
+                <button class="drawer-close" onclick="closeGiftModal()" style="position: static; font-size: 1.5rem; background: none; border: none; cursor: pointer; color: var(--text-muted);">&times;</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="gift-cust-id">
