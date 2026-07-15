@@ -2100,7 +2100,7 @@ function renderPresentationSlide() {
     setTimeout(() => {
         const counterPp = document.getElementById('slide-counter-pp');
         if (counterPp) {
-            counterPp.innerText = \`\${currentSlideIndex + 1} / \${presentationSlides.length}\`;
+            counterPp.innerText = `${currentSlideIndex + 1} / ${presentationSlides.length}`;
         }
     }, 10);
 
