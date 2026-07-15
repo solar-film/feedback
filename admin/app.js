@@ -2418,17 +2418,16 @@ function printGiftLabel(id) {
     const gift = c.giftData || {};
     const addr = gift.address || c.addressFromData || '';
     
-    // Determine Sender by Company
-    let senderName = '';
-    let senderAddress = '';
+    // Determine Background Image by Company
+    let bgImage = '../images/GFS-A5.png';
+    if (c.company && c.company.toUpperCase().includes('MHL')) {
+        bgImage = '../images/MHL-A5.png';
+    }
     
-    if (c.company === 'MHL') {
-        senderName = 'บริษัท มโหฬารฟิล์ม จำกัด (สำนักงานใหญ่)';
-        senderAddress = 'ฝ่ายการตลาดและลูกค้าสัมพันธ์<br>924 ถ.ลาซาล แขวงบางนาใต้ เขตบางนา กรุงเทพมหานคร 10260<br>Call Center: 02-055-6886 | Mobile: 094-998-1234';
-    } else {
-        // Default to GFS
-        senderName = 'บริษัท กู๊ดฟิล์ม จำกัด (สำนักงานใหญ่)';
-        senderAddress = 'ฝ่ายการตลาดและลูกค้าสัมพันธ์<br>914/10-11 ถนนลาซาล แขวงบางนา เขตบางนา กรุงเทพ 10260<br>Call Center: 02-096-3424 | Mobile: 097-097-2103';
+    // Format Receiver Name (use remark if available, fallback to c.name)
+    let receiverName = gift.remark || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
+    if (receiverName && !receiverName.startsWith('คุณ')) {
+        receiverName = 'คุณ' + receiverName;
     }
     
     const layout = document.getElementById('print-layout');
@@ -2437,6 +2436,16 @@ function printGiftLabel(id) {
     layout.innerHTML = `
         <style>
             @media print {
+                @page {
+                    size: A5 landscape;
+                    margin: 0;
+                }
+                body {
+                    margin: 0;
+                    padding: 0;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
                 body * {
                     visibility: hidden;
                 }
@@ -2449,98 +2458,52 @@ function printGiftLabel(id) {
                     top: 0;
                     width: 210mm;
                     height: 148mm;
-                    padding: 15mm;
-                    box-sizing: border-box;
-                    background: white;
+                    background-image: url('${bgImage}');
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    font-family: 'Prompt', 'Sarabun', sans-serif;
                 }
-                @page {
-                    size: A5 landscape;
-                    margin: 0;
-                }
-                .label-box {
-                    border: 2px solid #e2e8f0;
-                    border-radius: 12px;
-                    width: 100%;
-                    height: 100%;
-                    padding: 20px;
-                    box-sizing: border-box;
-                    font-family: 'Sarabun', 'Prompt', sans-serif;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                    position: relative;
-                }
-                .sender-info {
-                    font-size: 11pt;
-                    color: #475569;
-                    line-height: 1.4;
-                    max-width: 60%;
-                }
-                .sender-title {
-                    font-weight: bold;
-                    color: #1e293b;
-                    font-size: 12pt;
-                    margin-bottom: 4px;
-                }
-                .receiver-box {
-                    align-self: flex-end;
-                    width: 70%;
-                    border: 2px solid #005eb8;
-                    border-radius: 12px;
-                    padding: 20px;
-                    margin-top: 20px;
-                    background-color: #f8fafc;
-                }
-                .receiver-title {
-                    font-weight: bold;
-                    color: #005eb8;
-                    font-size: 14pt;
-                    margin-bottom: 10px;
-                    border-bottom: 1px solid #cbd5e1;
-                    padding-bottom: 5px;
-                }
-                .receiver-details {
-                    font-size: 14pt;
-                    color: #0f172a;
-                    line-height: 1.5;
-                }
-                .cute-message {
+                
+                .print-name {
                     position: absolute;
-                    bottom: 20px;
-                    left: 20px;
-                    font-size: 12pt;
-                    color: #ec4899;
-                    font-weight: bold;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    background: #fdf2f8;
-                    padding: 8px 12px;
-                    border-radius: 8px;
-                    border: 1px dashed #fbcfe8;
+                    top: 40mm;
+                    left: 48mm;
+                    font-size: 15pt;
+                    font-weight: 500;
+                    color: #1e293b;
+                    width: 140mm;
+                    white-space: nowrap;
+                    overflow: hidden;
+                }
+                
+                .print-phone {
+                    position: absolute;
+                    top: 55mm;
+                    left: 48mm;
+                    font-size: 15pt;
+                    font-weight: 500;
+                    color: #1e293b;
+                    width: 140mm;
+                }
+                
+                .print-address {
+                    position: absolute;
+                    top: 70mm;
+                    left: 36mm;
+                    font-size: 14pt;
+                    font-weight: 400;
+                    color: #1e293b;
+                    width: 155mm;
+                    line-height: 15.5mm;
+                    height: 32mm;
+                    overflow: hidden;
                 }
             }
         </style>
-        <div class="label-box">
-            <div class="sender-info">
-                <div class="sender-title">ผู้ส่ง (Sender): ${senderName}</div>
-                <div>${senderAddress}</div>
-            </div>
-            
-            <div class="receiver-box">
-                <div class="receiver-title">ผู้รับ (Receiver)</div>
-                <div class="receiver-details">
-                    <strong>คุณ${(c.name || '').replace(/^คุณ/, '')}</strong><br>
-                    <strong>โทร:</strong> ${c.phone || '-'}<br>
-                    <strong>ที่อยู่:</strong><br>
-                    ${addr.replace(/\n/g, '<br>') || '-'}
-                </div>
-            </div>
-            
-            <div class="cute-message">
-                💖 ขอบคุณที่ไว้วางใจให้เราดูแลรถของคุณนะคะ! รับของขวัญแทนคำขอบคุณจากพวกเราได้เลยค่ะ ✨
-            </div>
-        </div>
+        <div class="print-name">${receiverName}</div>
+        <div class="print-phone">${c.phone || '-'}</div>
+        <div class="print-address">${addr}</div>
     `;
     
     // Add font for print if missing
@@ -2555,7 +2518,7 @@ function printGiftLabel(id) {
     // Trigger print
     setTimeout(() => {
         window.print();
-    }, 300);
+    }, 500);
 }
 
 
