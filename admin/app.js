@@ -2232,6 +2232,9 @@ function renderGiftTable() {
                     <option value="ของตีกลับ" ${status === 'ของตีกลับ' ? 'selected' : ''}>ของตีกลับ</option>
                 </select>
             </td>
+            <td>
+                <input type="text" class="form-control" style="width: 150px; padding: 6px; font-size: 0.85rem;" placeholder="ระบุหมายเหตุ..." value="${gift.remark || ''}" onchange="quickChangeGiftData('${c.id}', 'remark', this.value)">
+            </td>
             <td style="text-align: center;">
                 <button class="btn-primary" style="padding: 8px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background-color: var(--primary); color: white; border: none; cursor: pointer; width: 32px; height: 32px;" onclick="printGiftLabel('${c.id}')" title="พิมพ์จ่าหน้าซอง">
                     <i data-lucide="printer" style="width: 16px; height: 16px; margin: 0;"></i>
@@ -2271,6 +2274,46 @@ function openGiftModal(id) {
 
 function closeGiftModal() {
     document.getElementById('modal-gift').style.display = 'none';
+}
+
+async function quickChangeGiftData(id, field, value) {
+    const c = state.customers.find(x => x.id === id);
+    if (!c) return;
+    
+    const gift = c.giftData || {};
+    let status = gift.status || '';
+    let item = gift.gift || '';
+    let addr = gift.address || c.addressFromData || '';
+    let remark = gift.remark || '';
+    
+    if (field === 'status') status = value;
+    if (field === 'gift') item = value;
+    if (field === 'address') addr = value;
+    if (field === 'remark') remark = value;
+    
+    try {
+        const payload = {
+            action: 'updateGiftStatus',
+            id: id,
+            status: status,
+            gift: item,
+            address: addr,
+            remark: remark
+        };
+        
+        await fetch(state.googleSheetsUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        c.giftData = { status, gift: item, address: addr, remark };
+        renderGiftTable();
+        showToast('บันทึกสำเร็จ', 'success');
+    } catch (e) {
+        alert('เกิดข้อผิดพลาด');
+    }
 }
 
 async function saveGiftStatus() {
