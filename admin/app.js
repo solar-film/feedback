@@ -2233,12 +2233,10 @@ function renderGiftTable() {
                     <option value="ของตีกลับ" ${status === 'ของตีกลับ' ? 'selected' : ''}>ของตีกลับ</option>
                 </select>
             </td>
-            <td>
-                <div style="display: flex; align-items: center; gap: 4px;">
-                    <input type="text" id="remark-input-${c.id}" class="form-control" style="width: 130px; padding: 6px; font-size: 0.85rem;" placeholder="ระบุชื่อที่ใช้รีวิว..." value="${gift.remark || ''}" onkeydown="if(event.key==='Enter') quickChangeGiftData('${c.id}', 'remark', this.value)">
-                    <button class="btn-secondary" style="padding: 4px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; color: #4b5563; border: 1px solid #d1d5db; cursor: pointer; flex-shrink: 0; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='#ffffff'" onclick="quickChangeGiftData('${c.id}', 'remark', document.getElementById('remark-input-${c.id}').value)" title="บันทึก">
-                        <i data-lucide="save" style="width: 14px; height: 14px; margin: 0;"></i>
-                    </button>
+            <td id="remark-cell-${c.id}">
+                <div style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text); padding: 6px; border: 1px dashed transparent; border-radius: 4px; transition: all 0.2s; width: 150px;" onmouseover="this.style.border='1px dashed var(--primary)'" onmouseout="this.style.border='1px dashed transparent'" onclick="enableRemarkEdit('${c.id}')" title="คลิกเพื่อแก้ไข">
+                    <i data-lucide="edit-3" style="width: 14px; height: 14px; flex-shrink: 0; opacity: 0.5; color: var(--primary);"></i>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ${!gift.remark ? 'opacity: 0.5; font-style: italic;' : ''}">${gift.remark || 'คลิกเพื่อระบุชื่อ...'}</span>
                 </div>
             </td>
             <td style="text-align: center;">
@@ -2600,6 +2598,31 @@ async function quickChangeGiftData(id, field, value) {
         alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
     }
 }
+
+window.enableRemarkEdit = function(id) {
+    const c = state.customers.find(x => x.id === id);
+    if (!c) return;
+    const gift = c.giftData || {};
+    const cell = document.getElementById(`remark-cell-${id}`);
+    if (!cell) return;
+    
+    cell.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 4px;">
+            <input type="text" id="remark-input-${id}" class="form-control" style="width: 130px; padding: 6px; font-size: 0.85rem;" placeholder="ระบุชื่อที่ใช้รีวิว..." value="${gift.remark || ''}" onkeydown="if(event.key==='Enter') quickChangeGiftData('${id}', 'remark', this.value)">
+            <button class="btn-secondary" style="padding: 4px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; color: #4b5563; border: 1px solid #d1d5db; cursor: pointer; flex-shrink: 0; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='#ffffff'" onclick="quickChangeGiftData('${id}', 'remark', document.getElementById('remark-input-${id}').value)" title="บันทึก">
+                <i data-lucide="save" style="width: 14px; height: 14px; margin: 0;"></i>
+            </button>
+        </div>
+    `;
+    if (window.lucide && lucide.createIcons) lucide.createIcons();
+    const input = document.getElementById(`remark-input-${id}`);
+    if (input) {
+        input.focus();
+        const val = input.value;
+        input.value = '';
+        input.value = val;
+    }
+};
 
 function promptEditAddress(id) {
     const c = state.customers.find(x => x.id === id);
