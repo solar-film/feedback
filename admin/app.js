@@ -1885,18 +1885,15 @@ function initPresentation() {
 
 function renderPresentationSlide() {
     const container = document.getElementById('presentation-content');
-    const counter = document.getElementById('slide-counter');
-    
     if (!presentationSlides || presentationSlides.length === 0) {
-        container.innerHTML = '<div style="text-align: center; color: var(--text-muted);">ไม่มีข้อมูลสำหรับนำเสนอในช่วงเวลานี้</div>';
-        counter.innerText = '0 / 0';
+        container.innerHTML = '<div style="text-align: center; color: var(--text-muted); margin-top: 40px;">ไม่มีข้อมูลสำหรับนำเสนอในช่วงเวลานี้</div>';
         return;
     }
     
     if (currentSlideIndex < 0) currentSlideIndex = 0;
     if (currentSlideIndex >= presentationSlides.length) currentSlideIndex = presentationSlides.length - 1;
     
-    counter.innerText = `${currentSlideIndex + 1} / ${presentationSlides.length}`;
+    
     
     const c = presentationSlides[currentSlideIndex];
     const fb = c.feedback;
