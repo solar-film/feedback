@@ -2321,9 +2321,7 @@ async function saveGiftStatus() {
     const status = document.getElementById('gift-status').value;
     const item = document.getElementById('gift-item').value;
     const addr = document.getElementById('gift-address').value;
-    let remark = document.getElementById('gift-remark').value;
-    
-    if (remark === null || remark === undefined) remark = '';
+    const remark = document.getElementById('gift-remark').value || '';
     
     if (!status || !item || !addr) {
         alert('กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน');
