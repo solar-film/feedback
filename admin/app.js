@@ -1776,7 +1776,7 @@ function renderPresentationSlide() {
             <!-- Team Scores Area -->
             <div class="slide-team-grid">
                 <!-- Admin -->
-                <div class="slide-team-card">
+                <div class="slide-team-card card-admin">
                     <div class="slide-team-card-header">
                         <div style="width: 48px; height: 48px; border-radius: 12px; background: #eff6ff; color: #3b82f6; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                             <i data-lucide="headset" style="width: 28px; height: 28px;"></i>
@@ -1791,7 +1791,7 @@ function renderPresentationSlide() {
                 </div>
                 
                 <!-- Sales -->
-                <div class="slide-team-card">
+                <div class="slide-team-card card-sales">
                     <div class="slide-team-card-header">
                         <div style="width: 48px; height: 48px; border-radius: 12px; background: #fdf4ff; color: #d946ef; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                             <i data-lucide="briefcase" style="width: 28px; height: 28px;"></i>
@@ -1806,7 +1806,7 @@ function renderPresentationSlide() {
                 </div>
                 
                 <!-- Tech -->
-                <div class="slide-team-card">
+                <div class="slide-team-card card-tech">
                     <div class="slide-team-card-header">
                         <div style="width: 48px; height: 48px; border-radius: 12px; background: #f0fdf4; color: #22c55e; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                             <i data-lucide="wrench" style="width: 28px; height: 28px;"></i>

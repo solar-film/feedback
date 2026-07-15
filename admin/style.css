@@ -1107,6 +1107,9 @@ body {
     flex-direction: column;
     gap: 12px;
 }
+.card-admin { background: linear-gradient(180deg, #ffffff, #f0f6ff); border-color: #dbeafe; }
+.card-sales { background: linear-gradient(180deg, #ffffff, #fff7ed); border-color: #ffedd5; }
+.card-tech { background: linear-gradient(180deg, #ffffff, #f0fdf4); border-color: #ccfbf1; }
 .slide-team-card-header {
     display: flex;
     align-items: center;
