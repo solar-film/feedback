@@ -2453,6 +2453,7 @@ function printGiftLabel(id) {
                     visibility: visible;
                 }
                 #print-layout {
+                    display: block !important;
                     position: absolute;
                     left: 0;
                     top: 0;
@@ -2463,6 +2464,8 @@ function printGiftLabel(id) {
                     background-position: center;
                     background-repeat: no-repeat;
                     font-family: 'Prompt', 'Sarabun', sans-serif;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
                 }
                 
                 .print-name {
