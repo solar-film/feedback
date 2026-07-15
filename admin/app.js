@@ -172,7 +172,7 @@ function switchTab(tabId) {
         kanban: "ท่อติดตามสถานะแบบประเมิน (Kanban)",
         reports: "รายงานคะแนนประเมินทีมบริการ",
         settings: "ตั้งค่าการเชื่อมต่อ Google Sheets API",
-        presentation: "โหมดนำเสนอข้อมูลฟรีแบคจากลูกค้า"
+        presentation: "โหมดนำเสนอข้อมูลฟีดแบคจากลูกค้า (Customer Feedback)"
     };
     document.getElementById('page-title').innerText = titles[tabId] || "Dashboard";
     
@@ -1731,33 +1731,46 @@ function renderPresentationSlide() {
     
     
     
-    const customerComment = fb.mvpComment ? fb.mvpComment.trim() : '';
+        const customerComment = fb.mvpComment ? fb.mvpComment.trim() : '';
     const quoteHtml = customerComment 
         ? `<div class="slide-quote-text">${customerComment}</div>`
         : `<div class="slide-quote-empty">ลูกค้าประเมินคะแนนเรียบร้อย แต่ไม่ได้ระบุข้อความเพิ่มเติม</div>`;
         
-    const mvpHtml = fb.mvp ? `<div class="slide-mvp-badge"><i data-lucide="award"></i> MVP: ${fb.mvp}</div>` : '';
+    // Calculate total score
+    let totalScore = 0;
+    let scoreCount = 0;
+    if (fb.ratings?.admin) { totalScore += fb.ratings.admin; scoreCount++; }
+    if (fb.ratings?.sales) { totalScore += fb.ratings.sales; scoreCount++; }
+    if (fb.ratings?.tech) { totalScore += fb.ratings.tech; scoreCount++; }
+    const avgScore = scoreCount > 0 ? (totalScore / scoreCount).toFixed(1) : '-';
         
     container.innerHTML = `
         <div class="slide-card" style="display: flex; flex-direction: column; gap: 0;">
-            <div class="slide-header" style="margin-bottom: 20px;">
+            <div class="slide-header" style="margin-bottom: 20px; align-items: flex-start;">
                 <div class="slide-cust-info">
                     <h3>${c.name}</h3>
-                    <div class="slide-cust-meta" style="flex-wrap: wrap;">
+                    <div class="slide-cust-meta" style="flex-direction: column; gap: 8px;">
                         <span><i data-lucide="building" style="width:16px;height:16px;"></i> <b>สถานที่:</b> ${c.siteType || c.company || '-'}</span>
-                        <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่:</b> ${c.installDate}</span>
-                        <span><i data-lucide="package" style="width:16px;height:16px;"></i> <b>ฟิล์ม:</b> ${c.filmModel}</span>
+                        <div style="display: flex; gap: 16px;">
+                            <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่:</b> ${c.installDate}</span>
+                            <span><i data-lucide="package" style="width:16px;height:16px;"></i> <b>ฟิล์ม:</b> ${c.filmModel}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="slide-mood-big" style="background: #f1f5f9; padding: 12px 24px; border-radius: 100px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
-                    ${fb.overallMood || '😊'}
+                <div style="display: flex; gap: 12px;">
+                    <div class="slide-mood-big" style="background: #f1f5f9; padding: 12px 20px; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 100px;">
+                        <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">คะแนนรวม</span>
+                        <span style="font-size: 1.8rem; font-weight: 900; color: var(--primary); line-height: 1;">${avgScore} <span style="font-size: 1rem; color: #94a3b8;">/5</span></span>
+                    </div>
+                    <div class="slide-mood-big" style="background: #f1f5f9; padding: 12px 24px; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center;">
+                        ${fb.overallMood || '😊'}
+                    </div>
                 </div>
             </div>
             
             <!-- Customer Quote Area -->
             <div class="slide-quote-container">
                 ${quoteHtml}
-                ${mvpHtml ? `<div class="slide-quote-footer">${mvpHtml}</div>` : ''}
             </div>
             
             <!-- Team Scores Area -->
@@ -1765,37 +1778,46 @@ function renderPresentationSlide() {
                 <!-- Admin -->
                 <div class="slide-team-card">
                     <div class="slide-team-card-header">
-                        <img src="../images/admin.png" alt="Admin" class="slide-score-img-small">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: #eff6ff; color: #3b82f6; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <i data-lucide="headset" style="width: 28px; height: 28px;"></i>
+                        </div>
                         <div class="slide-team-card-title">
                             <h4>แอดมิน (${c.adminName || '-'})</h4>
                             <div class="slide-team-score">${fb.ratings?.admin || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
                         </div>
                     </div>
                     <div class="slide-team-tags">${adminPos || '<span style="color:#ccc;">-</span>'}</div>
+                    ${fb.comments?.admin ? `<div class="slide-team-comment" style="margin-top:auto;">${fb.comments.admin}</div>` : ''}
                 </div>
                 
                 <!-- Sales -->
                 <div class="slide-team-card">
                     <div class="slide-team-card-header">
-                        <img src="../images/sales.png" alt="Sales" class="slide-score-img-small">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: #fdf4ff; color: #d946ef; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <i data-lucide="briefcase" style="width: 28px; height: 28px;"></i>
+                        </div>
                         <div class="slide-team-card-title">
                             <h4>ฝ่ายขาย (${c.sales || '-'})</h4>
                             <div class="slide-team-score">${fb.ratings?.sales || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
                         </div>
                     </div>
                     <div class="slide-team-tags">${salesPos || '<span style="color:#ccc;">-</span>'}</div>
+                    ${fb.comments?.sales ? `<div class="slide-team-comment" style="margin-top:auto;">${fb.comments.sales}</div>` : ''}
                 </div>
                 
                 <!-- Tech -->
                 <div class="slide-team-card">
                     <div class="slide-team-card-header">
-                        <img src="../images/tech.png" alt="Tech" class="slide-score-img-small">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: #f0fdf4; color: #22c55e; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <i data-lucide="wrench" style="width: 28px; height: 28px;"></i>
+                        </div>
                         <div class="slide-team-card-title">
                             <h4>ทีมช่าง (${c.tech || '-'})</h4>
                             <div class="slide-team-score">${fb.ratings?.tech || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
                         </div>
                     </div>
                     <div class="slide-team-tags">${techPos || '<span style="color:#ccc;">-</span>'}</div>
+                    ${fb.comments?.tech ? `<div class="slide-team-comment" style="margin-top:auto;">${fb.comments.tech}</div>` : ''}
                 </div>
             </div>
             
@@ -1808,6 +1830,7 @@ function renderPresentationSlide() {
             ` : ''}
         </div>
     `;
+
     lucide.createIcons();
 }
 
