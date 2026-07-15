@@ -2205,11 +2205,10 @@ function renderGiftTable() {
             <td>${c.id}</td>
             <td>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]}</td>
             <td>${c.company || '-'}</td>
-            <td>${statusBadge}</td>
             <td>${item}</td>
             <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${gift.address || c.addressFromData || '-'}">${gift.address || c.addressFromData || '-'}</td>
-            <td style="text-align: right;">
-                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <td>
+                <div style="display: flex; gap: 8px;">
                     <button class="btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; display: flex; align-items: center; gap: 6px; height: auto; min-height: 32px; font-weight: 500;" onclick="openGiftModal('${c.id}')">
                         <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> แก้ไข
                     </button>
@@ -2217,6 +2216,14 @@ function renderGiftTable() {
                         <i data-lucide="printer" style="width: 14px; height: 14px;"></i> พิมพ์
                     </button>
                 </div>
+            </td>
+            <td style="text-align: right;">
+                <select class="form-input" style="padding: 4px 8px; width: 120px; font-size: 0.85rem; ${status === 'เตรียมจัดส่ง' ? 'color: var(--warning); border-color: var(--warning);' : (status === 'จัดส่งแล้ว' ? 'color: var(--success); border-color: var(--success);' : (status === 'ของตีกลับ' ? 'color: var(--danger); border-color: var(--danger);' : ''))}" onchange="quickChangeGiftStatus('${c.id}', this.value)">
+                    <option value="" ${!status ? 'selected' : ''}>-</option>
+                    <option value="เตรียมจัดส่ง" ${status === 'เตรียมจัดส่ง' ? 'selected' : ''}>เตรียมจัดส่ง</option>
+                    <option value="จัดส่งแล้ว" ${status === 'จัดส่งแล้ว' ? 'selected' : ''}>จัดส่งแล้ว</option>
+                    <option value="ของตีกลับ" ${status === 'ของตีกลับ' ? 'selected' : ''}>ของตีกลับ</option>
+                </select>
             </td>
         `;
         tbody.appendChild(tr);
@@ -2492,3 +2499,37 @@ function printGiftLabel(id) {
     }, 300);
 }
 
+
+async function quickChangeGiftStatus(id, status) {
+    const c = state.customers.find(x => x.id === id);
+    if (!c) return;
+    const gift = c.giftData || {};
+    const item = gift.gift || '-';
+    const addr = gift.address || c.addressFromData || '';
+    const remark = gift.remark || '';
+    
+    try {
+        const payload = {
+            action: 'updateGiftStatus',
+            id: id,
+            status: status,
+            gift: item,
+            address: addr,
+            remark: remark
+        };
+        
+        await fetch(state.googleSheetsUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        c.giftData = { status, gift: item, address: addr, remark };
+        renderGiftTable();
+        showToast('อัปเดตสถานะจัดส่งสำเร็จ', 'success');
+    } catch (error) {
+        console.error('Error quick updating gift status:', error);
+        alert('เกิดข้อผิดพลาดในการบันทึกสถานะจัดส่ง');
+    }
+}
