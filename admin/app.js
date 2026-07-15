@@ -2004,7 +2004,7 @@ function renderPresentationSlide() {
 
             <!-- MVP Banner -->
             ${(showMvp && customerComment) ? `
-            <div class="pp-mvp-banner" style="background-image: url('../images/mvp.png'); background-size: cover; background-position: center; background-repeat: no-repeat; border: none; padding: 140px 40px 60px; min-height: 350px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+            <div class="pp-mvp-banner" style="background-image: url('../images/mvp.png'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: none; padding: 140px 40px 60px; min-height: 350px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
                 <div class="pp-banner-content">
                     <div class="pp-mvp-title" style="margin-top: -10px;">
                         ขอมอบมงให้แก่... <span class="pp-mvp-highlight">${mvpText} 🎉</span>
