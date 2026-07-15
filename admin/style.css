@@ -1141,11 +1141,14 @@ body {
     background: #ffffff;
     padding: 12px;
     border-radius: 8px;
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    border: 1px solid #e2e8f0;
-    font-style: italic;
+    font-size: 1rem;
+    color: var(--primary);
+    border: 1px solid #cbd5e1;
+    font-style: normal;
+    font-weight: 500;
     flex-grow: 1;
+    margin-top: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 @media (max-width: 900px) {
     .slide-team-grid {
