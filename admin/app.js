@@ -2236,13 +2236,13 @@ function renderGiftTable() {
             <td>
                 <div style="display: flex; align-items: center; gap: 4px;">
                     <input type="text" id="remark-input-${c.id}" class="form-control" style="width: 130px; padding: 6px; font-size: 0.85rem;" placeholder="ระบุชื่อที่ใช้รีวิว..." value="${gift.remark || ''}" onkeydown="if(event.key==='Enter') quickChangeGiftData('${c.id}', 'remark', this.value)">
-                    <button class="btn-secondary" style="padding: 4px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background-color: #6b7280; color: white; border: none; cursor: pointer; flex-shrink: 0; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#4b5563'" onmouseout="this.style.backgroundColor='#6b7280'" onclick="quickChangeGiftData('${c.id}', 'remark', document.getElementById('remark-input-${c.id}').value)" title="บันทึก">
+                    <button class="btn-secondary" style="padding: 4px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; color: #4b5563; border: 1px solid #d1d5db; cursor: pointer; flex-shrink: 0; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='#ffffff'" onclick="quickChangeGiftData('${c.id}', 'remark', document.getElementById('remark-input-${c.id}').value)" title="บันทึก">
                         <i data-lucide="save" style="width: 14px; height: 14px; margin: 0;"></i>
                     </button>
                 </div>
             </td>
             <td style="text-align: center;">
-                <button class="btn-secondary" style="padding: 8px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background-color: #6b7280; color: white; border: none; cursor: pointer; width: 32px; height: 32px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#4b5563'" onmouseout="this.style.backgroundColor='#6b7280'" onclick="printGiftLabel('${c.id}')" title="พิมพ์จ่าหน้าซอง">
+                <button class="btn-secondary" style="padding: 8px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; color: #4b5563; border: 1px solid #d1d5db; cursor: pointer; width: 32px; height: 32px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='#ffffff'" onclick="printGiftLabel('${c.id}')" title="พิมพ์จ่าหน้าซอง">
                     <i data-lucide="printer" style="width: 16px; height: 16px; margin: 0;"></i>
                 </button>
             </td>
