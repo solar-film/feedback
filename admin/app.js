@@ -1959,7 +1959,7 @@ function renderPresentationSlide() {
                 <div class="pp-toolbar-title">ข้อมูลฟีดแบคจากลูกค้า (Customer Feedback)</div>
             </div>
             <div style="display: flex; gap: 16px; align-items: center;">
-                <span id="slide-counter-pp" style="font-size: 1rem; font-weight: 700; color: #1e293b;"></span>
+                <span id="slide-counter-pp" style="font-size: 1rem; font-weight: 700; color: #1e293b;">${currentSlideIndex + 1} / ${presentationSlides.length}</span>
                 <button class="btn-secondary" onclick="toggleFullScreen()" title="ขยายเต็มหน้าจอ" style="padding: 6px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid #e2e8f0;">
                     <i data-lucide="maximize" style="width: 16px;"></i>
                 </button>
