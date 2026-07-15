@@ -93,7 +93,7 @@ function doPost(e) {
       var giftSheet = doc.getSheetByName(giftSheetName);
       if (!giftSheet) {
         giftSheet = doc.insertSheet(giftSheetName);
-        var giftHeaders = ["ID", "Timestamp", "Status", "Address", "Gift", "Remark"];
+        var giftHeaders = ["ID", "Timestamp", "Status", "Address", "Gift", "Review Name"];
         giftSheet.appendRow(giftHeaders);
         giftSheet.getRange(1, 1, 1, giftHeaders.length).setFontWeight("bold").setBackground("#eef3f8");
       }

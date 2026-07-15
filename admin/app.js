@@ -2233,7 +2233,7 @@ function renderGiftTable() {
                 </select>
             </td>
             <td>
-                <input type="text" class="form-control" style="width: 150px; padding: 6px; font-size: 0.85rem;" placeholder="ระบุหมายเหตุ..." value="${gift.remark || ''}" onchange="quickChangeGiftData('${c.id}', 'remark', this.value)">
+                <input type="text" class="form-control" style="width: 150px; padding: 6px; font-size: 0.85rem;" placeholder="ระบุชื่อที่ใช้รีวิว..." value="${gift.remark || ''}" onchange="quickChangeGiftData('${c.id}', 'remark', this.value)">
             </td>
             <td style="text-align: center;">
                 <button class="btn-primary" style="padding: 8px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background-color: var(--primary); color: white; border: none; cursor: pointer; width: 32px; height: 32px;" onclick="printGiftLabel('${c.id}')" title="พิมพ์จ่าหน้าซอง">
