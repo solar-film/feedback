@@ -1688,7 +1688,7 @@ let currentSlideIndex = 0;
 
 function initPresentation() {
     // Filter customers who have feedback data
-    presentationSlides = filteredData.filter(c => c.feedback && c.feedback.overallMood);
+    presentationSlides = state.customers.filter(c => c.feedback && (c.feedback.overallMood || c.status === 'Completed'));
     currentSlideIndex = 0;
     
     renderPresentationSlide();
@@ -1713,18 +1713,18 @@ function renderPresentationSlide() {
     const fb = c.feedback;
     
     // Build tags for benefits/details
-    const positiveTags = fb.benefits.map(b => `<span class="slide-tag positive"><i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-top:-2px;"></i> ${b}</span>`).join('');
+    const positiveTags = (fb.benefits || []).map(b => `<span class="slide-tag positive"><i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-top:-2px;"></i> ${b}</span>`).join('');
     
-    let adminPos = (fb.details.admin || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
-    let salesPos = (fb.details.sales || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
-    let techPos = (fb.details.tech || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
+    let adminPos = (fb.details?.admin || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
+    let salesPos = (fb.details?.sales || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
+    let techPos = (fb.details?.tech || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
     
     let supportTags = (fb.supportNeeds || []).map(b => `<span class="slide-tag negative"><i data-lucide="alert-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-top:-2px;"></i> ${b}</span>`).join('');
     
     let additionalComments = [];
-    if (fb.comments.admin) additionalComments.push(`<b>แอดมิน:</b> ${fb.comments.admin}`);
-    if (fb.comments.sales) additionalComments.push(`<b>ฝ่ายขาย:</b> ${fb.comments.sales}`);
-    if (fb.comments.tech) additionalComments.push(`<b>ทีมช่าง:</b> ${fb.comments.tech}`);
+    if (fb.comments?.admin) additionalComments.push(`<b>แอดมิน:</b> ${fb.comments.admin}`);
+    if (fb.comments?.sales) additionalComments.push(`<b>ฝ่ายขาย:</b> ${fb.comments.sales}`);
+    if (fb.comments?.tech) additionalComments.push(`<b>ทีมช่าง:</b> ${fb.comments.tech}`);
     if (fb.supportDetails) additionalComments.push(`<b style="color:var(--danger)">รายละเอียดเพิ่มเติม (ปรับปรุง):</b> ${fb.supportDetails}`);
     
     const commentsHtml = additionalComments.length > 0 
@@ -1753,15 +1753,15 @@ function renderPresentationSlide() {
             <div class="slide-scores">
                 <div class="slide-score-item">
                     <img src="../images/admin.png" alt="Admin" style="height: 40px; width: auto;">
-                    <span class="slide-score-val">${fb.ratings.admin || '-'} / 5</span>
+                    <span class="slide-score-val">${fb.ratings?.admin || '-'} / 5</span>
                 </div>
                 <div class="slide-score-item">
                     <img src="../images/sales.png" alt="Sales" style="height: 40px; width: auto;">
-                    <span class="slide-score-val">${fb.ratings.sales || '-'} / 5</span>
+                    <span class="slide-score-val">${fb.ratings?.sales || '-'} / 5</span>
                 </div>
                 <div class="slide-score-item">
                     <img src="../images/tech.png" alt="Tech" style="height: 40px; width: auto;">
-                    <span class="slide-score-val">${fb.ratings.tech || '-'} / 5</span>
+                    <span class="slide-score-val">${fb.ratings?.tech || '-'} / 5</span>
                 </div>
             </div>
             
