@@ -238,6 +238,7 @@ function handleGetAllCustomersDetailed() {
       filmModel: r["FilmModel"] || r["รุ่นฟิล์ม"] || r["รุ่นฟิล์ม / พื้นที่ติดตั้ง"] || "",
       sales: r["Sales"] || r["เซลล์ผู้ดูแล"] || r["ฝ่ายขาย"] || "-",
       tech: r["Tech"] || r["ช่างติดตั้ง"] || r["ทีมช่าง"] || "-",
+      adminName: r["_col_17"] || r["Admin"] || r["แอดมิน"] || "-",
       bill: r["Bill"] || r["เลขที่บิล"] || "-",
       status: status,
       feedback: feedback

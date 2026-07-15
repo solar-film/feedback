@@ -282,6 +282,7 @@ function loadData() {
                         filmModel: item.filmModel || '-',
                         sales: item.sales || '-',
                         tech: item.tech || '-',
+                        adminName: item._col_17 || item.adminName || '-',
                         bill: item.bill || '-',
                         status: status,
                         feedback: item.feedback || null
@@ -391,6 +392,7 @@ function forceRefreshData() {
                         filmModel: item.filmModel || '-',
                         sales: item.sales || '-',
                         tech: item.tech || '-',
+                        adminName: item._col_17 || item.adminName || '-',
                         bill: item.bill || '-',
                         status: status,
                         feedback: item.feedback || null
@@ -1758,7 +1760,7 @@ function renderPresentationSlide() {
                     <div class="slide-team-card-header">
                         <img src="../images/admin.png" alt="Admin" class="slide-score-img-small">
                         <div class="slide-team-card-title">
-                            <h4>แอดมิน</h4>
+                            <h4>แอดมิน (${c.adminName || '-'})</h4>
                             <div class="slide-team-score">${fb.ratings?.admin || '-'} <span style="font-size:1.2rem; color:var(--text-muted);">/ 5</span></div>
                         </div>
                     </div>
