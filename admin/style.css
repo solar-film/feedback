@@ -930,3 +930,128 @@ body {
     opacity: 0;
     margin-bottom: -60px; /* Collapse gap when sliding out */
 }
+
+/* Presentation Mode */
+.slide-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 900px;
+    min-height: 500px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    animation: fadeIn 0.4s ease forwards;
+    border-top: 6px solid var(--secondary);
+}
+
+.slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px dashed var(--border);
+    padding-bottom: 20px;
+}
+
+.slide-cust-info h3 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.slide-cust-meta {
+    font-size: 1rem;
+    color: var(--text-muted);
+    display: flex;
+    gap: 16px;
+}
+
+.slide-mood-big {
+    font-size: 4rem;
+    text-align: center;
+    background: var(--bg-main);
+    padding: 20px;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.slide-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.slide-section {
+    background: var(--bg-main);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.slide-section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.slide-tag {
+    display: inline-block;
+    background: #eef3f8;
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.slide-tag.positive {
+    background: #e6fcf0;
+    color: var(--success);
+}
+
+.slide-tag.negative {
+    background: #feeceb;
+    color: var(--danger);
+}
+
+.slide-scores {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+}
+
+.slide-score-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.slide-score-item img {
+    width: 60px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.slide-score-val {
+    font-size: 1.4rem;
+    font-weight: 800;
+}

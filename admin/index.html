@@ -54,7 +54,12 @@
                         <span>รายงานคะแนนประเมิน</span>
                     </a>
                 </li>
-
+                <li class="menu-item" data-tab="presentation">
+                    <a href="#">
+                        <i data-lucide="projector"></i>
+                        <span>โหมดนำเสนอ</span>
+                    </a>
+                </li>
             </ul>
             
             <div class="sidebar-footer">
@@ -352,7 +357,37 @@
                 </div>
 
 
-
+            </div>
+            
+            <!-- TAB 5: โหมดนำเสนอ -->
+            <div class="tab-pane" id="tab-presentation" style="height: 100%; padding: 0;">
+                <div id="presentation-container" style="background-color: #f0f8ff; border-radius: 12px; height: calc(100vh - 120px); display: flex; flex-direction: column; overflow: hidden; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <!-- Toolbar -->
+                    <div style="padding: 10px 20px; background: #ffffff; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--primary);">รีวิวจากลูกค้า</h2>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span id="slide-counter" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">0 / 0</span>
+                            <button class="btn-secondary" onclick="toggleFullScreen()" title="ขยายเต็มหน้าจอ" style="padding: 6px; border-radius: 50%;">
+                                <i data-lucide="maximize" style="width: 18px; height: 18px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide Content (Dynamically injected) -->
+                    <div id="presentation-content" style="flex: 1; overflow-y: auto; padding: 40px; display: flex; justify-content: center; align-items: center;">
+                        <div style="text-align: center; color: var(--text-muted);">ไม่มีข้อมูลสำหรับนำเสนอ</div>
+                    </div>
+                    
+                    <!-- Slide Navigation -->
+                    <div style="padding: 20px; background: #ffffff; border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 20px; align-items: center;">
+                        <button class="btn-secondary" onclick="prevSlide()" style="padding: 10px 24px; font-size: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <i data-lucide="chevron-left" style="width: 20px; height: 20px; margin-right: 6px;"></i> ก่อนหน้า
+                        </button>
+                        <button class="btn-primary" onclick="nextSlide()" style="padding: 10px 24px; font-size: 1rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                            ถัดไป <i data-lucide="chevron-right" style="width: 20px; height: 20px; margin-left: 6px;"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </main>
     </div>

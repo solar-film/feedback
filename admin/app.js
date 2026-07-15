@@ -171,7 +171,8 @@ function switchTab(tabId) {
         database: "ฐานข้อมูลรายชื่อลูกค้า",
         kanban: "ท่อติดตามสถานะแบบประเมิน (Kanban)",
         reports: "รายงานคะแนนประเมินทีมบริการ",
-        settings: "ตั้งค่าการเชื่อมต่อ Google Sheets API"
+        settings: "ตั้งค่าการเชื่อมต่อ Google Sheets API",
+        presentation: "โหมดนำเสนอรีวิวลูกค้า"
     };
     document.getElementById('page-title').innerText = titles[tabId] || "Dashboard";
     
@@ -185,6 +186,8 @@ function switchTab(tabId) {
         setTimeout(renderDashboardCharts, 100);
     } else if (tabId === 'reports') {
         setTimeout(renderReportCharts, 100);
+    } else if (tabId === 'presentation') {
+        if(typeof initPresentation === 'function') setTimeout(initPresentation, 100);
     }
 
     // Re-initialize Lucide Icons for dynamic content
@@ -508,6 +511,8 @@ function processDataAndRender() {
         renderDashboardCharts();
     } else if (state.currentTab === 'reports') {
         renderReportCharts();
+    } else if (state.currentTab === 'presentation') {
+        if(typeof initPresentation === 'function') initPresentation();
     }
 }
 
@@ -1673,4 +1678,141 @@ function formatInstallDate(dateStr) {
         }
     }
     return dateStr;
+}
+
+// ==========================================
+// PRESENTATION MODE LOGIC
+// ==========================================
+let presentationSlides = [];
+let currentSlideIndex = 0;
+
+function initPresentation() {
+    // Filter customers who have feedback data
+    presentationSlides = filteredData.filter(c => c.feedback && c.feedback.overallMood);
+    currentSlideIndex = 0;
+    
+    renderPresentationSlide();
+}
+
+function renderPresentationSlide() {
+    const container = document.getElementById('presentation-content');
+    const counter = document.getElementById('slide-counter');
+    
+    if (!presentationSlides || presentationSlides.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: var(--text-muted);">ไม่มีข้อมูลสำหรับนำเสนอในช่วงเวลานี้</div>';
+        counter.innerText = '0 / 0';
+        return;
+    }
+    
+    if (currentSlideIndex < 0) currentSlideIndex = 0;
+    if (currentSlideIndex >= presentationSlides.length) currentSlideIndex = presentationSlides.length - 1;
+    
+    counter.innerText = `${currentSlideIndex + 1} / ${presentationSlides.length}`;
+    
+    const c = presentationSlides[currentSlideIndex];
+    const fb = c.feedback;
+    
+    // Build tags for benefits/details
+    const positiveTags = fb.benefits.map(b => `<span class="slide-tag positive"><i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-top:-2px;"></i> ${b}</span>`).join('');
+    
+    let adminPos = (fb.details.admin || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
+    let salesPos = (fb.details.sales || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
+    let techPos = (fb.details.tech || []).map(b => `<span class="slide-tag positive">${b}</span>`).join('');
+    
+    let supportTags = (fb.supportNeeds || []).map(b => `<span class="slide-tag negative"><i data-lucide="alert-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-top:-2px;"></i> ${b}</span>`).join('');
+    
+    let additionalComments = [];
+    if (fb.comments.admin) additionalComments.push(`<b>แอดมิน:</b> ${fb.comments.admin}`);
+    if (fb.comments.sales) additionalComments.push(`<b>ฝ่ายขาย:</b> ${fb.comments.sales}`);
+    if (fb.comments.tech) additionalComments.push(`<b>ทีมช่าง:</b> ${fb.comments.tech}`);
+    if (fb.supportDetails) additionalComments.push(`<b style="color:var(--danger)">รายละเอียดเพิ่มเติม (ปรับปรุง):</b> ${fb.supportDetails}`);
+    
+    const commentsHtml = additionalComments.length > 0 
+        ? `<div style="margin-top: 20px; padding: 16px; background: #fff5f5; border-left: 4px solid var(--primary); border-radius: 8px;">
+            <div style="font-weight: 700; margin-bottom: 8px; color: var(--primary);">ความคิดเห็นเพิ่มเติม:</div>
+            ${additionalComments.map(ac => `<div>${ac}</div>`).join('')}
+           </div>`
+        : '';
+    
+    container.innerHTML = `
+        <div class="slide-card">
+            <div class="slide-header">
+                <div class="slide-cust-info">
+                    <h3>${c.name}</h3>
+                    <div class="slide-cust-meta">
+                        <span><i data-lucide="building" style="width:16px;height:16px;"></i> ${c.company}</span>
+                        <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> ${c.installDate}</span>
+                        <span><i data-lucide="hash" style="width:16px;height:16px;"></i> ${c.id}</span>
+                    </div>
+                </div>
+                <div class="slide-mood-big">
+                    ${fb.overallMood}
+                </div>
+            </div>
+            
+            <div class="slide-scores">
+                <div class="slide-score-item">
+                    <img src="../images/admin.png" alt="Admin" style="height: 40px; width: auto;">
+                    <span class="slide-score-val">${fb.ratings.admin || '-'} / 5</span>
+                </div>
+                <div class="slide-score-item">
+                    <img src="../images/sales.png" alt="Sales" style="height: 40px; width: auto;">
+                    <span class="slide-score-val">${fb.ratings.sales || '-'} / 5</span>
+                </div>
+                <div class="slide-score-item">
+                    <img src="../images/tech.png" alt="Tech" style="height: 40px; width: auto;">
+                    <span class="slide-score-val">${fb.ratings.tech || '-'} / 5</span>
+                </div>
+            </div>
+            
+            <div class="slide-grid">
+                <div class="slide-section">
+                    <div class="slide-section-title">
+                        <i data-lucide="thumbs-up"></i> สิ่งที่ลูกค้าประทับใจ
+                    </div>
+                    <div>${positiveTags} ${adminPos} ${salesPos} ${techPos}</div>
+                </div>
+                
+                <div class="slide-section">
+                    <div class="slide-section-title" style="color: var(--danger);">
+                        <i data-lucide="alert-triangle"></i> สิ่งที่ควรปรับปรุง
+                    </div>
+                    <div>${supportTags || '<span style="color: var(--text-muted); font-size: 0.9rem;">ไม่มีข้อเสนอแนะให้ปรับปรุง</span>'}</div>
+                </div>
+            </div>
+            
+            ${commentsHtml}
+        </div>
+    `;
+    
+    lucide.createIcons();
+}
+
+function prevSlide() {
+    if (currentSlideIndex > 0) {
+        currentSlideIndex--;
+        renderPresentationSlide();
+    }
+}
+
+function nextSlide() {
+    if (currentSlideIndex < presentationSlides.length - 1) {
+        currentSlideIndex++;
+        renderPresentationSlide();
+    }
+}
+
+function toggleFullScreen() {
+    const elem = document.getElementById('presentation-container');
+    if (!document.fullscreenElement) {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(err => {
+                alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+            });
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
 }
