@@ -1782,7 +1782,7 @@ function renderPresentationSlide() {
                             <i data-lucide="headset" style="width: 28px; height: 28px;"></i>
                         </div>
                         <div class="slide-team-card-title">
-                            <h4>แอดมิน (${c.adminName || '-'})</h4>
+                            <h4>แอดมิน <span class="highlight-name">(${c.adminName || '-'})</span></h4>
                             <div class="slide-team-score">${fb.ratings?.admin || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
                         </div>
                     </div>
@@ -1797,7 +1797,7 @@ function renderPresentationSlide() {
                             <i data-lucide="briefcase" style="width: 28px; height: 28px;"></i>
                         </div>
                         <div class="slide-team-card-title">
-                            <h4>ฝ่ายขาย (${c.sales || '-'})</h4>
+                            <h4>ฝ่ายขาย <span class="highlight-name">(${c.sales || '-'})</span></h4>
                             <div class="slide-team-score">${fb.ratings?.sales || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
                         </div>
                     </div>
@@ -1812,7 +1812,7 @@ function renderPresentationSlide() {
                             <i data-lucide="wrench" style="width: 28px; height: 28px;"></i>
                         </div>
                         <div class="slide-team-card-title">
-                            <h4>ทีมช่าง (${c.tech || '-'})</h4>
+                            <h4>ทีมช่าง <span class="highlight-name">(${c.tech || '-'})</span></h4>
                             <div class="slide-team-score">${fb.ratings?.tech || '-'} <span style="font-size:1.1rem; color:#94a3b8;">/ 5</span></div>
                         </div>
                     </div>

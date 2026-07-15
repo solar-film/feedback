@@ -1120,6 +1120,11 @@ body {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
+.highlight-name {
+    color: var(--primary);
+    font-weight: 800;
+}
+
 .slide-team-card-title h4 {
     margin: 0;
     font-size: 1.1rem;
