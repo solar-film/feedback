@@ -606,6 +606,17 @@ function renderCustomerTable() {
 }
 
 // Search and Filter Database Table
+function clearAllFilters() {
+    if(document.getElementById('global-filter-month')) document.getElementById('global-filter-month').value = 'all';
+    if(document.getElementById('global-filter-company')) document.getElementById('global-filter-company').value = 'all';
+    if(document.getElementById('global-filter-start')) document.getElementById('global-filter-start').value = '';
+    if(document.getElementById('global-filter-end')) document.getElementById('global-filter-end').value = '';
+    if(document.getElementById('search-input')) document.getElementById('search-input').value = '';
+    if(document.getElementById('filter-status')) document.getElementById('filter-status').value = 'all';
+    
+    applyGlobalFilter();
+}
+
 function filterCustomerTable() {
     const query = document.getElementById('search-input')?.value.toLowerCase().trim() || '';
     const status = document.getElementById('filter-status')?.value || 'all';
