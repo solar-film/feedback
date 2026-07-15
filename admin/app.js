@@ -1752,7 +1752,7 @@ function renderPresentationSlide() {
                     <div class="slide-cust-meta" style="flex-direction: column; gap: 8px;">
                         <span><i data-lucide="building" style="width:16px;height:16px;"></i> <b>สถานที่:</b> ${c.siteType || c.company || '-'}</span>
                         <div style="display: flex; gap: 16px;">
-                            <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่:</b> ${c.installDate}</span>
+                            <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่ติดตั้ง:</b> ${c.installDate}</span>
                         </div>
                     </div>
                 </div>
