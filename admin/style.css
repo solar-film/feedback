@@ -319,7 +319,7 @@ body {
 /* Charts & Summary Row */
 .charts-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
     margin-bottom: 32px;
 }
@@ -1072,4 +1072,65 @@ body {
     font-weight: 900 !important;
     color: var(--primary) !important;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.slide-team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.slide-team-card {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.slide-team-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 12px;
+}
+.slide-score-img-small {
+    height: 50px;
+    width: auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.slide-team-card-title h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-main);
+}
+.slide-team-score {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+    margin-top: 4px;
+}
+.slide-team-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.slide-team-comment {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    border: 1px solid #e2e8f0;
+    font-style: italic;
+    flex-grow: 1;
+}
+@media (max-width: 900px) {
+    .slide-team-grid {
+        grid-template-columns: 1fr;
+    }
 }

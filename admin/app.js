@@ -172,7 +172,7 @@ function switchTab(tabId) {
         kanban: "ท่อติดตามสถานะแบบประเมิน (Kanban)",
         reports: "รายงานคะแนนประเมินทีมบริการ",
         settings: "ตั้งค่าการเชื่อมต่อ Google Sheets API",
-        presentation: "โหมดนำเสนอรีวิวลูกค้า"
+        presentation: "โหมดนำเสนอข้อมูลฟรีแบคจากลูกค้า"
     };
     document.getElementById('page-title').innerText = titles[tabId] || "Dashboard";
     
@@ -1727,13 +1727,14 @@ function renderPresentationSlide() {
     if (fb.comments?.tech) additionalComments.push(`<b>ทีมช่าง:</b> ${fb.comments.tech}`);
     if (fb.supportDetails) additionalComments.push(`<b style="color:var(--danger)">รายละเอียดเพิ่มเติม (ปรับปรุง):</b> ${fb.supportDetails}`);
     
+    
     const commentsHtml = additionalComments.length > 0 
         ? `<div style="margin-top: 20px; padding: 16px; background: #fff5f5; border-left: 4px solid var(--primary); border-radius: 8px;">
-            <div style="font-weight: 700; margin-bottom: 8px; color: var(--primary);">ความคิดเห็นเพิ่มเติม:</div>
-            ${additionalComments.map(ac => `<div>${ac}</div>`).join('')}
+            <div style="font-weight: 700; margin-bottom: 8px; color: var(--primary);">รายละเอียดเพิ่มเติม (ปรับปรุง):</div>
+            ${fb.supportDetails ? `<div>${fb.supportDetails}</div>` : ''}
            </div>`
         : '';
-    
+        
     container.innerHTML = `
         <div class="slide-card">
             <div class="slide-header">
@@ -1743,8 +1744,7 @@ function renderPresentationSlide() {
                         <span><i data-lucide="building" style="width:16px;height:16px;"></i> <b>สถานที่:</b> ${c.siteType || c.company || '-'}</span>
                         <span><i data-lucide="calendar" style="width:16px;height:16px;"></i> <b>วันที่ติดตั้ง:</b> ${c.installDate}</span>
                         <span><i data-lucide="hash" style="width:16px;height:16px;"></i> <b>รหัส:</b> ${c.id}</span>
-                        <span><i data-lucide="user" style="width:16px;height:16px;"></i> <b>ฝ่ายขาย:</b> ${c.sales || '-'}</span>
-                        <span><i data-lucide="wrench" style="width:16px;height:16px;"></i> <b>ทีมช่าง:</b> ${c.tech || '-'}</span>
+                        <span><i data-lucide="package" style="width:16px;height:16px;"></i> <b>รุ่นฟิล์ม:</b> ${c.filmModel}</span>
                     </div>
                 </div>
                 <div class="slide-mood-big">
@@ -1752,27 +1752,53 @@ function renderPresentationSlide() {
                 </div>
             </div>
             
-            <div class="slide-scores">
-                <div class="slide-score-item">
-                    <img src="../images/admin.png" alt="Admin" class="slide-score-img">
-                    <span class="slide-score-val">${fb.ratings?.admin || '-'} / 5</span>
+            <div class="slide-team-grid">
+                <!-- Admin -->
+                <div class="slide-team-card">
+                    <div class="slide-team-card-header">
+                        <img src="../images/admin.png" alt="Admin" class="slide-score-img-small">
+                        <div class="slide-team-card-title">
+                            <h4>แอดมิน</h4>
+                            <div class="slide-team-score">${fb.ratings?.admin || '-'} <span style="font-size:1.2rem; color:var(--text-muted);">/ 5</span></div>
+                        </div>
+                    </div>
+                    <div class="slide-team-tags">${adminPos || '<span style="color:#ccc;">-</span>'}</div>
+                    ${fb.comments?.admin ? `<div class="slide-team-comment">${fb.comments.admin}</div>` : ''}
                 </div>
-                <div class="slide-score-item">
-                    <img src="../images/sales.png" alt="Sales" class="slide-score-img">
-                    <span class="slide-score-val">${fb.ratings?.sales || '-'} / 5</span>
+                
+                <!-- Sales -->
+                <div class="slide-team-card">
+                    <div class="slide-team-card-header">
+                        <img src="../images/sales.png" alt="Sales" class="slide-score-img-small">
+                        <div class="slide-team-card-title">
+                            <h4>ฝ่ายขาย (${c.sales || '-'})</h4>
+                            <div class="slide-team-score">${fb.ratings?.sales || '-'} <span style="font-size:1.2rem; color:var(--text-muted);">/ 5</span></div>
+                        </div>
+                    </div>
+                    <div class="slide-team-tags">${salesPos || '<span style="color:#ccc;">-</span>'}</div>
+                    ${fb.comments?.sales ? `<div class="slide-team-comment">${fb.comments.sales}</div>` : ''}
                 </div>
-                <div class="slide-score-item">
-                    <img src="../images/tech.png" alt="Tech" class="slide-score-img">
-                    <span class="slide-score-val">${fb.ratings?.tech || '-'} / 5</span>
+                
+                <!-- Tech -->
+                <div class="slide-team-card">
+                    <div class="slide-team-card-header">
+                        <img src="../images/tech.png" alt="Tech" class="slide-score-img-small">
+                        <div class="slide-team-card-title">
+                            <h4>ทีมช่าง (${c.tech || '-'})</h4>
+                            <div class="slide-team-score">${fb.ratings?.tech || '-'} <span style="font-size:1.2rem; color:var(--text-muted);">/ 5</span></div>
+                        </div>
+                    </div>
+                    <div class="slide-team-tags">${techPos || '<span style="color:#ccc;">-</span>'}</div>
+                    ${fb.comments?.tech ? `<div class="slide-team-comment">${fb.comments.tech}</div>` : ''}
                 </div>
             </div>
             
             <div class="slide-grid">
                 <div class="slide-section">
                     <div class="slide-section-title">
-                        <i data-lucide="thumbs-up"></i> สิ่งที่ลูกค้าประทับใจ
+                        <i data-lucide="thumbs-up"></i> ผลลัพธ์ของฟิล์ม
                     </div>
-                    <div>${positiveTags} ${adminPos} ${salesPos} ${techPos}</div>
+                    <div>${positiveTags || '<span style="color: var(--text-muted); font-size: 0.9rem;">-</span>'}</div>
                 </div>
                 
                 <div class="slide-section">
@@ -1780,13 +1806,11 @@ function renderPresentationSlide() {
                         <i data-lucide="alert-triangle"></i> สิ่งที่ควรปรับปรุง
                     </div>
                     <div>${supportTags || '<span style="color: var(--text-muted); font-size: 0.9rem;">ไม่มีข้อเสนอแนะให้ปรับปรุง</span>'}</div>
+                    ${fb.supportDetails ? `<div style="margin-top:8px; font-size:0.95rem;">${fb.supportDetails}</div>` : ''}
                 </div>
             </div>
-            
-            ${commentsHtml}
         </div>
     `;
-    
     lucide.createIcons();
 }
 
