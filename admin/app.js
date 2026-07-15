@@ -2003,15 +2003,18 @@ function renderPresentationSlide() {
             </div>
 
             <!-- MVP Banner -->
-            ${(fb.mvp || customerComment) ? `
+            ${(showMvp && customerComment) ? `
             <div class="pp-mvp-banner">
                 <div class="pp-banner-bg"></div>
                 <div class="pp-banner-content">
-                    ${fb.mvp ? `
-                    <div class="pp-trophy">🏆</div>
+                    ${showMvp ? `
+                    <div class="pp-trophy-container">
+                        <div class="pp-light-rays"></div>
+                        <div class="pp-trophy">🏆</div>
+                    </div>
                     <div class="pp-ribbon">⭐ MVP ประจำงานนี้</div>
                     <div class="pp-mvp-title">
-                        ขอมอบมงให้แก่... <span class="pp-mvp-highlight">${fb.mvp} 🎉</span>
+                        ขอมอบมงให้แก่... <span class="pp-mvp-highlight">${mvpText} 🎉</span>
                     </div>
                     ` : ''}
                     ${customerComment ? `
