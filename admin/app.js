@@ -2218,14 +2218,14 @@ function renderGiftTable() {
                 </div>
             </td>
             <td>
-                <select class="form-input" style="padding: 4px 8px; width: 140px; font-size: 0.85rem; color: var(--text-main);" onchange="quickChangeGiftData('${c.id}', 'gift', this.value)">
+                <select class="beautiful-select" style="width: 155px;" onchange="quickChangeGiftData('${c.id}', 'gift', this.value)">
                     <option value="" ${!item || item === '-' ? 'selected' : ''}>-</option>
                     <option value="ร่ม3M" ${item === 'ร่ม3M' ? 'selected' : ''}>ร่ม3M</option>
                     <option value="ผ้าไมโครไฟเบอร์ 2 ผืน" ${item === 'ผ้าไมโครไฟเบอร์ 2 ผืน' ? 'selected' : ''}>ผ้าไมโครไฟเบอร์ 2 ผืน</option>
                 </select>
             </td>
             <td>
-                <select class="form-input" style="padding: 4px 8px; width: 120px; font-size: 0.85rem; ${status === 'เตรียมจัดส่ง' ? 'color: var(--warning); border-color: var(--warning);' : (status === 'จัดส่งแล้ว' ? 'color: var(--success); border-color: var(--success);' : (status === 'ของตีกลับ' ? 'color: var(--danger); border-color: var(--danger);' : ''))}" onchange="quickChangeGiftData('${c.id}', 'status', this.value)">
+                <select class="beautiful-select ${status === 'เตรียมจัดส่ง' ? 'status-warning' : (status === 'จัดส่งแล้ว' ? 'status-success' : (status === 'ของตีกลับ' ? 'status-danger' : ''))}" style="width: 135px;" onchange="quickChangeGiftData('${c.id}', 'status', this.value)">
                     <option value="" ${!status ? 'selected' : ''}>-</option>
                     <option value="เตรียมจัดส่ง" ${status === 'เตรียมจัดส่ง' ? 'selected' : ''}>เตรียมจัดส่ง</option>
                     <option value="จัดส่งแล้ว" ${status === 'จัดส่งแล้ว' ? 'selected' : ''}>จัดส่งแล้ว</option>
@@ -2556,8 +2556,29 @@ function promptEditAddress(id) {
     if (!c) return;
     const gift = c.giftData || {};
     const currentAddr = gift.address || c.addressFromData || '';
-    const newAddr = prompt("แก้ไขที่อยู่สำหรับจัดส่ง:", currentAddr);
-    if (newAddr !== null && newAddr !== currentAddr) {
+    
+    document.getElementById('edit-address-id').value = id;
+    document.getElementById('edit-address-text').value = currentAddr;
+    
+    const modal = document.getElementById('modal-edit-address');
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        document.getElementById('edit-address-text').focus();
+    }, 100);
+}
+
+function closeEditAddressModal() {
+    const modal = document.getElementById('modal-edit-address');
+    modal.style.display = 'none';
+}
+
+function saveEditedAddress() {
+    const id = document.getElementById('edit-address-id').value;
+    const newAddr = document.getElementById('edit-address-text').value.trim();
+    
+    if (id) {
         quickChangeGiftData(id, 'address', newAddr);
     }
+    
+    closeEditAddressModal();
 }
