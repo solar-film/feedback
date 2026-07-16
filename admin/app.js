@@ -2475,7 +2475,7 @@ function printGiftLabel(id) {
         <style>
             @media print {
                 @page {
-                    size: landscape;
+                    size: A5 landscape;
                     margin: 0;
                 }
                 body {
