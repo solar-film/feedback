@@ -698,16 +698,7 @@ function renderKanbanBoard() {
         card.setAttribute('ondragstart', `dragStart(event, '${c.id}')`);
         card.setAttribute('onclick', `openCustomerDrawer('${c.id}')`);
 
-        let moveButtons = `<div style="display: flex; gap: 4px; align-items: center;">`;
-        const laneOrder = ['Unsent', 'Sent', 'Completed', 'Action Required'];
-        const currentIndex = laneOrder.indexOf(laneKey);
-        if (currentIndex > 0) {
-            moveButtons += `<button onclick="moveKanbanCard('${c.id}', '${laneOrder[currentIndex - 1]}', event)" style="background:transparent; border:none; padding:4px; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; border-radius:4px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'"><i data-lucide="chevron-left" style="width:16px; height:16px;"></i></button>`;
-        }
-        if (currentIndex < 3) {
-            moveButtons += `<button onclick="moveKanbanCard('${c.id}', '${laneOrder[currentIndex + 1]}', event)" style="background:transparent; border:none; padding:4px; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; border-radius:4px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'"><i data-lucide="chevron-right" style="width:16px; height:16px;"></i></button>`;
-        }
-        moveButtons += `</div>`;
+
 
         let footerHtml = '';
         if (c.feedback) {
@@ -722,14 +713,12 @@ function renderKanbanBoard() {
                             <span>${avg} / 5</span>
                         </span>
                     </div>
-                    ${moveButtons}
                 </div>
             `;
         } else {
             footerHtml = `
                 <div class="kanban-card-footer" style="display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size: 0.65rem; color: var(--text-muted);">รอดำเนินการ</span>
-                    ${moveButtons}
                 </div>
             `;
         }
@@ -2336,6 +2325,8 @@ async function quickChangeGiftData(id, field, value) {
         const payload = {
             action: 'updateGiftStatus',
             id: id,
+            customerName: c.name || '',
+            phone: c.phone || '',
             status: status,
             gift: item,
             address: addr,
@@ -2375,9 +2366,12 @@ async function saveGiftStatus() {
     btn.disabled = true;
     
     try {
+        const c = state.customers.find(x => x.id === id);
         const payload = {
             action: 'updateGiftStatus',
             id: id,
+            customerName: c ? c.name : '',
+            phone: c ? c.phone : '',
             status: status,
             gift: item,
             address: addr,

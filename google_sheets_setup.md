@@ -93,7 +93,7 @@ function doPost(e) {
       var giftSheet = doc.getSheetByName(giftSheetName);
       if (!giftSheet) {
         giftSheet = doc.insertSheet(giftSheetName);
-        var giftHeaders = ["ID", "Timestamp", "Status", "Address", "Gift", "Review Name"];
+        var giftHeaders = ["ID", "Timestamp", "Status", "ชื่อลูกค้า", "เบอร์ติดต่อ", "Address", "Gift", "Review Name"];
         giftSheet.appendRow(giftHeaders);
         giftSheet.getRange(1, 1, 1, giftHeaders.length).setFontWeight("bold").setBackground("#eef3f8");
       }
@@ -103,17 +103,19 @@ function doPost(e) {
       var found = false;
       for (var i = 1; i < values.length; i++) {
         if (values[i][0] === data.id) {
-          giftSheet.getRange(i + 1, 2).setValue(new Date()); // Col B
-          giftSheet.getRange(i + 1, 3).setValue(data.status); // Col C
-          giftSheet.getRange(i + 1, 4).setValue(data.address); // Col D
-          giftSheet.getRange(i + 1, 5).setValue(data.gift); // Col E
-          giftSheet.getRange(i + 1, 6).setValue(data.remark); // Col F
+          giftSheet.getRange(i + 1, 2).setValue(new Date()); // Col B: Timestamp
+          giftSheet.getRange(i + 1, 3).setValue(data.status); // Col C: Status
+          giftSheet.getRange(i + 1, 4).setValue(data.customerName || ""); // Col D: ชื่อลูกค้า
+          giftSheet.getRange(i + 1, 5).setValue(data.phone || ""); // Col E: เบอร์ติดต่อ
+          giftSheet.getRange(i + 1, 6).setValue(data.address); // Col F: Address
+          giftSheet.getRange(i + 1, 7).setValue(data.gift); // Col G: Gift
+          giftSheet.getRange(i + 1, 8).setValue(data.remark); // Col H: Review Name
           found = true;
           break;
         }
       }
       if (!found) {
-        giftSheet.appendRow([data.id, new Date(), data.status, data.address, data.gift, data.remark]);
+        giftSheet.appendRow([data.id, new Date(), data.status, data.customerName || "", data.phone || "", data.address, data.gift, data.remark]);
       }
       return ContentService.createTextOutput(JSON.stringify({
         status: "success",
@@ -262,9 +264,11 @@ function handleGetAllCustomersDetailed() {
       if (gId) {
         giftDict[gId] = {
           status: giftRows[i]["Status"] || "",
-          address: giftRows[i]["Address"] || "",
-          gift: giftRows[i]["Gift"] || "",
-          remark: giftRows[i]["ชื่อที่ใช้รีวิว"] || giftRows[i]["Review Name"] || giftRows[i]["Remark"] || giftRows[i]["หมายเหตุ"] || "",
+          customerName: giftRows[i]["ชื่อลูกค้า"] || "",
+          phone: giftRows[i]["เบอร์ติดต่อ"] || "",
+          address: giftRows[i]["Address"] || giftRows[i]["ที่อยู่สำหรับจัดส่ง"] || "",
+          gift: giftRows[i]["Gift"] || giftRows[i]["ของรางวัล"] || "",
+          remark: giftRows[i]["Review Name"] || giftRows[i]["ชื่อที่ใช้รีวิว"] || giftRows[i]["Remark"] || "",
           timestamp: giftRows[i]["Timestamp"] || ""
         };
       }
