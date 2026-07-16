@@ -2510,7 +2510,7 @@ function printGiftLabel(id) {
                     font-weight: 500;
                     color: #1e293b;
                     width: 71.8vw;
-                    line-height: 9.0vh;
+                    line-height: 8.7vh;
                     height: 43vh;
                     overflow: hidden;
                     z-index: 1;
