@@ -103,13 +103,17 @@ function doPost(e) {
       var found = false;
       for (var i = 1; i < values.length; i++) {
         if (values[i][0] === data.id) {
-          giftSheet.getRange(i + 1, 2).setValue(new Date()); // Col B: Timestamp
-          giftSheet.getRange(i + 1, 3).setValue(data.status); // Col C: Status
-          giftSheet.getRange(i + 1, 4).setValue(data.customerName || ""); // Col D: ชื่อลูกค้า
-          giftSheet.getRange(i + 1, 5).setValue(data.phone || ""); // Col E: เบอร์ติดต่อ
-          giftSheet.getRange(i + 1, 6).setValue(data.address); // Col F: Address
-          giftSheet.getRange(i + 1, 7).setValue(data.gift); // Col G: Gift
-          giftSheet.getRange(i + 1, 8).setValue(data.remark); // Col H: Review Name
+          var rowData = [
+             data.id,
+             new Date(),
+             data.status,
+             data.customerName || "",
+             data.phone || "",
+             data.address,
+             data.gift,
+             data.remark
+          ];
+          giftSheet.getRange(i + 1, 1, 1, 8).setValues([rowData]);
           found = true;
           break;
         }
@@ -228,23 +232,28 @@ function doGet(e) {
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
-// ตัวช่วยอ่านข้อมูลจากชีต (รองรับทั้งภาษาไทยและอังกฤษ)
+// ตัวช่วยอ่านข้อมูลจากชีต (ความเร็วสูง)
 function getSheetData(sheetName) {
   var doc = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = doc.getSheetByName(sheetName);
   if (!sheet) return null;
   
-  var data = sheet.getDataRange().getDisplayValues();
+  var data = sheet.getDataRange().getValues();
   if (data.length < 2) return [];
   
   var headers = data[0];
   var rows = [];
+  var tz = doc.getSpreadsheetTimeZone();
   
   for (var i = 1; i < data.length; i++) {
     var obj = {};
     for (var j = 0; j < headers.length; j++) {
-      obj[headers[j]] = data[i][j];
-      obj["_col_" + j] = data[i][j]; // Store by raw column index (e.g., _col_9 for Col J)
+      var val = data[i][j];
+      if (val instanceof Date) {
+        val = Utilities.formatDate(val, tz, "dd/MM/yyyy HH:mm:ss");
+      }
+      obj[headers[j]] = val;
+      obj["_col_" + j] = val; // Store by raw column index (e.g., _col_9 for Col J)
     }
     rows.push(obj);
   }
