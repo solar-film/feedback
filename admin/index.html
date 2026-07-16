@@ -651,7 +651,13 @@
             <input type="hidden" id="edit-address-id">
             
             <div class="form-group" style="margin-bottom: 20px;">
-                <textarea id="edit-address-text" class="form-control" rows="4" style="width: 100%; border-radius: 8px; padding: 12px; font-size: 1rem; border: 1px solid var(--border); box-sizing: border-box;" placeholder="กรอกที่อยู่สำหรับจัดส่งที่นี่..."></textarea>
+                <textarea id="edit-address-text" class="form-control" rows="5" style="width: 100%; border-radius: 8px; padding: 12px; font-size: 1rem; border: 1px solid var(--border); box-sizing: border-box;" placeholder="กรอกข้อมูลที่นี่..."></textarea>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
+                    💡 <b>เคล็ดลับจัดรูปแบบการพิมพ์:</b><br>
+                    บรรทัดที่ 1: ชื่อผู้รับ<br>
+                    บรรทัดที่ 2: เบอร์โทรศัพท์<br>
+                    บรรทัดที่ 3 เป็นต้นไป: ที่อยู่จัดส่ง
+                </div>
             </div>
             
             <div style="display: flex; justify-content: flex-end; gap: 12px;">
@@ -664,6 +670,6 @@
     </div>
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=13"></script>
+    <script defer src="app.js?v=14"></script>
 </body>
 </html>

@@ -2206,16 +2206,40 @@ function renderGiftTable() {
         else if (status === 'ของตีกลับ') statusBadge = '<span class="status-badge" style="background-color:var(--danger-light);color:var(--danger);">ของตีกลับ</span>';
         else statusBadge = '<span style="color:var(--text-muted);">-</span>';
         
+        let displayRowName = c.name ? c.name.replace(/^คุณ/, '').trim() : '';
+        if (displayRowName && !displayRowName.startsWith('คุณ')) displayRowName = 'คุณ' + displayRowName;
+        let displayRowPhone = c.phone || '-';
+        let displayRowAddress = gift.address || c.addressFromData || '-';
+        
+        if (gift.address) {
+            const addrLines = gift.address.split('\\n').map(l => l.trim()).filter(l => l !== '');
+            if (addrLines.length >= 3) {
+                displayRowName = addrLines[0];
+                displayRowPhone = addrLines[1];
+                displayRowAddress = addrLines.slice(2).join(' ');
+            }
+        }
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${c.id}</td>
-            <td>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]}</td>
-            <td>${c.phone || '-'}</td>
-            <td>${c.company || '-'}</td>
-            <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไข: ${gift.address || c.addressFromData || '-'}" onclick="promptEditAddress('${c.id}')">
+            <td style="cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไขข้อมูลจัดส่ง" onclick="promptEditAddress('${c.id}')">
                 <div style="display: flex; align-items: center; gap: 4px;">
                     <i data-lucide="edit-3" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
-                    <span style="overflow: hidden; text-overflow: ellipsis;">${gift.address || c.addressFromData || '-'}</span>
+                    <span>${displayRowName}</span>
+                </div>
+            </td>
+            <td style="cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไขข้อมูลจัดส่ง" onclick="promptEditAddress('${c.id}')">
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <i data-lucide="edit-3" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+                    <span>${displayRowPhone}</span>
+                </div>
+            </td>
+            <td>${c.company || '-'}</td>
+            <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไขข้อมูลจัดส่ง" onclick="promptEditAddress('${c.id}')">
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <i data-lucide="edit-3" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+                    <span style="overflow: hidden; text-overflow: ellipsis;">${displayRowAddress}</span>
                 </div>
             </td>
             <td>
