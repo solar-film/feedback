@@ -2007,7 +2007,7 @@ function renderPresentationSlide() {
                         <h3>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]} <span style="font-size: 1rem; color: #94a3b8; font-weight: 500; margin-left: 8px;">#${c.id || ''}</span></h3>
                         <div class="pp-meta-row">
                             <i data-lucide="map-pin" class="pp-meta-icon"></i>
-                            <span>สถานที่: ${c.siteType || c.company || '-'}</span>
+                            <span>สถานที่: ${c.addressFromData || '-'}</span>
                         </div>
                         <div class="pp-meta-row">
                             <i data-lucide="calendar" class="pp-meta-icon"></i>
