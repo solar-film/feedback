@@ -850,6 +850,8 @@ function openCustomerDrawer(id) {
     document.getElementById('drawer-cust-film').innerText = c.filmModel || '-';
     document.getElementById('drawer-cust-sitetype').innerText = c.siteType || '-';
     document.getElementById('drawer-cust-line').innerText = c.lineAt || '-';
+    document.getElementById('drawer-cust-jobtype').innerText = c.jobType || '-';
+    document.getElementById('drawer-cust-admin').innerText = c.adminName || '-';
 
     // Draw Journey Timeline
     renderJourneyTimeline(c);
