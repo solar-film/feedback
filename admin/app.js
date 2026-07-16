@@ -2612,7 +2612,7 @@ function promptEditAddress(id) {
             let defaultName = c.name ? c.name.replace(/^คุณ/, '').trim() : '';
             if (defaultName && !defaultName.startsWith('คุณ')) defaultName = 'คุณ' + defaultName;
             const defaultPhone = c.phone || '-';
-            currentAddr = `${defaultName}\\n${defaultPhone}\\n${currentAddr}`;
+            currentAddr = defaultName + '\n' + defaultPhone + '\n' + currentAddr;
         }
     }
     
