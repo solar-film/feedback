@@ -2209,19 +2209,10 @@ function renderGiftTable() {
         else if (status === 'ของตีกลับ') statusBadge = '<span class="status-badge" style="background-color:var(--danger-light);color:var(--danger);">ของตีกลับ</span>';
         else statusBadge = '<span style="color:var(--text-muted);">-</span>';
         
-        let displayRowName = c.name ? c.name.replace(/^คุณ/, '').trim() : '';
+        let displayRowName = gift.customerName || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
         if (displayRowName && !displayRowName.startsWith('คุณ')) displayRowName = 'คุณ' + displayRowName;
-        let displayRowPhone = c.phone || '-';
+        let displayRowPhone = gift.phone || c.phone || '-';
         let displayRowAddress = gift.address || c.addressFromData || '-';
-        
-        if (gift.address) {
-            const addrLines = gift.address.split('\\n').map(l => l.trim()).filter(l => l !== '');
-            if (addrLines.length >= 3) {
-                displayRowName = addrLines[0];
-                displayRowPhone = addrLines[1];
-                displayRowAddress = addrLines.slice(2).join(' ');
-            }
-        }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
