@@ -2398,16 +2398,18 @@ function printGiftLabel(id) {
     if (!c) return;
     
     const gift = c.giftData || {};
-    let addr = gift.address || c.addressFromData || '';
+    let printName = gift.customerName || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
+    if (printName && !printName.startsWith('คุณ')) printName = 'คุณ' + printName;
     
-    // Auto-format old records to 3 lines for printing
-    if (addr) {
-        const addrLines = addr.split('\\n').map(l => l.trim()).filter(l => l !== '');
-        if (addrLines.length < 3) {
-            let defaultName = c.name ? c.name.replace(/^คุณ/, '').trim() : '';
-            if (defaultName && !defaultName.startsWith('คุณ')) defaultName = 'คุณ' + defaultName;
-            const defaultPhone = c.phone || '-';
-            addr = defaultName + '\\n' + defaultPhone + '\\n' + addr;
+    let printPhone = gift.phone || c.phone || '-';
+    let printAddress = gift.address || c.addressFromData || '';
+    
+    if (printAddress) {
+        const addrLines = printAddress.split('\\n').map(l => l.trim()).filter(l => l !== '');
+        if (addrLines.length >= 3 && !gift.customerName) {
+            printName = addrLines[0];
+            printPhone = addrLines[1];
+            printAddress = addrLines.slice(2).join(' ');
         }
     }
     
@@ -2418,7 +2420,7 @@ function printGiftLabel(id) {
     }
     
     // Use only Address field for printing as requested
-    let receiverAddress = addr.replace(/\\n/g, '<br>') || '-';
+    let receiverAddress = `${printName}<br>${printPhone}<br>${printAddress.replace(/\\n/g, '<br>')}`;
 
     const layout = document.getElementById('print-layout');
     
