@@ -2665,3 +2665,59 @@ window.enableAddressEdit = function(id) {
     if (window.lucide && lucide.createIcons) lucide.createIcons();
     document.getElementById(`address-input-${id}`).focus();
 };
+
+// -----------------------------------------
+// Login & Authentication System
+// -----------------------------------------
+window.checkLoginStatus = function() {
+    const pwd = sessionStorage.getItem('admin_password');
+    if (pwd) {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('app-container').style.display = 'flex';
+        loadData();
+    } else {
+        document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('app-container').style.display = 'none';
+    }
+};
+
+window.handleLogin = function(e) {
+    e.preventDefault();
+    const pwd = document.getElementById('admin-password').value;
+    const btn = document.getElementById('login-btn');
+    const err = document.getElementById('login-error');
+    
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin-icon"></i> กำลังตรวจสอบ...';
+    btn.disabled = true;
+    err.style.display = 'none';
+    
+    fetch(state.googleSheetsUrl, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'getAllCustomersDetailed', password: pwd })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            sessionStorage.setItem('admin_password', pwd);
+            checkLoginStatus();
+        } else {
+            err.style.display = 'block';
+            err.innerText = "รหัสผ่านไม่ถูกต้อง";
+        }
+    })
+    .catch(error => {
+        err.style.display = 'block';
+        err.innerText = "การเชื่อมต่อล้มเหลว กรุณาลองใหม่";
+    })
+    .finally(() => {
+        btn.innerHTML = 'เข้าสู่ระบบ <i data-lucide="arrow-right"></i>';
+        btn.disabled = false;
+        lucide.createIcons();
+    });
+};
+
+window.handleLogout = function() {
+    sessionStorage.removeItem('admin_password');
+    document.getElementById('admin-password').value = '';
+    checkLoginStatus();
+};
