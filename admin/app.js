@@ -846,10 +846,10 @@ function openCustomerDrawer(id) {
     // Fill metadata
     document.getElementById('drawer-cust-name').innerText = c.name;
     document.getElementById('drawer-cust-id').innerText = `รหัสสัญญา: ${c.id}`;
-    document.getElementById('drawer-cust-phone').innerText = c.phone;
-    document.getElementById('drawer-cust-sitetype').innerText = c.siteType;
-    document.getElementById('drawer-cust-date').innerText = c.installDate;
+    document.getElementById('drawer-cust-bill').innerText = c.bill || '-';
     document.getElementById('drawer-cust-film').innerText = c.filmModel || '-';
+    document.getElementById('drawer-cust-sitetype').innerText = c.siteType || '-';
+    document.getElementById('drawer-cust-line').innerText = c.lineAt || '-';
 
     // Draw Journey Timeline
     renderJourneyTimeline(c);
