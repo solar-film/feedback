@@ -980,7 +980,7 @@ function renderJourneyTimeline(customer) {
             <span class="timeline-time">${installDate}</span>
         </div>
         <div class="timeline-body">
-            ทีมช่างดำเนินติดตั้งเสร็จสิ้นที่หน้างานประเภท ${customer.siteType} รุ่นฟิล์ม ${customer.filmModel} เรียบร้อยแล้วค่ะ
+            ทีมช่างดำเนินติดตั้งเสร็จสิ้นที่หน้างาน ${customer.addressFromData || ""} ${customer.siteType} รุ่นฟิล์ม ${customer.filmModel} เรียบร้อยแล้วค่ะ
         </div>
     `;
     container.appendChild(step1);
