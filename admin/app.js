@@ -2485,8 +2485,8 @@ function printGiftLabel(id) {
                 
                 .print-name {
                     position: absolute;
-                    top: 47.5vh;
-                    left: 22.8vw;
+                    top: 27.5vh;
+                    left: 20vw;
                     font-size: 2.5vw;
                     font-weight: 500;
                     color: #1e293b;
@@ -2498,8 +2498,8 @@ function printGiftLabel(id) {
                 
                 .print-phone {
                     position: absolute;
-                    top: 58vh;
-                    left: 22.8vw;
+                    top: 37.5vh;
+                    left: 20vw;
                     font-size: 2.5vw;
                     font-weight: 500;
                     color: #1e293b;
@@ -2509,13 +2509,13 @@ function printGiftLabel(id) {
                 
                 .print-address {
                     position: absolute;
-                    top: 68.5vh;
-                    left: 17.1vw;
+                    top: 47.5vh;
+                    left: 17vw;
                     font-size: 2.3vw;
                     font-weight: 400;
                     color: #1e293b;
                     width: 73.8vw;
-                    line-height: 10.5vh;
+                    line-height: 9.8vh;
                     height: 22vh;
                     overflow: hidden;
                     z-index: 1;
