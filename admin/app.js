@@ -2504,13 +2504,13 @@ function printGiftLabel(id) {
                 
                 .print-address {
                     position: absolute;
-                    top: 26.35vh;
+                    top: 28vh;
                     left: 20vw;
-                    font-size: 2.5vw;
+                    font-size: 3.2vw;
                     font-weight: 500;
                     color: #1e293b;
                     width: 73.8vw;
-                    line-height: 9.79vh;
+                    line-height: 9.0vh;
                     height: 43vh;
                     overflow: hidden;
                     z-index: 1;
