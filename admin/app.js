@@ -2626,11 +2626,11 @@ function promptEditAddress(id) {
     
     let defaultName = gift.customerName || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
     if (defaultName && !defaultName.startsWith('คุณ')) defaultName = 'คุณ' + defaultName;
-    const defaultPhone = gift.phone || c.phone || '-';
-    
-    currentAddr = defaultName + '\n' + defaultPhone + '\n' + currentAddr;
+    const defaultPhone = gift.phone || c.phone || '';
     
     document.getElementById('edit-address-id').value = id;
+    document.getElementById('edit-address-name').value = defaultName;
+    document.getElementById('edit-address-phone').value = defaultPhone;
     document.getElementById('edit-address-text').value = currentAddr;
     
     const modal = document.getElementById('modal-edit-address');
@@ -2647,20 +2647,18 @@ function closeEditAddressModal() {
 
 function saveEditedAddress() {
     const id = document.getElementById('edit-address-id').value;
+    const newName = document.getElementById('edit-address-name').value.trim();
+    const newPhone = document.getElementById('edit-address-phone').value.trim();
     const newAddrText = document.getElementById('edit-address-text').value.trim();
     
     if (id) {
         const c = state.customers.find(x => x.id === id);
         if (c) {
             if (!c.giftData) c.giftData = {};
-            const addrLines = newAddrText.split('\n').map(l => l.trim()).filter(l => l !== '');
-            if (addrLines.length >= 3) {
-                c.giftData.customerName = addrLines[0];
-                c.giftData.phone = addrLines[1];
-                c.giftData.address = addrLines.slice(2).join(' ');
-            } else {
-                c.giftData.address = newAddrText;
-            }
+            c.giftData.customerName = newName;
+            c.giftData.phone = newPhone;
+            c.giftData.address = newAddrText;
+            
             quickChangeGiftData(id, 'address', c.giftData.address);
         }
     }

@@ -652,14 +652,19 @@
             
             <input type="hidden" id="edit-address-id">
             
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">ชื่อลูกค้า (Customer Name)</label>
+                <input type="text" id="edit-address-name" class="form-control" style="width: 100%; border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid var(--border); box-sizing: border-box;" placeholder="ชื่อลูกค้า">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">เบอร์ติดต่อ (Phone)</label>
+                <input type="text" id="edit-address-phone" class="form-control" style="width: 100%; border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid var(--border); box-sizing: border-box;" placeholder="เบอร์โทรศัพท์">
+            </div>
+            
             <div class="form-group" style="margin-bottom: 20px;">
-                <textarea id="edit-address-text" class="form-control" rows="5" style="width: 100%; border-radius: 8px; padding: 12px; font-size: 1rem; border: 1px solid var(--border); box-sizing: border-box;" placeholder="กรอกข้อมูลที่นี่..."></textarea>
-                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
-                    💡 <b>เคล็ดลับจัดรูปแบบการพิมพ์:</b><br>
-                    บรรทัดที่ 1: ชื่อผู้รับ<br>
-                    บรรทัดที่ 2: เบอร์โทรศัพท์<br>
-                    บรรทัดที่ 3 เป็นต้นไป: ที่อยู่จัดส่ง
-                </div>
+                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">ที่อยู่จัดส่ง (Delivery Address)</label>
+                <textarea id="edit-address-text" class="form-control" rows="4" style="width: 100%; border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid var(--border); box-sizing: border-box;" placeholder="รายละเอียดที่อยู่..."></textarea>
             </div>
             
             <div style="display: flex; justify-content: flex-end; gap: 12px;">
@@ -672,6 +677,6 @@
     </div>
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=36"></script>
+    <script defer src="app.js?v=37"></script>
 </body>
 </html>
