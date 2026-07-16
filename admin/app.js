@@ -437,6 +437,20 @@ function forceRefreshData() {
 
 // DATA PROCESSING AND RENDERING
 function updateDataAndRender(customersData) {
+    // Sort customers by date descending (latest first)
+    customersData.sort((a, b) => {
+        const getTs = (d) => {
+            if (!d || d === '-') return 0;
+            const parts = d.split('/');
+            if (parts.length === 3) {
+                // parts = [DD, MM, YYYY]
+                return new Date(parts[2], parts[1]-1, parts[0]).getTime();
+            }
+            return 0;
+        };
+        return getTs(b.installDate) - getTs(a.installDate);
+    });
+
     state.allCustomers = customersData;
     if (!state.filterInitialized && state.allCustomers.length > 0) {
         populateFilters(true);
@@ -1864,19 +1878,16 @@ function populateFilters(init) {
 
 function formatInstallDate(dateStr) {
     if (!dateStr) return '-';
-    // If it's a long date string containing "GMT"
-    if (dateStr.indexOf('GMT') > -1) {
-        try {
-            const date = new Date(dateStr);
-            if (!isNaN(date.getTime())) {
-                const yyyy = date.getFullYear();
-                const mm = String(date.getMonth() + 1).padStart(2, '0');
-                const dd = String(date.getDate()).padStart(2, '0');
-                return `${yyyy}-${mm}-${dd}`;
-            }
-        } catch (e) {
-            console.error("Error parsing date:", e);
+    try {
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            return `${dd}/${mm}/${yyyy}`;
         }
+    } catch (e) {
+        console.error("Error parsing date:", e);
     }
     return dateStr;
 }
