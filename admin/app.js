@@ -2424,24 +2424,8 @@ function printGiftLabel(id) {
         bgImage = '../images/MHL-A5.png';
     }
     
-    // Parse Address multi-line format if provided (Name, Phone, Address...)
-    let receiverName = '';
-    let receiverPhone = '';
-    let receiverAddress = '';
-    
-    const addrLines = addr.split('\\n').map(l => l.trim()).filter(l => l !== '');
-    if (addrLines.length >= 3) {
-        receiverName = addrLines[0];
-        receiverPhone = addrLines[1];
-        receiverAddress = addrLines.slice(2).join(' ');
-    } else {
-        receiverName = gift.remark || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
-        if (receiverName && !receiverName.startsWith('คุณ')) {
-            receiverName = 'คุณ' + receiverName;
-        }
-        receiverPhone = c.phone || '-';
-        receiverAddress = addr.replace(/\\n/g, ' ') || '-';
-    }
+    // Use only Address field for printing as requested
+    let receiverAddress = addr.replace(/\\n/g, '<br>') || '-';
 
     const layout = document.getElementById('print-layout');
     
@@ -2481,50 +2465,22 @@ function printGiftLabel(id) {
                     height: 100vh;
                     z-index: -1;
                     object-fit: fill;
-                }
-                
-                .print-name {
+                .print-address {
                     position: absolute;
                     top: 27.5vh;
                     left: 20vw;
                     font-size: 2.5vw;
                     font-weight: 500;
                     color: #1e293b;
-                    width: 66vw;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    z-index: 1;
-                }
-                
-                .print-phone {
-                    position: absolute;
-                    top: 37.5vh;
-                    left: 20vw;
-                    font-size: 2.5vw;
-                    font-weight: 500;
-                    color: #1e293b;
-                    width: 66vw;
-                    z-index: 1;
-                }
-                
-                .print-address {
-                    position: absolute;
-                    top: 47.5vh;
-                    left: 17vw;
-                    font-size: 2.3vw;
-                    font-weight: 400;
-                    color: #1e293b;
                     width: 73.8vw;
                     line-height: 9.8vh;
-                    height: 22vh;
+                    height: 43vh;
                     overflow: hidden;
                     z-index: 1;
                 }
             }
         </style>
         <img class="print-bg" src="${bgImage}" alt="Background" />
-        <div class="print-name">${receiverName}</div>
-        <div class="print-phone">${receiverPhone}</div>
         <div class="print-address">${receiverAddress}</div>
     `;
     
