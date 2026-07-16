@@ -589,6 +589,7 @@ body {
 }
 
 .kanban-card {
+    position: relative;
     background-color: #ffffff;
     border-radius: var(--radius-md);
     border: 1px solid var(--border);

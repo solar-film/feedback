@@ -734,8 +734,14 @@ function renderKanbanBoard() {
             `;
         }
 
+        let reviewBadge = '';
+        if (c.feedback && c.feedback.googleReviewClicked && ['TRUE', 'YES', 'Y'].includes(c.feedback.googleReviewClicked.toString().toUpperCase())) {
+            reviewBadge = `<div style="position: absolute; top: 12px; right: 12px;" title="ลูกค้าคลิกให้รีวิว Google แล้ว"><i data-lucide="star" style="width:16px; height:16px; color:#fbbf24; fill:#fbbf24;"></i></div>`;
+        }
+
         card.innerHTML = `
-            <div class="kanban-card-title">${c.name} <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: normal; margin-left: 4px;">#${c.id}</span></div>
+            ${reviewBadge}
+            <div class="kanban-card-title" style="padding-right: 20px;">${c.name} <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: normal; margin-left: 4px;">#${c.id}</span></div>
             <div class="kanban-card-meta">📞 ${c.phone} | LINE: ${c.lineAt || '-'}</div>
             <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">📅 ติดตั้ง: ${c.installDate || '-'}</div>
             <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px;">👤 ฝ่ายขาย: ${c.sales || '-'} | 🔧 ช่าง: ${c.tech || '-'}</div>
