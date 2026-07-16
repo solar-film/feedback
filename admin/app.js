@@ -674,7 +674,8 @@ function filterCustomerTable() {
         else if (rowStatusTag && rowStatusTag.classList.contains('completed')) rowStatus = 'Completed';
         else if (rowStatusTag && rowStatusTag.classList.contains('action')) rowStatus = 'Action Required';
 
-        const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || lineAt.includes(query) || sales.includes(query) || tech.includes(query) || company.toLowerCase().includes(query);
+        const dateStr = row.cells[6].innerText.toLowerCase();
+        const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || lineAt.includes(query) || sales.includes(query) || tech.includes(query) || company.toLowerCase().includes(query) || dateStr.includes(query);
         const matchesStatus = status === 'all' || rowStatus === status;
 
         if (matchesQuery && matchesStatus) {
