@@ -2469,7 +2469,7 @@ function printGiftLabel(id) {
         <style>
             @media print {
                 @page {
-                    size: A5 landscape;
+                    size: 210mm 148mm;
                     margin: 0;
                 }
                 body {
@@ -2504,7 +2504,7 @@ function printGiftLabel(id) {
                 
                 .print-address {
                     position: absolute;
-                    top: 42.5mm;
+                    top: 39mm;
                     left: 42mm;
                     font-size: 18pt;
                     font-weight: 500;
