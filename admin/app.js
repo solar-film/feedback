@@ -133,8 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Attach Sidebar switch events
     setupSidebarTabEvents();
     
-    // Initial data load
-    loadData();
+    // Check login status first
+    checkLoginStatus();
 });
 
 // Sidebar navigation handler
@@ -243,7 +243,13 @@ function loadData() {
     }
 
     // --- 2. Fetch fresh data in the background ---
-    fetch(`${state.googleSheetsUrl}?action=getAllCustomersDetailed`)
+    const pwd = sessionStorage.getItem('admin_password');
+    if (!pwd) return;
+
+    fetch(state.googleSheetsUrl, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'getAllCustomersDetailed', password: pwd })
+    })
         .then(res => {
             if (!res.ok) throw new Error("HTTP error " + res.status);
             return res.json();
@@ -360,7 +366,13 @@ function forceRefreshData() {
     // Bypass cache for visual feedback
     updateApiBadge('loading', 'กำลังดึงข้อมูลล่าสุด...');
     
-    fetch(`${state.googleSheetsUrl}?action=getAllCustomersDetailed`)
+    const pwd = sessionStorage.getItem('admin_password');
+    if (!pwd) return;
+
+    fetch(state.googleSheetsUrl, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'getAllCustomersDetailed', password: pwd })
+    })
         .then(res => {
             if (!res.ok) throw new Error("HTTP error " + res.status);
             return res.json();
@@ -417,6 +429,9 @@ function forceRefreshData() {
                 updateApiBadge('connected', 'เชื่อมต่อฐานข้อมูลแล้ว ✓');
                 showToast('อัปเดตข้อมูลเรียบร้อยแล้ว', 'success');
             } else {
+                if (data.message && data.message.includes("Unauthorized")) {
+                    handleLogout();
+                }
                 throw new Error(data.message || "Unknown error");
             }
         })

@@ -13,9 +13,29 @@
     <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 </head>
 <body>
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-modal glass-panel">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <img src="../images/logo.png" alt="Logo" style="width: 60px; height: 60px; object-fit: contain; border-radius: 12px; margin-bottom: 12px;">
+                <h2 style="margin: 0; font-size: 1.5rem; color: var(--text-main);">Admin Login</h2>
+                <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);">กรุณากรอกรหัสผ่านเพื่อเข้าสู่ระบบ</p>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <i data-lucide="lock" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-muted);"></i>
+                    <input type="password" id="admin-password" placeholder="Password" required style="width: 100%; padding: 14px 14px 14px 44px; border: 1px solid var(--border-light); border-radius: 12px; font-family: inherit; font-size: 1rem; background: rgba(255, 255, 255, 0.7); outline: none; transition: border-color 0.2s;">
+                </div>
+                <button type="submit" id="login-btn" class="primary-btn" style="width: 100%; padding: 14px; font-size: 1.05rem; border-radius: 12px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    เข้าสู่ระบบ <i data-lucide="arrow-right"></i>
+                </button>
+            </form>
+            <div id="login-error" style="color: #ef4444; font-size: 0.85rem; text-align: center; margin-top: 16px; display: none;">รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่</div>
+        </div>
+    </div>
 
     <!-- Layout Wrapper -->
-    <div class="admin-layout">
+    <div class="admin-layout" id="app-container" style="display: none;">
         
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
@@ -65,6 +85,9 @@
             </ul>
             
             <div class="sidebar-footer">
+                <button onclick="handleLogout()" class="secondary-btn" style="width: 100%; justify-content: center; margin-bottom: 16px; border-color: rgba(239, 68, 68, 0.2); color: #ef4444; background: rgba(239, 68, 68, 0.05);">
+                    <i data-lucide="log-out" style="width: 16px; height: 16px;"></i> ออกจากระบบ
+                </button>
                 <span>OILLY.G Dashboard v.1/2026</span>
             </div>
         </aside>
@@ -644,6 +667,6 @@
 
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=48"></script>
+    <script defer src="app.js?v=49"></script>
 </body>
 </html>

@@ -15,6 +15,8 @@
 4. คัดลอกโค้ดด้านล่างนี้ไปวางแทนที่:
 
 ```javascript
+var ADMIN_PASSWORD = "MKT123"; // รหัสผ่านสำหรับเข้าถึงหน้า Admin
+
 function doPost(e) {
   var sheetName = "GFS_Care_Quest";
   var doc = SpreadsheetApp.getActiveSpreadsheet();
@@ -51,6 +53,23 @@ function doPost(e) {
   
   try {
     var data = JSON.parse(e.postData.contents);
+    
+    // ==========================================
+    // 🛡️ ADMIN PROTECTED ACTIONS
+    // ==========================================
+    var adminActions = ["updateStatus", "updateGiftStatus", "deleteGiftStatus", "getAllCustomersDetailed", "getCustomer", "getAllCustomers"];
+    if (adminActions.indexOf(data.action) !== -1) {
+      if (data.password !== ADMIN_PASSWORD) {
+        return ContentService.createTextOutput(JSON.stringify({
+          status: "error",
+          message: "Unauthorized: Invalid Password"
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+      
+      if (data.action === "getAllCustomersDetailed") return handleGetAllCustomersDetailed();
+      if (data.action === "getAllCustomers") return handleGetAllCustomers();
+      if (data.action === "getCustomer") return handleGetCustomer(data.id);
+    }
     
     // ตรวจสอบว่าเป็นการส่งอัปเดตสถานะหรือไม่
     if (data.action === "updateStatus") {
@@ -213,22 +232,12 @@ function doPost(e) {
 }
 
 // -------------------------------------------------------------
-// ฟังก์ชัน doGet สำหรับดึงข้อมูลกลับไปแสดงผลบน Admin Dashboard
+// ฟังก์ชัน doGet (ไม่ใช้ดึงข้อมูลแล้ว เพื่อความปลอดภัย)
 // -------------------------------------------------------------
 function doGet(e) {
-  var action = e.parameter.action;
-  
-  if (action === "getAllCustomersDetailed") {
-    return handleGetAllCustomersDetailed();
-  } else if (action === "getCustomer") {
-    return handleGetCustomer(e.parameter.id);
-  } else if (action === "getAllCustomers") {
-    return handleGetAllCustomers();
-  }
-  
   return ContentService.createTextOutput(JSON.stringify({ 
     status: "success", 
-    message: "API is running properly. Please provide an action parameter." 
+    message: "API is running properly. Protected endpoints require POST request with password." 
   })).setMimeType(ContentService.MimeType.JSON);
 }
 

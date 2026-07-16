@@ -1940,3 +1940,53 @@ body {
     background-position: right 10px center;
     background-size: 14px;
 }
+
+/* Login System Styles */
+.login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(240, 244, 248, 0.95), rgba(226, 232, 240, 0.95));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.login-modal {
+    width: 100%;
+    max-width: 400px;
+    padding: 32px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+    animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-group input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+}
+
+.input-group input:focus + i {
+    color: var(--primary) !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
