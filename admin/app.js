@@ -2475,7 +2475,7 @@ function printGiftLabel(id) {
         <style>
             @media print {
                 @page {
-                    size: A5 landscape;
+                    size: A4 portrait;
                     margin: 0;
                 }
                 body {
@@ -2494,7 +2494,7 @@ function printGiftLabel(id) {
                     left: 0;
                     top: 0;
                     width: 100vw;
-                    height: 100vh;
+                    height: 50vh; /* Top half of A4 portrait */
                     font-family: 'Prompt', 'Sarabun', sans-serif;
                 }
                 
@@ -2503,21 +2503,21 @@ function printGiftLabel(id) {
                     top: 0;
                     left: 0;
                     width: 100vw;
-                    height: 100vh;
+                    height: 50vh;
                     z-index: -1;
                     object-fit: fill;
                 }
                 
                 .print-address {
                     position: absolute;
-                    top: 29.5vh;
+                    top: 14.75vh;
                     left: 22vw;
                     font-size: 3.2vw;
                     font-weight: 500;
                     color: #1e293b;
                     width: 71.8vw;
-                    line-height: 8.7vh;
-                    height: 43vh;
+                    line-height: 4.35vh;
+                    height: 21.5vh;
                     overflow: hidden;
                     z-index: 1;
                 }
