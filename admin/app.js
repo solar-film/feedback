@@ -174,7 +174,7 @@ function switchTab(tabId) {
     const titles = {
         dashboard: "Dashboard ภาพรวม",
         database: "ฐานข้อมูลรายชื่อลูกค้า",
-        kanban: "ท่อติดตามสถานะแบบประเมิน (Kanban)",
+        kanban: "ติดตามสถานะแบบประเมิน (Kanban)",
         reports: "รายงานคะแนนประเมินทีมบริการ",
         settings: "ตั้งค่าการเชื่อมต่อ Google Sheets API",
         presentation: "โหมดนำเสนอข้อมูลฟีดแบคจากลูกค้า (Customer Feedback)"
