@@ -2325,8 +2325,8 @@ async function quickChangeGiftData(id, field, value) {
         const payload = {
             action: 'updateGiftStatus',
             id: id,
-            customerName: c.name || '',
-            phone: c.phone || '',
+            customerName: c.giftData && c.giftData.customerName ? c.giftData.customerName : (c.name || ''),
+            phone: c.giftData && c.giftData.phone ? c.giftData.phone : (c.phone || ''),
             status: status,
             gift: item,
             address: addr,
@@ -2386,7 +2386,6 @@ async function saveGiftStatus() {
         });
         
         // Update local state temporarily so it reflects immediately
-        const c = state.customers.find(x => x.id === id);
         if (c) {
             c.giftData = { status, gift: item, address: addr, remark };
         }
@@ -2625,16 +2624,11 @@ function promptEditAddress(id) {
     const gift = c.giftData || {};
     let currentAddr = gift.address || c.addressFromData || '';
     
-    // Prepopulate with Name and Phone if it doesn't already have the multi-line format
-    if (currentAddr) {
-        const addrLines = currentAddr.split('\\n').map(l => l.trim()).filter(l => l !== '');
-        if (addrLines.length < 3) {
-            let defaultName = c.name ? c.name.replace(/^คุณ/, '').trim() : '';
-            if (defaultName && !defaultName.startsWith('คุณ')) defaultName = 'คุณ' + defaultName;
-            const defaultPhone = c.phone || '-';
-            currentAddr = defaultName + '\n' + defaultPhone + '\n' + currentAddr;
-        }
-    }
+    let defaultName = gift.customerName || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
+    if (defaultName && !defaultName.startsWith('คุณ')) defaultName = 'คุณ' + defaultName;
+    const defaultPhone = gift.phone || c.phone || '-';
+    
+    currentAddr = defaultName + '\n' + defaultPhone + '\n' + currentAddr;
     
     document.getElementById('edit-address-id').value = id;
     document.getElementById('edit-address-text').value = currentAddr;
@@ -2653,10 +2647,22 @@ function closeEditAddressModal() {
 
 function saveEditedAddress() {
     const id = document.getElementById('edit-address-id').value;
-    const newAddr = document.getElementById('edit-address-text').value.trim();
+    const newAddrText = document.getElementById('edit-address-text').value.trim();
     
     if (id) {
-        quickChangeGiftData(id, 'address', newAddr);
+        const c = state.customers.find(x => x.id === id);
+        if (c) {
+            if (!c.giftData) c.giftData = {};
+            const addrLines = newAddrText.split('\n').map(l => l.trim()).filter(l => l !== '');
+            if (addrLines.length >= 3) {
+                c.giftData.customerName = addrLines[0];
+                c.giftData.phone = addrLines[1];
+                c.giftData.address = addrLines.slice(2).join(' ');
+            } else {
+                c.giftData.address = newAddrText;
+            }
+            quickChangeGiftData(id, 'address', c.giftData.address);
+        }
     }
     
     closeEditAddressModal();
