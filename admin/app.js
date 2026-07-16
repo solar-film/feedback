@@ -931,7 +931,8 @@ function openCustomerDrawer(id) {
     
     document.getElementById('drawer-btn-copy').onclick = () => {
         try {
-            const copyPromise = copyTextRobust(surveyLink);
+            const surveyMessage = `มีบางอย่างที่อยากบอก... แต่ขอฟังความเห็นคุณก่อนครับ 🤫\n\nไขความลับเพื่อบริการที่เหนือระดับ พร้อมลุ้นรับ 'ของรางวัลปริศนา' \n\nที่เตรียมไว้ให้คุณ! เข้ามาที่นี่เลยครับ 👇\n${surveyLink}\n\nขอบคุณที่มาร่วมเปิดเผยความประทับใจไปกับเรานะครับ 🙏`;
+            const copyPromise = copyTextRobust(surveyMessage);
             copyPromise.then(() => {
                 const btn = document.getElementById('drawer-btn-copy');
                 const originalHtml = btn.innerHTML;
