@@ -343,7 +343,7 @@ function handleGetAllCustomersDetailed() {
       sales: r["Sales"] || r["เซลล์ผู้ดูแล"] || r["ฝ่ายขาย"] || "-",
       tech: r["Tech"] || r["ช่างติดตั้ง"] || r["ทีมช่าง"] || "-",
       adminName: r["_col_17"] || r["Admin"] || r["แอดมิน"] || "-",
-      jobType: r["_col_14"] || r["JobType"] || r["ประเภทหน้างาน"] || "-",
+      jobType: r["_col_14"] || r["JobType"] || r["ประเภทหน้างาน"] || r["ประเภทงาน"] || "-",
       bill: r["_col_30"] || r["Bill"] || r["เลขที่บิล"] || "-",
       status: status,
       feedback: feedback,
