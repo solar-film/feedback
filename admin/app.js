@@ -3,7 +3,7 @@
 // Global state variables
 const state = {
     currentTab: 'dashboard',
-    googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec',
+    googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbxcFOZ3VdBW0MkqtPTtkCvJNsWXS3cUCYM_U6BDFDSvxta2RZwTmymobnQPpDYoyIDjLQ/exec',
     allCustomers: [],
     customers: [],
     charts: {
@@ -215,9 +215,10 @@ function toggleSidebar() {
 function loadData() {
     const cachedUrl = localStorage.getItem('google_sheets_apps_script_url');
     if (cachedUrl === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec' ||
-        cachedUrl === 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec') {
+        cachedUrl === 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec' ||
+        cachedUrl === 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec') {
         localStorage.removeItem('google_sheets_apps_script_url');
-        state.googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec';
+        state.googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbxcFOZ3VdBW0MkqtPTtkCvJNsWXS3cUCYM_U6BDFDSvxta2RZwTmymobnQPpDYoyIDjLQ/exec';
     }
 
     if (!state.googleSheetsUrl || state.googleSheetsUrl.trim() === '') {
