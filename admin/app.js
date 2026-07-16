@@ -2440,7 +2440,18 @@ function printGiftLabel(id) {
     if (!c) return;
     
     const gift = c.giftData || {};
-    const addr = gift.address || c.addressFromData || '';
+    let addr = gift.address || c.addressFromData || '';
+    
+    // Auto-format old records to 3 lines for printing
+    if (addr) {
+        const addrLines = addr.split('\\n').map(l => l.trim()).filter(l => l !== '');
+        if (addrLines.length < 3) {
+            let defaultName = c.name ? c.name.replace(/^คุณ/, '').trim() : '';
+            if (defaultName && !defaultName.startsWith('คุณ')) defaultName = 'คุณ' + defaultName;
+            const defaultPhone = c.phone || '-';
+            addr = defaultName + '\\n' + defaultPhone + '\\n' + addr;
+        }
+    }
     
     // Determine Background Image by Company
     let bgImage = '../images/GFS-A5.png';
@@ -2458,7 +2469,7 @@ function printGiftLabel(id) {
         <style>
             @media print {
                 @page {
-                    size: landscape;
+                    size: A5 landscape;
                     margin: 0;
                 }
                 body {
@@ -2493,7 +2504,7 @@ function printGiftLabel(id) {
                 
                 .print-address {
                     position: absolute;
-                    top: 40.7mm;
+                    top: 42.5mm;
                     left: 42mm;
                     font-size: 18pt;
                     font-weight: 500;
