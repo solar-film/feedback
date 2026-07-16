@@ -2217,23 +2217,23 @@ function renderGiftTable() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${c.id}</td>
-            <td style="cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไขข้อมูลจัดส่ง" onclick="promptEditAddress('${c.id}')">
-                <div style="display: flex; align-items: center; gap: 4px;">
-                    <i data-lucide="edit-3" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
-                    <span>${displayRowName}</span>
+            <td id="name-cell-${c.id}">
+                <div style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text); padding: 6px; border: 1px dashed transparent; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.border='1px dashed var(--primary)'" onmouseout="this.style.border='1px dashed transparent'" onclick="enableNameEdit('${c.id}')" title="คลิกเพื่อแก้ไข">
+                    <i data-lucide="edit-3" style="width: 14px; height: 14px; flex-shrink: 0; opacity: 0.5; color: var(--primary);"></i>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayRowName || '-'}</span>
                 </div>
             </td>
-            <td style="cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไขข้อมูลจัดส่ง" onclick="promptEditAddress('${c.id}')">
-                <div style="display: flex; align-items: center; gap: 4px;">
-                    <i data-lucide="edit-3" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
-                    <span>${displayRowPhone}</span>
+            <td id="phone-cell-${c.id}">
+                <div style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text); padding: 6px; border: 1px dashed transparent; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.border='1px dashed var(--primary)'" onmouseout="this.style.border='1px dashed transparent'" onclick="enablePhoneEdit('${c.id}')" title="คลิกเพื่อแก้ไข">
+                    <i data-lucide="edit-3" style="width: 14px; height: 14px; flex-shrink: 0; opacity: 0.5; color: var(--primary);"></i>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayRowPhone}</span>
                 </div>
             </td>
             <td>${c.company || '-'}</td>
-            <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: var(--primary);" title="คลิกเพื่อแก้ไขข้อมูลจัดส่ง" onclick="promptEditAddress('${c.id}')">
-                <div style="display: flex; align-items: center; gap: 4px;">
-                    <i data-lucide="edit-3" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
-                    <span style="overflow: hidden; text-overflow: ellipsis;">${displayRowAddress}</span>
+            <td id="address-cell-${c.id}" style="max-width: 300px;">
+                <div style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text); padding: 6px; border: 1px dashed transparent; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.border='1px dashed var(--primary)'" onmouseout="this.style.border='1px dashed transparent'" onclick="enableAddressEdit('${c.id}')" title="คลิกเพื่อแก้ไข">
+                    <i data-lucide="edit-3" style="width: 14px; height: 14px; flex-shrink: 0; opacity: 0.5; color: var(--primary);"></i>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayRowAddress}</span>
                 </div>
             </td>
             <td>
@@ -2553,16 +2553,22 @@ async function quickChangeGiftData(id, field, value) {
     let status = gift.status || '';
     let addr = gift.address || c.addressFromData || '';
     let remark = gift.remark || '';
-    if (field === 'remark') remark = value;
+    let cName = gift.customerName || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
+    let phone = gift.phone || c.phone || '';
     
+    if (field === 'remark') remark = value;
     if (field === 'status') status = value;
     if (field === 'gift') item = value;
     if (field === 'address') addr = value;
+    if (field === 'name') cName = value;
+    if (field === 'phone') phone = value;
     
     try {
         const payload = {
             action: 'updateGiftStatus',
             id: id,
+            customerName: cName,
+            phone: phone,
             status: status,
             gift: item,
             address: addr,
@@ -2576,7 +2582,7 @@ async function quickChangeGiftData(id, field, value) {
             body: JSON.stringify(payload)
         });
         
-        c.giftData = { status, gift: item, address: addr, remark };
+        c.giftData = { status, gift: item, address: addr, remark, customerName: cName, phone: phone };
         renderGiftTable();
         showToast('อัปเดตข้อมูลสำเร็จ', 'success');
     } catch (error) {
@@ -2610,50 +2616,61 @@ window.enableRemarkEdit = function(id) {
     }
 };
 
-function promptEditAddress(id) {
+window.enableNameEdit = function(id) {
     const c = state.customers.find(x => x.id === id);
     if (!c) return;
     const gift = c.giftData || {};
-    let currentAddr = gift.address || c.addressFromData || '';
+    const cell = document.getElementById(`name-cell-${id}`);
+    if (!cell) return;
     
     let defaultName = gift.customerName || (c.name ? c.name.replace(/^คุณ/, '').trim() : '');
-    if (defaultName && !defaultName.startsWith('คุณ')) defaultName = 'คุณ' + defaultName;
-    const defaultPhone = gift.phone || c.phone || '';
     
-    document.getElementById('edit-address-id').value = id;
-    document.getElementById('edit-address-name').value = defaultName;
-    document.getElementById('edit-address-phone').value = defaultPhone;
-    document.getElementById('edit-address-text').value = currentAddr;
-    
-    const modal = document.getElementById('modal-edit-address');
-    modal.style.display = 'flex';
-    setTimeout(() => {
-        document.getElementById('edit-address-text').focus();
-    }, 100);
-}
+    cell.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 4px;">
+            <input type="text" id="name-input-${id}" class="form-control" style="width: 150px; padding: 6px; font-size: 0.85rem;" placeholder="ชื่อลูกค้า..." value="${defaultName}" onkeydown="if(event.key==='Enter') quickChangeGiftData('${id}', 'name', this.value)">
+            <button class="btn-secondary" style="padding: 4px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; color: #4b5563; border: 1px solid #d1d5db; cursor: pointer; flex-shrink: 0;" onclick="quickChangeGiftData('${id}', 'name', document.getElementById('name-input-${id}').value)">
+                <i data-lucide="save" style="width: 14px; height: 14px; margin: 0;"></i>
+            </button>
+        </div>
+    `;
+    if (window.lucide && lucide.createIcons) lucide.createIcons();
+    document.getElementById(`name-input-${id}`).focus();
+};
 
-function closeEditAddressModal() {
-    const modal = document.getElementById('modal-edit-address');
-    modal.style.display = 'none';
-}
+window.enablePhoneEdit = function(id) {
+    const c = state.customers.find(x => x.id === id);
+    if (!c) return;
+    const gift = c.giftData || {};
+    const cell = document.getElementById(`phone-cell-${id}`);
+    if (!cell) return;
+    
+    cell.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 4px;">
+            <input type="text" id="phone-input-${id}" class="form-control" style="width: 120px; padding: 6px; font-size: 0.85rem;" placeholder="เบอร์โทร..." value="${gift.phone || c.phone || ''}" onkeydown="if(event.key==='Enter') quickChangeGiftData('${id}', 'phone', this.value)">
+            <button class="btn-secondary" style="padding: 4px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; color: #4b5563; border: 1px solid #d1d5db; cursor: pointer; flex-shrink: 0;" onclick="quickChangeGiftData('${id}', 'phone', document.getElementById('phone-input-${id}').value)">
+                <i data-lucide="save" style="width: 14px; height: 14px; margin: 0;"></i>
+            </button>
+        </div>
+    `;
+    if (window.lucide && lucide.createIcons) lucide.createIcons();
+    document.getElementById(`phone-input-${id}`).focus();
+};
 
-function saveEditedAddress() {
-    const id = document.getElementById('edit-address-id').value;
-    const newName = document.getElementById('edit-address-name').value.trim();
-    const newPhone = document.getElementById('edit-address-phone').value.trim();
-    const newAddrText = document.getElementById('edit-address-text').value.trim();
+window.enableAddressEdit = function(id) {
+    const c = state.customers.find(x => x.id === id);
+    if (!c) return;
+    const gift = c.giftData || {};
+    const cell = document.getElementById(`address-cell-${id}`);
+    if (!cell) return;
     
-    if (id) {
-        const c = state.customers.find(x => x.id === id);
-        if (c) {
-            if (!c.giftData) c.giftData = {};
-            c.giftData.customerName = newName;
-            c.giftData.phone = newPhone;
-            c.giftData.address = newAddrText;
-            
-            quickChangeGiftData(id, 'address', c.giftData.address);
-        }
-    }
-    
-    closeEditAddressModal();
-}
+    cell.innerHTML = `
+        <div style="display: flex; align-items: flex-start; gap: 4px;">
+            <textarea id="address-input-${id}" class="form-control" rows="2" style="width: 250px; padding: 6px; font-size: 0.85rem;" placeholder="ที่อยู่จัดส่ง...">${gift.address || c.addressFromData || ''}</textarea>
+            <button class="btn-secondary" style="padding: 4px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; color: #4b5563; border: 1px solid #d1d5db; cursor: pointer; flex-shrink: 0;" onclick="quickChangeGiftData('${id}', 'address', document.getElementById('address-input-${id}').value)">
+                <i data-lucide="save" style="width: 14px; height: 14px; margin: 0;"></i>
+            </button>
+        </div>
+    `;
+    if (window.lucide && lucide.createIcons) lucide.createIcons();
+    document.getElementById(`address-input-${id}`).focus();
+};

@@ -641,42 +641,9 @@
     <!-- Print Layout (Hidden by default, used only when printing) -->
     <div id="print-layout" style="display: none;"></div>
     <!-- Modal for Editing Address -->
-    <div class="drawer-modal" id="modal-edit-address" onclick="if(event.target===this) closeEditAddressModal()" style="justify-content: center; align-items: center; z-index: 10000;">
-        <div class="drawer-content" style="max-width: 500px; width: 90%; border-radius: 16px; height: auto; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="margin: 0; font-size: 1.25rem; display: flex; align-items: center; gap: 8px; color: var(--primary);">
-                    <i data-lucide="map-pin"></i> แก้ไขที่อยู่สำหรับจัดส่ง
-                </h3>
-                <button onclick="closeEditAddressModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
-            </div>
-            
-            <input type="hidden" id="edit-address-id">
-            
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">ชื่อลูกค้า (Customer Name)</label>
-                <input type="text" id="edit-address-name" class="form-control" style="width: 100%; border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid var(--border); box-sizing: border-box;" placeholder="ชื่อลูกค้า">
-            </div>
-            
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">เบอร์ติดต่อ (Phone)</label>
-                <input type="text" id="edit-address-phone" class="form-control" style="width: 100%; border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid var(--border); box-sizing: border-box;" placeholder="เบอร์โทรศัพท์">
-            </div>
-            
-            <div class="form-group" style="margin-bottom: 20px;">
-                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">ที่อยู่จัดส่ง (Delivery Address)</label>
-                <textarea id="edit-address-text" class="form-control" rows="4" style="width: 100%; border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid var(--border); box-sizing: border-box;" placeholder="รายละเอียดที่อยู่..."></textarea>
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button type="button" class="btn-secondary" onclick="closeEditAddressModal()" style="padding: 10px 20px; border-radius: 8px;">ยกเลิก</button>
-                <button type="button" class="btn-primary" onclick="saveEditedAddress()" style="padding: 10px 24px; border-radius: 8px;">
-                    <i data-lucide="save" style="width: 16px;"></i> บันทึก
-                </button>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=39"></script>
+    <script defer src="app.js?v=40"></script>
 </body>
 </html>
