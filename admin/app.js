@@ -2370,8 +2370,8 @@ async function saveGiftStatus() {
         const payload = {
             action: 'updateGiftStatus',
             id: id,
-            customerName: c ? c.name : '',
-            phone: c ? c.phone : '',
+            customerName: c && c.giftData && c.giftData.customerName ? c.giftData.customerName : (c ? c.name : ''),
+            phone: c && c.giftData && c.giftData.phone ? c.giftData.phone : (c ? c.phone : ''),
             status: status,
             gift: item,
             address: addr,
