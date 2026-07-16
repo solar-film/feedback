@@ -2603,7 +2603,18 @@ function promptEditAddress(id) {
     const c = state.customers.find(x => x.id === id);
     if (!c) return;
     const gift = c.giftData || {};
-    const currentAddr = gift.address || c.addressFromData || '';
+    let currentAddr = gift.address || c.addressFromData || '';
+    
+    // Prepopulate with Name and Phone if it doesn't already have the multi-line format
+    if (currentAddr) {
+        const addrLines = currentAddr.split('\\n').map(l => l.trim()).filter(l => l !== '');
+        if (addrLines.length < 3) {
+            let defaultName = c.name ? c.name.replace(/^คุณ/, '').trim() : '';
+            if (defaultName && !defaultName.startsWith('คุณ')) defaultName = 'คุณ' + defaultName;
+            const defaultPhone = c.phone || '-';
+            currentAddr = `${defaultName}\\n${defaultPhone}\\n${currentAddr}`;
+        }
+    }
     
     document.getElementById('edit-address-id').value = id;
     document.getElementById('edit-address-text').value = currentAddr;
