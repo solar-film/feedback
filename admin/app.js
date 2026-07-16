@@ -2298,47 +2298,7 @@ function closeGiftModal() {
     document.getElementById('modal-gift').style.display = 'none';
 }
 
-async function quickChangeGiftData(id, field, value) {
-    const c = state.customers.find(x => x.id === id);
-    if (!c) return;
-    
-    const gift = c.giftData || {};
-    let status = gift.status || '';
-    let item = gift.gift || '';
-    let addr = gift.address || c.addressFromData || '';
-    let remark = gift.remark || '';
-    
-    if (field === 'status') status = value;
-    if (field === 'gift') item = value;
-    if (field === 'address') addr = value;
-    if (field === 'remark') remark = value;
-    
-    try {
-        const payload = {
-            action: 'updateGiftStatus',
-            id: id,
-            customerName: c.giftData && c.giftData.customerName ? c.giftData.customerName : (c.name || ''),
-            phone: c.giftData && c.giftData.phone ? c.giftData.phone : (c.phone || ''),
-            status: status,
-            gift: item,
-            address: addr,
-            remark: remark
-        };
-        
-        await fetch(state.googleSheetsUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        
-        c.giftData = { status, gift: item, address: addr, remark };
-        renderGiftTable();
-        showToast('บันทึกสำเร็จ', 'success');
-    } catch (e) {
-        alert('เกิดข้อผิดพลาด');
-    }
-}
+
 
 async function saveGiftStatus() {
     const id = document.getElementById('gift-cust-id').value;
