@@ -361,7 +361,8 @@ function handleGetAllCustomersDetailed() {
       status: status,
       feedback: feedback,
       giftData: giftData,
-      addressFromData: addressFromData
+      addressFromData: addressFromData,
+      filterDate: r["_col_25"] || ""
     };
   });
   

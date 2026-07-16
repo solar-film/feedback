@@ -285,6 +285,7 @@ function loadData() {
                         lineAt: item.lineAt || '-',
                         siteType: item.siteType || '-',
                         installDate: formatInstallDate(item.installDate),
+                        filterDate: formatInstallDate(item.filterDate || item.installDate),
                         filmModel: item.filmModel || '-',
                         sales: item.sales || '-',
                         tech: item.tech || '-',
@@ -398,6 +399,7 @@ function forceRefreshData() {
                         lineAt: item.lineAt || '-',
                         siteType: item._col_16 || item.siteType || item.company || '-',
                         installDate: formatInstallDate(item.installDate),
+                        filterDate: formatInstallDate(item.filterDate || item.installDate),
                         filmModel: item.filmModel || '-',
                         sales: item.sales || '-',
                         tech: item.tech || '-',
@@ -469,8 +471,8 @@ function applyGlobalFilter() {
 
     state.customers = state.allCustomers.filter(c => {
         let m = '', y = '';
-        if (c.installDate && c.installDate !== '-') {
-            const dateStr = formatInstallDate(c.installDate);
+        if (c.filterDate && c.filterDate !== '-') {
+            const dateStr = c.filterDate;
             if (dateStr.indexOf('-') > -1) {
                 const p = dateStr.split('-');
                 m = parseInt(p[1], 10);
@@ -491,8 +493,8 @@ function applyGlobalFilter() {
 
         // Date Range check
         let matchesDateRange = true;
-        if (c.installDate && c.installDate !== '-') {
-            const dateStr = formatInstallDate(c.installDate);
+        if (c.filterDate && c.filterDate !== '-') {
+            const dateStr = c.filterDate;
             let rowDateObj = null;
             if (dateStr.indexOf('-') > -1) {
                 const p = dateStr.split('-');
@@ -1809,9 +1811,9 @@ function populateFilters(init) {
     state.allCustomers.forEach(c => {
         if (c.company && c.company !== '-') uniqueCompanies.add(c.company);
 
-        if (!c.installDate || c.installDate === '-') return;
+        if (!c.filterDate || c.filterDate === '-') return;
         let m = '', y = '';
-        const dateStr = formatInstallDate(c.installDate);
+        const dateStr = c.filterDate;
         if (dateStr.indexOf('-') > -1) {
             const p = dateStr.split('-');
             m = parseInt(p[1], 10);
