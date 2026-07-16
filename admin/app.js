@@ -980,7 +980,7 @@ function renderJourneyTimeline(customer) {
             <span class="timeline-time">${installDate}</span>
         </div>
         <div class="timeline-body">
-            ทีมช่างดำเนินติดตั้งเสร็จสิ้นที่หน้างาน ${customer.addressFromData || ""} ${customer.siteType} รุ่นฟิล์ม ${customer.filmModel} เรียบร้อยแล้วค่ะ
+            ทีมช่างดำเนินติดตั้งเสร็จสิ้นที่หน้างาน ${customer.addressFromData || ""} รุ่นฟิล์ม ${customer.filmModel} เรียบร้อยแล้วค่ะ
         </div>
     `;
     container.appendChild(step1);
@@ -1005,8 +1005,11 @@ function renderJourneyTimeline(customer) {
     const step3 = document.createElement('div');
     if (hasFeedback) {
         step3.className = 'timeline-step completed';
-        const dateObj = new Date(customer.feedback.timestamp);
-        const timeStr = dateObj.toLocaleDateString('th-TH');
+        let timeStr = customer.feedback.timestamp || "-";
+        const dateObj = new Date(timeStr);
+        if (!isNaN(dateObj.getTime())) {
+            timeStr = dateObj.toLocaleDateString('th-TH');
+        }
         step3.innerHTML = `
             <div class="timeline-dot"></div>
             <div class="timeline-header">
