@@ -243,7 +243,7 @@ function loadData() {
     }
 
     // --- 2. Fetch fresh data in the background ---
-    const pwd = sessionStorage.getItem('admin_password');
+    const pwd = localStorage.getItem('admin_password');
     if (!pwd) return;
 
     fetch(state.googleSheetsUrl, {
@@ -366,7 +366,7 @@ function forceRefreshData() {
     // Bypass cache for visual feedback
     updateApiBadge('loading', 'กำลังดึงข้อมูลล่าสุด...');
     
-    const pwd = sessionStorage.getItem('admin_password');
+    const pwd = localStorage.getItem('admin_password');
     if (!pwd) return;
 
     fetch(state.googleSheetsUrl, {
@@ -811,7 +811,7 @@ function updateCustomerStatus(customerId, targetStatus) {
                 action: 'updateStatus',
                 id: customerId,
                 status: targetStatus,
-                password: sessionStorage.getItem('admin_password')
+                password: localStorage.getItem('admin_password')
             })
         }).catch(err => console.error("Failed to sync status to Google Sheets:", err));
     }
@@ -2351,7 +2351,7 @@ async function saveGiftStatus() {
         const c = state.customers.find(x => x.id === id);
         const payload = {
             action: 'updateGiftStatus',
-            password: sessionStorage.getItem('admin_password'),
+            password: localStorage.getItem('admin_password'),
             id: id,
             customerName: c && c.giftData && c.giftData.customerName ? c.giftData.customerName : (c ? c.name : ''),
             phone: c && c.giftData && c.giftData.phone ? c.giftData.phone : (c ? c.phone : ''),
@@ -2397,7 +2397,7 @@ async function deleteGiftStatus() {
     try {
         const payload = {
             action: 'deleteGiftStatus',
-            password: sessionStorage.getItem('admin_password'),
+            password: localStorage.getItem('admin_password'),
             id: id
         };
         
@@ -2560,7 +2560,7 @@ async function quickChangeGiftData(id, field, value) {
     try {
         const payload = {
             action: 'updateGiftStatus',
-            password: sessionStorage.getItem('admin_password'),
+            password: localStorage.getItem('admin_password'),
             id: id,
             customerName: cName,
             phone: phone,
@@ -2674,7 +2674,7 @@ window.enableAddressEdit = function(id) {
 // Login & Authentication System
 // -----------------------------------------
 window.checkLoginStatus = function() {
-    const pwd = sessionStorage.getItem('admin_password');
+    const pwd = localStorage.getItem('admin_password');
     if (pwd) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app-container').style.display = 'flex';
@@ -2702,7 +2702,7 @@ window.handleLogin = function(e) {
     .then(res => res.json())
     .then(data => {
         if (data.status === 'success') {
-            sessionStorage.setItem('admin_password', pwd);
+            localStorage.setItem('admin_password', pwd);
             checkLoginStatus();
         } else {
             err.style.display = 'block';
@@ -2721,7 +2721,7 @@ window.handleLogin = function(e) {
 };
 
 window.handleLogout = function() {
-    sessionStorage.removeItem('admin_password');
+    localStorage.removeItem('admin_password');
     document.getElementById('admin-password').value = '';
     checkLoginStatus();
 };
