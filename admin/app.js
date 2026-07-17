@@ -810,7 +810,8 @@ function updateCustomerStatus(customerId, targetStatus) {
             body: JSON.stringify({
                 action: 'updateStatus',
                 id: customerId,
-                status: targetStatus
+                status: targetStatus,
+                password: sessionStorage.getItem('admin_password')
             })
         }).catch(err => console.error("Failed to sync status to Google Sheets:", err));
     }
@@ -2350,6 +2351,7 @@ async function saveGiftStatus() {
         const c = state.customers.find(x => x.id === id);
         const payload = {
             action: 'updateGiftStatus',
+            password: sessionStorage.getItem('admin_password'),
             id: id,
             customerName: c && c.giftData && c.giftData.customerName ? c.giftData.customerName : (c ? c.name : ''),
             phone: c && c.giftData && c.giftData.phone ? c.giftData.phone : (c ? c.phone : ''),
@@ -2395,6 +2397,7 @@ async function deleteGiftStatus() {
     try {
         const payload = {
             action: 'deleteGiftStatus',
+            password: sessionStorage.getItem('admin_password'),
             id: id
         };
         
@@ -2557,6 +2560,7 @@ async function quickChangeGiftData(id, field, value) {
     try {
         const payload = {
             action: 'updateGiftStatus',
+            password: sessionStorage.getItem('admin_password'),
             id: id,
             customerName: cName,
             phone: phone,
