@@ -831,8 +831,11 @@ function markAsSent(id) {
 
 // Copy link action helper
 function copySurveyLink(id, btn) {
+    const c = state.customers.find(x => x.id === id);
+    const companyName = (c && c.company === 'MHL') ? 'Maholan film' : 'Goodfilm';
+    const custName = (c && c.name) ? c.name : 'ลูกค้า';
     const baseUrl = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(id)}`;
-    const surveyMessage = `มีบางอย่างที่อยากบอก... แต่ขอฟังความเห็นคุณก่อนครับ 🤫\n\nไขความลับเพื่อบริการที่เหนือระดับ พร้อมลุ้นรับ 'ของรางวัลปริศนา' \n\nที่เตรียมไว้ให้คุณ! เข้ามาที่นี่เลยครับ 👇\n${baseUrl}\n\nขอบคุณที่มาร่วมเปิดเผยความประทับใจไปกับเรานะครับ 🙏`;
+    const surveyMessage = `สวัสดีค่ะ คุณ ${custName} ✨\n\nวันนี้ ${companyName} มีกิจกรรมสนุกๆ มาชวนคุณร่วมสนุกแบบไม่กี่วินาทีค่ะ\n\nเพียงบอกความรู้สึกของคุณหลังจากติดตั้งฟิล์มกับเรา ปลดล็อกคำแนะนำเพื่อบริการที่เหนือระดับ พร้อมลุ้นรับ "Exclusive Mystery Gift" ของรางวัลปริศนาที่เราคัดมาอย่างดี 🧩\n\nร่วมสนุกและเปิดรับของรางวัลที่นี่เลยค่ะ 👇\n${baseUrl}\n\nขอบคุณที่ให้เราดูแลนะคะ 💙`;
     const copyPromise = copyTextRobust(surveyMessage);
 
     copyPromise.then(() => {
@@ -934,17 +937,17 @@ function openCustomerDrawer(id) {
 
     // Dynamic LINE link & copy inside Drawer
     const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
-    const companyName = c.company === 'MHL' ? 'MHL' : 'Goodfilm';
-    const lineMessage = `สวัสดีครับคุณ${c.name} ${companyName} รบกวนเวลาสั้น ๆ 2 นาที ร่วมทำภารกิจประเมินความพึงพอใจการติดตั้งฟิล์ม ผ่านลิงก์นี้นะครับ: ${surveyLink} ขอบคุณมากครับ 💙`;
+    const brandName = c.company === 'MHL' ? 'Maholan film' : 'Goodfilm';
+    const custName = c.name ? c.name : 'ลูกค้า';
+    const surveyMessage = `สวัสดีค่ะ คุณ ${custName} ✨\n\nวันนี้ ${brandName} มีกิจกรรมสนุกๆ มาชวนคุณร่วมสนุกแบบไม่กี่วินาทีค่ะ\n\nเพียงบอกความรู้สึกของคุณหลังจากติดตั้งฟิล์มกับเรา ปลดล็อกคำแนะนำเพื่อบริการที่เหนือระดับ พร้อมลุ้นรับ "Exclusive Mystery Gift" ของรางวัลปริศนาที่เราคัดมาอย่างดี 🧩\n\nร่วมสนุกและเปิดรับของรางวัลที่นี่เลยค่ะ 👇\n${surveyLink}\n\nขอบคุณที่ให้เราดูแลนะคะ 💙`;
     
     document.getElementById('drawer-btn-line').onclick = () => {
-        window.open(`https://line.me/R/msg/text/?${encodeURIComponent(lineMessage)}`, '_blank');
+        window.open(`https://line.me/R/msg/text/?${encodeURIComponent(surveyMessage)}`, '_blank');
         markAsSent(c.id);
     };
     
     document.getElementById('drawer-btn-copy').onclick = () => {
         try {
-            const surveyMessage = `มีบางอย่างที่อยากบอก... แต่ขอฟังความเห็นคุณก่อนครับ 🤫\n\nไขความลับเพื่อบริการที่เหนือระดับ พร้อมลุ้นรับ 'ของรางวัลปริศนา' \n\nที่เตรียมไว้ให้คุณ! เข้ามาที่นี่เลยครับ 👇\n${surveyLink}\n\nขอบคุณที่มาร่วมเปิดเผยความประทับใจไปกับเรานะครับ 🙏`;
             const copyPromise = copyTextRobust(surveyMessage);
             copyPromise.then(() => {
                 const btn = document.getElementById('drawer-btn-copy');
