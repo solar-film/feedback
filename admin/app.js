@@ -1913,8 +1913,45 @@ let presentationSlides = [];
 let currentSlideIndex = 0;
 
 function initPresentation() {
-    // Filter customers who have feedback data
-    presentationSlides = state.customers.filter(c => c.feedback && (c.feedback.overallMood || c.status === 'Completed'));
+    const monthVal = document.getElementById('global-filter-month')?.value || 'all';
+    const companyVal = document.getElementById('global-filter-company')?.value || 'all';
+    const startVal = document.getElementById('global-filter-start')?.value;
+    const endVal = document.getElementById('global-filter-end')?.value;
+
+    // Filter customers who have feedback data, using fb.timestamp instead of installDate
+    presentationSlides = state.allCustomers.filter(c => {
+        if (!c.feedback || (!c.feedback.overallMood && c.status !== 'Completed')) return false;
+        
+        if (companyVal !== 'all' && c.company !== companyVal) return false;
+
+        const tsStr = c.feedback.timestamp;
+        if (!tsStr) return false;
+
+        const p = tsStr.split(' ')[0].split('/');
+        if (p.length === 3) {
+            const d = parseInt(p[0], 10);
+            const m = parseInt(p[1], 10);
+            const y = parseInt(p[2], 10);
+            const rowDateObj = new Date(y, m - 1, d);
+            const rowMonthYear = `${m}-${y}`;
+
+            if (monthVal !== 'all' && rowMonthYear !== monthVal) return false;
+
+            if (startVal) {
+                const sDate = new Date(startVal);
+                sDate.setHours(0,0,0,0);
+                if (rowDateObj < sDate) return false;
+            }
+            if (endVal) {
+                const eDate = new Date(endVal);
+                eDate.setHours(23,59,59,999);
+                if (rowDateObj > eDate) return false;
+            }
+        }
+        
+        return true;
+    });
+
     currentSlideIndex = 0;
     
     renderPresentationSlide();
