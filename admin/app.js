@@ -2069,11 +2069,13 @@ function renderPresentationSlide() {
                         </div>
                     </div>
                     <div class="pp-tc-tags">${adminTagsHtml || '<span class="pp-tag" style="opacity: 0;">-</span>'}</div>
+                    ${fb.comments?.admin ? `
                     <div class="pp-divider"></div>
                     <div class="pp-comment-box">
                         <i data-lucide="message-circle" class="pp-comment-icon"></i>
-                        <span>${fb.comments?.admin || '-'}</span>
+                        <span>${fb.comments.admin}</span>
                     </div>
+                    ` : ''}
                 </div>
 
                 <!-- Sales -->
@@ -2093,11 +2095,13 @@ function renderPresentationSlide() {
                         </div>
                     </div>
                     <div class="pp-tc-tags">${salesTagsHtml || '<span class="pp-tag" style="opacity: 0;">-</span>'}</div>
+                    ${fb.comments?.sales ? `
                     <div class="pp-divider"></div>
                     <div class="pp-comment-box">
                         <i data-lucide="message-circle" class="pp-comment-icon"></i>
-                        <span>${fb.comments?.sales || '-'}</span>
+                        <span>${fb.comments.sales}</span>
                     </div>
+                    ` : ''}
                 </div>
 
                 <!-- Tech -->
@@ -2117,11 +2121,13 @@ function renderPresentationSlide() {
                         </div>
                     </div>
                     <div class="pp-tc-tags">${techTagsHtml || '<span class="pp-tag" style="opacity: 0;">-</span>'}</div>
+                    ${fb.comments?.tech ? `
                     <div class="pp-divider"></div>
                     <div class="pp-comment-box">
                         <i data-lucide="message-circle" class="pp-comment-icon"></i>
-                        <span>${fb.comments?.tech || '-'}</span>
+                        <span>${fb.comments.tech}</span>
                     </div>
+                    ` : ''}
                 </div>
             </div>
 
