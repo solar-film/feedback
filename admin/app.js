@@ -2050,25 +2050,6 @@ function renderPresentationSlide() {
                 </div>
             </div>
 
-            <!-- MVP Banner -->
-            ${(showMvp) ? `
-            <div class="pp-mvp-banner" style="background-image: url('../images/mvp.png'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: none; padding: 140px 40px 60px; min-height: 350px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
-                <div class="pp-banner-content">
-                    <div class="pp-mvp-title" style="margin-top: -10px;">
-                        ขอมอบมงให้แก่... <span class="pp-mvp-highlight">${mvpText} 🎉</span>
-                    </div>
-                    ${customerComment ? `
-                    <div class="pp-quote-subtext" style="color: #475569;">ข้อความฝากถึงทีมงาน</div>
-                    <div class="pp-quote-text" style="justify-content: center; text-align: center;">
-                        <span class="pp-quote-mark">“</span>
-                        ${customerComment}
-                        <span class="pp-quote-mark">”</span>
-                    </div>
-                    ` : ''}
-                </div>
-            </div>
-            ` : ''}
-
             <!-- Team Cards -->
             <div class="pp-team-grid">
                 <!-- Admin -->
@@ -2143,6 +2124,25 @@ function renderPresentationSlide() {
                     </div>
                 </div>
             </div>
+
+            <!-- MVP Banner -->
+            ${(showMvp) ? `
+            <div class="pp-mvp-banner" style="background-image: url('../images/mvp.png'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: none; padding: 140px 40px 60px; min-height: 350px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin-top: 24px;">
+                <div class="pp-banner-content">
+                    <div class="pp-mvp-title" style="margin-top: -10px;">
+                        ขอมอบมงให้แก่... <span class="pp-mvp-highlight">${mvpText} 🎉</span>
+                    </div>
+                    ${customerComment ? `
+                    <div class="pp-quote-subtext" style="color: #475569;">ข้อความฝากถึงทีมงาน</div>
+                    <div class="pp-quote-text" style="justify-content: center; text-align: center;">
+                        <span class="pp-quote-mark">“</span>
+                        ${customerComment}
+                        <span class="pp-quote-mark">”</span>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            ` : ''}
             
             ${fb.supportDetails ? `
             <div class="pp-support-details">
