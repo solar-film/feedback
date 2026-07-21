@@ -283,6 +283,7 @@ function loadData() {
                         name: item.name,
                         phone: item.phone,
                         lineAt: item.lineAt || '-',
+                        contactChannel: item.contactChannel || '-',
                         siteType: item.siteType || '-',
                         installDate: formatInstallDate(item.installDate),
                         filterDate: formatInstallDate(item.filterDate || item.installDate),
@@ -399,6 +400,7 @@ function forceRefreshData() {
                         name: item.name,
                         phone: item.phone,
                         lineAt: item.lineAt || '-',
+                        contactChannel: item.contactChannel || '-',
                         siteType: item._col_16 || item.siteType || item.company || '-',
                         installDate: formatInstallDate(item.installDate),
                         filterDate: formatInstallDate(item.filterDate || item.installDate),
@@ -870,7 +872,7 @@ function openCustomerDrawer(id) {
     document.getElementById('drawer-cust-name').innerText = c.name;
     document.getElementById('drawer-cust-id').innerText = `รหัสสัญญา: ${c.id}`;
     document.getElementById('drawer-cust-bill').innerText = c.bill || '-';
-    document.getElementById('drawer-cust-film').innerText = c.filmModel || '-';
+    document.getElementById('drawer-cust-contact').innerText = c.contactChannel || '-';
     document.getElementById('drawer-cust-sitetype').innerText = c.siteType || '-';
     document.getElementById('drawer-cust-line').innerText = c.lineAt || '-';
     document.getElementById('drawer-cust-jobtype').innerText = c.jobType || '-';

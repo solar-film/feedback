@@ -359,6 +359,7 @@ function handleGetAllCustomersDetailed() {
       name: r["Name"] || r["ชื่อผู้ติดต่อ"] || r["ชื่อลูกค้า"] || "",
       phone: r["Phone"] || r["เบอร์โทรศัพท์"] || r["เบอร์ติดต่อ"] || "",
       lineAt: r["_col_11"] || r["Line@"] || r["LINE"] || r["Line Name"] || "-",
+      contactChannel: r["_col_10"] || "-",
       siteType: r["_col_37"] || r["พื้นที่ที่ติดตั้ง"] || r["SiteType"] || "-",
       installDate: r["InstallDate"] || r["วันที่ติดตั้ง"] || "",
       filmModel: r["_col_33"] || r["รุ่นฟิล์มที่ติดตั้ง"] || r["FilmModel"] || "-",
