@@ -2075,7 +2075,7 @@ function renderPresentationSlide() {
                             <i data-lucide="headphones" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div class="pp-tc-info">
-                            <h4>แอดมิน (${c.adminName || 'ket'})</h4>
+                            <h4>แอดมิน (${(c.adminName && c.adminName !== '-') ? c.adminName : (c.sales && c.sales !== '-' ? c.sales : '-')})</h4>
                             <div class="pp-tc-score-row">
                                 <div class="pp-tc-score">${getScoreStr(fb.ratings?.admin)}<span> / 5</span></div>
                                 <div class="pp-progress-bar">
