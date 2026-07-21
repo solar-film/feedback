@@ -1961,7 +1961,8 @@ function renderPresentationSlide() {
                 if (mvpLower === 'all') {
                     mvpText = 'ทุกทีม';
                 } else if (mvpLower === 'admin') {
-                    mvpText = `แอดมิน${c.adminName ? ' (' + c.adminName + ')' : ''}`;
+                    const adminDisplayName = (c.adminName && c.adminName !== '-') ? c.adminName : (c.sales && c.sales !== '-' ? c.sales : '');
+                    mvpText = `แอดมิน${adminDisplayName ? ' (' + adminDisplayName + ')' : ''}`;
                 } else if (mvpLower === 'sale' || mvpLower === 'sales') {
                     mvpText = `ฝ่ายขาย${c.sales ? ' (' + c.sales + ')' : ''}`;
                 } else if (mvpLower === 'tech') {
