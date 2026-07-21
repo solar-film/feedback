@@ -2088,7 +2088,7 @@ function renderPresentationSlide() {
                     <div class="pp-divider"></div>
                     <div class="pp-comment-box">
                         <i data-lucide="message-circle" class="pp-comment-icon"></i>
-                        <span>${fb.comments?.admin || 'แอดมินตอบช้า หลายชั่วโมงกว่าจะตอบ'}</span>
+                        <span>${fb.comments?.admin || '-'}</span>
                     </div>
                 </div>
 
@@ -2099,7 +2099,7 @@ function renderPresentationSlide() {
                             <i data-lucide="briefcase" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div class="pp-tc-info">
-                            <h4>ฝ่ายขาย (${c.sales || 'Jay'})</h4>
+                            <h4>ฝ่ายขาย (${c.sales || '-'})</h4>
                             <div class="pp-tc-score-row">
                                 <div class="pp-tc-score">${getScoreStr(fb.ratings?.sales)}<span> / 5</span></div>
                                 <div class="pp-progress-bar">
@@ -2112,7 +2112,7 @@ function renderPresentationSlide() {
                     <div class="pp-divider"></div>
                     <div class="pp-comment-box">
                         <i data-lucide="message-circle" class="pp-comment-icon"></i>
-                        <span>${fb.comments?.sales || 'ฝ่ายขายดีค่ะ'}</span>
+                        <span>${fb.comments?.sales || '-'}</span>
                     </div>
                 </div>
 
@@ -2123,7 +2123,7 @@ function renderPresentationSlide() {
                             <i data-lucide="wrench" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div class="pp-tc-info">
-                            <h4>ทีมช่าง (${c.tech || 'บอล'})</h4>
+                            <h4>ทีมช่าง (${c.tech || '-'})</h4>
                             <div class="pp-tc-score-row">
                                 <div class="pp-tc-score">${getScoreStr(fb.ratings?.tech)}<span> / 5</span></div>
                                 <div class="pp-progress-bar">
@@ -2136,7 +2136,7 @@ function renderPresentationSlide() {
                     <div class="pp-divider"></div>
                     <div class="pp-comment-box">
                         <i data-lucide="message-circle" class="pp-comment-icon"></i>
-                        <span>${fb.comments?.tech || 'ติดเสร็จเร็ว'}</span>
+                        <span>${fb.comments?.tech || '-'}</span>
                     </div>
                 </div>
             </div>
