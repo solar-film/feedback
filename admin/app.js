@@ -1924,15 +1924,47 @@ function initPresentation() {
         
         if (companyVal !== 'all' && c.company !== companyVal) return false;
 
-        const tsStr = c.feedback.timestamp;
+        const tsStr = String(c.feedback.timestamp || '');
         if (!tsStr) return false;
 
-        const p = tsStr.split(' ')[0].split('/');
-        if (p.length === 3) {
-            const d = parseInt(p[0], 10);
-            const m = parseInt(p[1], 10);
-            const y = parseInt(p[2], 10);
-            const rowDateObj = new Date(y, m - 1, d);
+        let rowDateObj = null;
+        let m = null, y = null;
+
+        if (tsStr.includes('T')) {
+            rowDateObj = new Date(tsStr);
+            if (!isNaN(rowDateObj.getTime())) {
+                m = rowDateObj.getMonth() + 1;
+                y = rowDateObj.getFullYear();
+            }
+        } else if (tsStr.includes('/')) {
+            const dtPart = tsStr.split(' ')[0];
+            const p = dtPart.split('/');
+            if (p.length === 3) {
+                const part0 = parseInt(p[0], 10);
+                const part1 = parseInt(p[1], 10);
+                const part2 = parseInt(p[2], 10);
+                if (part0 > 12) {
+                    rowDateObj = new Date(part2, part1 - 1, part0);
+                    m = part1; y = part2;
+                } else if (part1 > 12) {
+                    rowDateObj = new Date(part2, part0 - 1, part1);
+                    m = part0; y = part2;
+                } else {
+                    rowDateObj = new Date(part2, part1 - 1, part0);
+                    m = part1; y = part2;
+                }
+            }
+        } else if (tsStr.includes('-')) {
+            const dtPart = tsStr.split(' ')[0];
+            const p = dtPart.split('-');
+            if (p.length === 3) {
+                rowDateObj = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+                m = parseInt(p[1], 10);
+                y = parseInt(p[0], 10);
+            }
+        }
+
+        if (rowDateObj && m && y && !isNaN(rowDateObj.getTime())) {
             const rowMonthYear = `${m}-${y}`;
 
             if (monthVal !== 'all' && rowMonthYear !== monthVal) return false;
@@ -1947,8 +1979,12 @@ function initPresentation() {
                 eDate.setHours(23,59,59,999);
                 if (rowDateObj > eDate) return false;
             }
+            return true;
         }
         
+        if (monthVal !== 'all' || startVal || endVal) {
+            return false;
+        }
         return true;
     });
 
