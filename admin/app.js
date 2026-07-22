@@ -186,6 +186,34 @@ function switchTab(tabId) {
         document.getElementById('sidebar').classList.remove('open');
     }
 
+    // Set default month filter based on tab (Only on first visit)
+    state.tabVisited = state.tabVisited || {};
+    const monthSelect = document.getElementById('global-filter-month');
+    if (monthSelect && !state.tabVisited[tabId]) {
+        if (tabId === 'database' || tabId === 'kanban') {
+            const currentM = new Date().getMonth() + 1;
+            const currentY = new Date().getFullYear();
+            const currentMonthKey = `${currentM}-${currentY}`;
+            
+            let hasCurrent = Array.from(monthSelect.options).some(o => o.value === currentMonthKey);
+            if (!hasCurrent) {
+                const opt = document.createElement('option');
+                opt.value = currentMonthKey;
+                const monthNames = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+                opt.textContent = `${monthNames[currentM]} ${currentY}`;
+                monthSelect.appendChild(opt);
+            }
+            monthSelect.value = currentMonthKey;
+        } else {
+            monthSelect.value = 'all';
+        }
+        state.tabVisited[tabId] = true;
+        
+        if (state.allCustomers && state.allCustomers.length > 0) {
+            applyGlobalFilter();
+        }
+    }
+
     // Refresh charts if dashboard or reports are activated
     if (tabId === 'dashboard') {
         setTimeout(renderDashboardCharts, 100);
@@ -450,14 +478,25 @@ function updateDataAndRender(customersData) {
     customersData.sort((a, b) => {
         const getTs = (d) => {
             if (!d || d === '-') return 0;
-            const parts = d.split('/');
+            const datePart = d.split(' ')[0];
+            const parts = datePart.split('/');
             if (parts.length === 3) {
-                // parts = [DD, MM, YYYY]
-                return new Date(parts[2], parts[1]-1, parts[0]).getTime();
+                let part0 = parseInt(parts[0], 10);
+                let part1 = parseInt(parts[1], 10);
+                let part2 = parseInt(parts[2], 10);
+                if (part0 > 12) return new Date(part2, part1-1, part0).getTime();
+                if (part1 > 12) return new Date(part2, part0-1, part1).getTime();
+                return new Date(part2, part1-1, part0).getTime();
+            }
+            if (datePart.includes('-')) {
+                const parts2 = datePart.split('-');
+                if (parts2.length === 3) {
+                    return new Date(parts2[0], parts2[1]-1, parts2[2]).getTime();
+                }
             }
             return 0;
         };
-        return getTs(b.installDate) - getTs(a.installDate);
+        return getTs(b.filterDate) - getTs(a.filterDate);
     });
 
     state.allCustomers = customersData;
@@ -1858,11 +1897,16 @@ function populateFilters(init) {
             const currentY = new Date().getFullYear();
             const currentMonthKey = `${currentM}-${currentY}`;
             
-            if (Array.from(monthSelect.options).some(o => o.value === currentMonthKey)) {
-                monthSelect.value = currentMonthKey;
-            } else if (sortedMonths.length > 0) {
-                monthSelect.value = sortedMonths[0].val; // Default to newest month
+            // Just ensure current month is an option
+            let hasCurrent = Array.from(monthSelect.options).some(o => o.value === currentMonthKey);
+            if (!hasCurrent) {
+                const opt = document.createElement('option');
+                opt.value = currentMonthKey;
+                const monthNames = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+                opt.textContent = `${monthNames[currentM]} ${currentY}`;
+                monthSelect.appendChild(opt);
             }
+            // We do not override monthSelect.value here because switchTab handles the default per tab
         } else if (currentMonthVal) {
             if (currentMonthVal.indexOf('-') === -1 && currentMonthVal !== 'all') {
                 const currentYear = new Date().getFullYear();

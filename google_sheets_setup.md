@@ -372,7 +372,7 @@ function handleGetAllCustomersDetailed() {
       feedback: feedback,
       giftData: giftData,
       addressFromData: addressFromData,
-      filterDate: r["_col_25"] || ""
+      filterDate: r["_col_26"] || ""
     };
   });
   
