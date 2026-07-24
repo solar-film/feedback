@@ -848,7 +848,7 @@ function copySurveyLink(id, btn) {
     const companyName = (c && c.company === 'MHL') ? 'Maholan film' : 'Goodfilm';
     const custName = (c && c.name) ? c.name : 'คุณลูกค้า';
     const baseUrl = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(id)}`;
-    const surveyMessage = `สวัสดีค่ะ ${custName} ✨\nวันนี้ ${companyName} มีกิจกรรมสนุกๆ มาชวนคุณร่วมสนุกแบบไม่กี่วินาทีค่ะ\n\nมาร่วมไขความลับเพื่อรับบริการที่ฟินกว่าเดิม พร้อมสุ่มรับ 🎁 'ของรางวัลปริศนา' ที่ทีมงานตั้งใจเตรียมไว้ให้คุณโดยเฉพาะ!\n\nจิ้มเปิดกล่องสุ่มตรงนี้ได้เลยค่ะ 👇\n${baseUrl}\n\nขอบคุณที่ให้เราดูแลนะคะ 💙`;
+    const surveyMessage = `สวัสดีค่ะ  ✨\nวันนี้ ${companyName} มีกิจกรรมสนุกๆ มาชวนคุณร่วมสนุกแบบไม่กี่วินาทีค่ะ\n\nมาร่วมไขความลับเพื่อรับบริการที่ฟินกว่าเดิม พร้อมสุ่มรับ 🎁 'ของรางวัลปริศนา' ที่ทีมงานตั้งใจเตรียมไว้ให้คุณโดยเฉพาะ!\n\nจิ้มเปิดกล่องสุ่มตรงนี้ได้เลยค่ะ 👇\n${baseUrl}\n\nขอบคุณที่ให้เราดูแลนะคะ 💙`;
     const copyPromise = copyTextRobust(surveyMessage);
 
     copyPromise.then(() => {
@@ -952,7 +952,7 @@ function openCustomerDrawer(id) {
     const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
     const brandName = c.company === 'MHL' ? 'Maholan film' : 'Goodfilm';
     const custName = c.name ? c.name : 'คุณลูกค้า';
-    const surveyMessage = `สวัสดีค่ะ ${custName} ✨\nวันนี้ ${brandName} มีกิจกรรมสนุกๆ มาชวนคุณร่วมสนุกแบบไม่กี่วินาทีค่ะ\n\nมาร่วมไขความลับเพื่อรับบริการที่ฟินกว่าเดิม พร้อมสุ่มรับ 🎁 'ของรางวัลปริศนา' ที่ทีมงานตั้งใจเตรียมไว้ให้คุณโดยเฉพาะ!\n\nจิ้มเปิดกล่องสุ่มตรงนี้ได้เลยค่ะ 👇\n${surveyLink}\n\nขอบคุณที่ให้เราดูแลนะคะ 💙`;
+    const surveyMessage = `สวัสดีค่ะ ✨\nวันนี้ ${brandName} มีกิจกรรมสนุกๆ มาชวนคุณร่วมสนุกแบบไม่กี่วินาทีค่ะ\n\nมาร่วมไขความลับเพื่อรับบริการที่ฟินกว่าเดิม พร้อมสุ่มรับ 🎁 'ของรางวัลปริศนา' ที่ทีมงานตั้งใจเตรียมไว้ให้คุณโดยเฉพาะ!\n\nจิ้มเปิดกล่องสุ่มตรงนี้ได้เลยค่ะ 👇\n${surveyLink}\n\nขอบคุณที่ให้เราดูแลนะคะ 💙`;
     
     document.getElementById('drawer-btn-line').onclick = () => {
         window.open(`https://line.me/R/msg/text/?${encodeURIComponent(surveyMessage)}`, '_blank');
