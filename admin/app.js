@@ -2224,11 +2224,11 @@ function renderPresentationSlide() {
             ${(showMvp) ? `
             <div class="pp-mvp-banner" style="background-image: url('../images/mvp.png'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: none; padding: 140px 40px 60px 28%; min-height: 350px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin-top: 24px;">
                 <div class="pp-banner-content">
-                    <div class="pp-mvp-title" style="margin-top: 15px; margin-left: -30px;">
+                    <div class="pp-mvp-title" style="margin-top: 15px; margin-left: -70px;">
                         ขอมอบมงให้แก่... <span class="pp-mvp-highlight">${mvpText} 🎉</span>
                     </div>
                     ${customerComment ? `
-                    <div class="pp-quote-subtext" style="color: #475569; font-size: 1rem;">ข้อความฝากถึงทีมงาน</div>
+                    <div class="pp-quote-subtext" style="color: #475569; font-size: 0.85rem;">ข้อความฝากถึงทีมงาน</div>
                     <div class="pp-quote-text" style="justify-content: center; text-align: center;">
                         <span class="pp-quote-mark">“</span>
                         ${customerComment}
