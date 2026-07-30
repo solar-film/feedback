@@ -2222,17 +2222,17 @@ function renderPresentationSlide() {
 
             <!-- MVP Banner -->
             ${(showMvp) ? `
-            <div class="pp-mvp-banner" style="background-image: url('../images/mvp.png'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: none; padding: 130px 40px 60px 29%; min-height: 350px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin-top: 24px; display: flex; align-items: center; justify-content: center;">
+            <div class="pp-mvp-banner" style="background-image: url('../images/mvp.png'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: none; padding: 130px 40px 60px 29%; height: 400px; box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin-top: 24px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                 <div class="pp-banner-content" style="width: 100%; max-width: 800px; display: flex; flex-direction: column; align-items: center; transform: translateX(-15px);">
-                    <div class="pp-mvp-title" style="margin-top: 0; text-align: center;">
+                    <div class="pp-mvp-title" style="margin-top: -15px; text-align: center;">
                         ขอมอบมงให้แก่... <span class="pp-mvp-highlight">${mvpText} 🎉</span>
                     </div>
                     ${customerComment ? `
-                    <div style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 20px 50px; margin-top: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid rgba(255,255,255,0.8); position: relative; width: 90%; text-align: center;">
+                    <div style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 16px 50px; margin-top: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid rgba(255,255,255,0.8); position: relative; width: 90%; text-align: center;">
                         <div style="position: absolute; left: 15px; top: 50%; transform: translateY(-30%); font-size: 4rem; color: #7cb3ff; font-family: Georgia, serif; line-height: 0;">“</div>
                         <div style="position: absolute; right: 15px; top: 50%; transform: translateY(-10%); font-size: 4rem; color: #7cb3ff; font-family: Georgia, serif; line-height: 0;">”</div>
-                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px; font-weight: 500;">ข้อความฝากถึงทีมงาน</div>
-                        <div style="font-size: 1.4rem; font-weight: 700; color: #1e3a8a; line-height: 1.6; position: relative; z-index: 1;">
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px; font-weight: 500;">ข้อความฝากถึงทีมงาน</div>
+                        <div style="font-size: 1.3rem; font-weight: 700; color: #1e3a8a; line-height: 1.5; position: relative; z-index: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; max-height: 4.5em;">
                             ${customerComment}
                         </div>
                     </div>
