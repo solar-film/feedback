@@ -278,7 +278,7 @@ function handleGetAllCustomersDetailed() {
   var giftDict = {};
   if (giftRows) {
     for (var i = 0; i < giftRows.length; i++) {
-      var gId = giftRows[i]["ID"] || "";
+      var gId = giftRows[i]["ID"] ? giftRows[i]["ID"].toString().trim() : "";
       if (gId) {
         giftDict[gId] = {
           status: giftRows[i]["Status"] || "",
@@ -300,7 +300,7 @@ function handleGetAllCustomersDetailed() {
   var statusLogDict = {};
   if (logRows) {
     for (var i = 0; i < logRows.length; i++) {
-      var lId = logRows[i]["ID"] || "";
+      var lId = logRows[i]["ID"] ? logRows[i]["ID"].toString().trim() : "";
       if (lId) {
         statusLogDict[lId] = logRows[i]["Status"] || "Unsent";
       }
@@ -312,7 +312,7 @@ function handleGetAllCustomersDetailed() {
   if (fbRows) {
     for (var i = 0; i < fbRows.length; i++) {
       var f = fbRows[i];
-      var fId = f["ID"] || "";
+      var fId = f["ID"] ? f["ID"].toString().trim() : "";
       if (fId) {
         feedbackDict[fId] = {
           timestamp: f["Timestamp"] || "",
