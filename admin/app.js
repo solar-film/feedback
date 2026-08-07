@@ -2312,8 +2312,12 @@ function renderGiftTable() {
     const tbody = document.getElementById('gifts-table-body');
     if (!tbody) return;
     
-    // Filter customers who have googleReviewClicked === 'Yes'
-    const giftCustomers = state.customers.filter(c => c.feedback && c.feedback.googleReviewClicked === 'Yes');
+    // Filter customers who have googleReviewClicked === 'Yes' (robust check)
+    const giftCustomers = state.customers.filter(c => {
+        if (!c.feedback || !c.feedback.googleReviewClicked) return false;
+        const clicked = c.feedback.googleReviewClicked.toString().trim().toUpperCase();
+        return clicked === 'YES' || clicked === 'TRUE' || clicked === 'Y';
+    });
     
     if (giftCustomers.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:30px;">ไม่มีข้อมูลลูกค้าที่กดรีวิว Google Maps</td></tr>';
