@@ -345,7 +345,8 @@ function handleGetAllCustomersDetailed() {
   }
   
   var result = dataRows.map(function(r) {
-    var id = r["ID"] || r["รหัสลูกค้า"] || r["รหัส ID"] || "";
+    var idRaw = r["ID"] || r["รหัสลูกค้า"] || r["รหัส ID"] || "";
+    var id = idRaw ? idRaw.toString().trim() : "";
     var feedback = feedbackDict[id] || null;
     var sentStatus = statusLogDict[id] || "Unsent";
     var status = feedback ? "Completed" : sentStatus;
