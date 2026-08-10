@@ -444,31 +444,31 @@ function forceRefreshData() {
         });
 }
 
+function getCustomerTargetDate(c) {
+    if (c.feedback && c.feedback.timestamp) {
+        const d = new Date(c.feedback.timestamp);
+        if (!isNaN(d.getTime())) return d;
+    }
+    const installD = c.filterDate || c.installDate;
+    if (installD && installD !== '-') {
+        return parseDateObj(installD);
+    }
+    return new Date(0);
+}
+
+function getCustomerInstallDate(c) {
+    const installD = c.filterDate || c.installDate;
+    if (installD && installD !== '-') {
+        return parseDateObj(installD);
+    }
+    return new Date(0);
+}
+
 // DATA PROCESSING AND RENDERING
 function updateDataAndRender(customersData) {
-    // Sort customers by date descending (latest first)
+    // Sort customers by install date descending (latest first)
     customersData.sort((a, b) => {
-        const getTs = (d) => {
-            if (!d || d === '-') return 0;
-            const datePart = d.split(' ')[0];
-            const parts = datePart.split('/');
-            if (parts.length === 3) {
-                let part0 = parseInt(parts[0], 10);
-                let part1 = parseInt(parts[1], 10);
-                let part2 = parseInt(parts[2], 10);
-                if (part0 > 12) return new Date(part2, part1-1, part0).getTime();
-                if (part1 > 12) return new Date(part2, part0-1, part1).getTime();
-                return new Date(part2, part1-1, part0).getTime();
-            }
-            if (datePart.includes('-')) {
-                const parts2 = datePart.split('-');
-                if (parts2.length === 3) {
-                    return new Date(parts2[0], parts2[1]-1, parts2[2]).getTime();
-                }
-            }
-            return 0;
-        };
-        return getTs(b.filterDate) - getTs(a.filterDate);
+        return getCustomerInstallDate(b) - getCustomerInstallDate(a);
     });
 
     state.allCustomers = customersData;
@@ -488,18 +488,11 @@ function applyGlobalFilter() {
     const endVal = document.getElementById('global-filter-end')?.value;
 
     state.customers = state.allCustomers.filter(c => {
+        const targetDate = getCustomerTargetDate(c);
         let m = '', y = '';
-        if (c.filterDate && c.filterDate !== '-') {
-            const dateStr = c.filterDate;
-            if (dateStr.indexOf('-') > -1) {
-                const p = dateStr.split('-');
-                m = parseInt(p[1], 10);
-                y = p[0].length === 2 ? "20" + p[0] : p[0];
-            } else if (dateStr.indexOf('/') > -1) {
-                const p = dateStr.split('/');
-                m = parseInt(p[1], 10);
-                y = p[2].length === 2 ? "20" + p[2] : p[2];
-            }
+        if (targetDate.getTime() !== 0) {
+            m = targetDate.getMonth() + 1;
+            y = targetDate.getFullYear();
         }
         const rowMonthYear = (m && y) ? `${m}-${y}` : '';
 
@@ -511,28 +504,16 @@ function applyGlobalFilter() {
 
         // Date Range check
         let matchesDateRange = true;
-        if (c.filterDate && c.filterDate !== '-') {
-            const dateStr = c.filterDate;
-            let rowDateObj = null;
-            if (dateStr.indexOf('-') > -1) {
-                const p = dateStr.split('-');
-                rowDateObj = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
-            } else if (dateStr.indexOf('/') > -1) {
-                const p = dateStr.split('/');
-                rowDateObj = new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
+        if (targetDate.getTime() !== 0) {
+            if (startVal) {
+                const sDate = new Date(startVal);
+                sDate.setHours(0,0,0,0);
+                if (targetDate < sDate) matchesDateRange = false;
             }
-
-            if (rowDateObj) {
-                if (startVal) {
-                    const sDate = new Date(startVal);
-                    sDate.setHours(0,0,0,0);
-                    if (rowDateObj < sDate) matchesDateRange = false;
-                }
-                if (endVal) {
-                    const eDate = new Date(endVal);
-                    eDate.setHours(23,59,59,999);
-                    if (rowDateObj > eDate) matchesDateRange = false;
-                }
+            if (endVal) {
+                const eDate = new Date(endVal);
+                eDate.setHours(23,59,59,999);
+                if (targetDate > eDate) matchesDateRange = false;
             }
         }
 
@@ -607,9 +588,7 @@ function renderCustomerTable() {
 
     // Sort customers by date descending (latest date on top)
     const sortedCustomers = [...state.customers].sort((a, b) => {
-        const dateA = parseDateObj(a.installDate);
-        const dateB = parseDateObj(b.installDate);
-        return dateB - dateA;
+        return getCustomerInstallDate(b) - getCustomerInstallDate(a);
     });
 
     sortedCustomers.forEach((c, index) => {
@@ -724,57 +703,88 @@ function renderKanbanBoard() {
 
     let counts = { 'Unsent': 0, 'Sent': 0, 'Completed': 0, 'Action Required': 0 };
 
+    // Group customers by status
+    const groups = {
+        'Unsent': [],
+        'Sent': [],
+        'Completed': [],
+        'Action Required': []
+    };
+
     state.customers.forEach(c => {
         const laneKey = c.status || 'Unsent';
-        if (!lanes[laneKey]) return;
+        if (groups[laneKey]) {
+            groups[laneKey].push(c);
+        }
+    });
 
-        const card = document.createElement('div');
-        card.className = 'kanban-card';
-        card.setAttribute('draggable', 'true');
-        card.setAttribute('ondragstart', `dragStart(event, '${c.id}')`);
-        card.setAttribute('onclick', `openCustomerDrawer('${c.id}')`);
+    // Sort each group
+    // 1. Unsent & Sent: Sort by installation date descending (newest first)
+    groups['Unsent'].sort((a, b) => getCustomerInstallDate(b) - getCustomerInstallDate(a));
+    groups['Sent'].sort((a, b) => getCustomerInstallDate(b) - getCustomerInstallDate(a));
 
+    // 2. Completed & Action Required: Sort by evaluation date (feedback.timestamp) descending (newest first)
+    const sortByFeedbackTime = (a, b) => {
+        const timeA = a.feedback && a.feedback.timestamp ? new Date(a.feedback.timestamp).getTime() : 0;
+        const timeB = b.feedback && b.feedback.timestamp ? new Date(b.feedback.timestamp).getTime() : 0;
+        return timeB - timeA;
+    };
+    groups['Completed'].sort(sortByFeedbackTime);
+    groups['Action Required'].sort(sortByFeedbackTime);
 
+    // Render cards for each lane
+    Object.keys(groups).forEach(laneKey => {
+        const customersList = groups[laneKey];
+        const container = lanes[laneKey];
+        if (!container) return;
 
-        let footerHtml = '';
-        if (c.feedback) {
-            const overall = c.feedback.overallMood || '😐';
-            const avg = (((c.feedback.ratings.admin || 0) + (c.feedback.ratings.sales || 0) + (c.feedback.ratings.tech || 0)) / 3).toFixed(1);
-            footerHtml = `
-                <div class="kanban-card-footer" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; gap:8px; align-items:center;">
-                        <span style="font-size: 1.2rem;">${overall}</span>
-                        <span class="kanban-card-rating">
-                            <i data-lucide="star" style="width:12px; height:12px; fill:var(--accent); color:var(--accent);"></i>
-                            <span>${avg} / 5</span>
-                        </span>
+        customersList.forEach(c => {
+            const card = document.createElement('div');
+            card.className = 'kanban-card';
+            card.setAttribute('draggable', 'true');
+            card.setAttribute('ondragstart', `dragStart(event, '${c.id}')`);
+            card.setAttribute('onclick', `openCustomerDrawer('${c.id}')`);
+
+            let footerHtml = '';
+            if (c.feedback) {
+                const overall = c.feedback.overallMood || '😐';
+                const avg = (((c.feedback.ratings.admin || 0) + (c.feedback.ratings.sales || 0) + (c.feedback.ratings.tech || 0)) / 3).toFixed(1);
+                footerHtml = `
+                    <div class="kanban-card-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <span style="font-size: 1.2rem;">${overall}</span>
+                            <span class="kanban-card-rating">
+                                <i data-lucide="star" style="width:12px; height:12px; fill:var(--accent); color:var(--accent);"></i>
+                                <span>${avg} / 5</span>
+                            </span>
+                        </div>
                     </div>
-                </div>
+                `;
+            } else {
+                footerHtml = `
+                    <div class="kanban-card-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size: 0.65rem; color: var(--text-muted);">รอดำเนินการ</span>
+                    </div>
+                `;
+            }
+
+            let reviewBadge = '';
+            if (c.feedback && c.feedback.googleReviewClicked && ['TRUE', 'YES', 'Y'].includes(c.feedback.googleReviewClicked.toString().toUpperCase())) {
+                reviewBadge = `<div style="position: absolute; top: 12px; right: 12px;" title="ลูกค้าคลิกให้รีวิว Google แล้ว"><i data-lucide="star" style="width:16px; height:16px; color:#fbbf24; fill:#fbbf24;"></i></div>`;
+            }
+
+            card.innerHTML = `
+                ${reviewBadge}
+                <div class="kanban-card-title" style="padding-right: 20px;">${c.name} <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: normal; margin-left: 4px;">#${c.id}</span></div>
+                <div class="kanban-card-meta">📞 ${c.phone} | LINE: ${c.lineAt || '-'}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">📅 ติดตั้ง: ${c.installDate || '-'}</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px;">👤 ฝ่ายขาย: ${c.sales || '-'} | 🔧 ช่าง: ${c.tech || '-'}</div>
+                ${footerHtml}
             `;
-        } else {
-            footerHtml = `
-                <div class="kanban-card-footer" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size: 0.65rem; color: var(--text-muted);">รอดำเนินการ</span>
-                </div>
-            `;
-        }
 
-        let reviewBadge = '';
-        if (c.feedback && c.feedback.googleReviewClicked && ['TRUE', 'YES', 'Y'].includes(c.feedback.googleReviewClicked.toString().toUpperCase())) {
-            reviewBadge = `<div style="position: absolute; top: 12px; right: 12px;" title="ลูกค้าคลิกให้รีวิว Google แล้ว"><i data-lucide="star" style="width:16px; height:16px; color:#fbbf24; fill:#fbbf24;"></i></div>`;
-        }
-
-        card.innerHTML = `
-            ${reviewBadge}
-            <div class="kanban-card-title" style="padding-right: 20px;">${c.name} <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: normal; margin-left: 4px;">#${c.id}</span></div>
-            <div class="kanban-card-meta">📞 ${c.phone} | LINE: ${c.lineAt || '-'}</div>
-            <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">📅 ติดตั้ง: ${c.installDate || '-'}</div>
-            <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px;">👤 ฝ่ายขาย: ${c.sales || '-'} | 🔧 ช่าง: ${c.tech || '-'}</div>
-            ${footerHtml}
-        `;
-
-        lanes[laneKey].appendChild(card);
-        counts[laneKey]++;
+            container.appendChild(card);
+            counts[laneKey]++;
+        });
     });
 
     // Update counts
@@ -1833,19 +1843,11 @@ function populateFilters(init) {
     state.allCustomers.forEach(c => {
         if (c.company && c.company !== '-') uniqueCompanies.add(c.company);
 
-        if (!c.filterDate || c.filterDate === '-') return;
-        let m = '', y = '';
-        const dateStr = c.filterDate;
-        if (dateStr.indexOf('-') > -1) {
-            const p = dateStr.split('-');
-            m = parseInt(p[1], 10);
-            y = p[0].length === 2 ? "20" + p[0] : p[0];
-        } else if (dateStr.indexOf('/') > -1) {
-            const p = dateStr.split('/');
-            m = parseInt(p[1], 10);
-            y = p[2].length === 2 ? "20" + p[2] : p[2];
-        }
-        if (m && y) uniqueMonths.add(`${m}-${y}`);
+        const targetDate = getCustomerTargetDate(c);
+        if (targetDate.getTime() === 0) return;
+        const m = targetDate.getMonth() + 1;
+        const y = targetDate.getFullYear();
+        uniqueMonths.add(`${m}-${y}`);
     });
 
     // Populate Months
