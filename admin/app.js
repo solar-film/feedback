@@ -605,7 +605,7 @@ function renderCustomerTable() {
         // Dynamic LINE Message
         const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
         const companyName = c.company === 'MHL' ? 'MHL' : 'Goodfilm';
-        const lineMessage = `สวัสดีครับคุณ${c.name} ${companyName} รบกวนเวลาสั้น ๆ 2 นาที ร่วมทำภารกิจประเมินความพึงพอใจการติดตั้งฟิล์ม ผ่านลิงก์นี้นะครับ: ${surveyLink} ขอบคุณมากครับ 💙`;
+        const lineMessage = `สวัสดีค่ะคุณลูกค้า ✨\n\n${companyName} อยากฟังความเห็นของคุณลูกค้าเพื่อนำไปปรับปรุงบริการให้ดียิ่งขึ้น\nตอบแบบสอบถามสั้นๆ พร้อมรับของตอบแทนจากทางร้าน จัดส่งให้ถึงบ้าน🎁\n\nคลิกตอบแบบสอบถาม (ใช้เวลา 30 วินาที): ${surveyLink}\nขอบคุณมากค่ะ 💙`;
         const lineDeepLink = `https://line.me/R/msg/text/?${encodeURIComponent(lineMessage)}`;
 
         tr.innerHTML = `
@@ -858,7 +858,7 @@ function copySurveyLink(id, btn) {
     const companyName = (c && c.company === 'MHL') ? 'Maholan film' : 'Goodfilm';
     const custName = (c && c.name) ? c.name : 'คุณลูกค้า';
     const baseUrl = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(id)}`;
-    const surveyMessage = `สวัสดีค่ะ  ✨\nวันนี้ ${companyName} มีกิจกรรมสนุกๆ มาชวนคุณร่วมสนุกแบบไม่กี่วินาทีค่ะ\n\nมาร่วมไขความลับเพื่อรับบริการที่ฟินกว่าเดิม พร้อมสุ่มรับ 🎁 'ของรางวัลปริศนา' ที่ทีมงานตั้งใจเตรียมไว้ให้คุณโดยเฉพาะ!\n\nจิ้มเปิดกล่องสุ่มตรงนี้ได้เลยค่ะ 👇\n${baseUrl}\n\nขอบคุณที่ให้เราดูแลนะคะ 💙`;
+    const surveyMessage = `สวัสดีค่ะคุณลูกค้า ✨\n\n${companyName} อยากฟังความเห็นของคุณลูกค้าเพื่อนำไปปรับปรุงบริการให้ดียิ่งขึ้น\nตอบแบบสอบถามสั้นๆ พร้อมรับของตอบแทนจากทางร้าน จัดส่งให้ถึงบ้าน🎁\n\nคลิกตอบแบบสอบถาม (ใช้เวลา 30 วินาที): ${baseUrl}\nขอบคุณมากค่ะ 💙`;
     const copyPromise = copyTextRobust(surveyMessage);
 
     copyPromise.then(() => {
@@ -962,7 +962,7 @@ function openCustomerDrawer(id) {
     const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
     const brandName = c.company === 'MHL' ? 'Maholan film' : 'Goodfilm';
     const custName = c.name ? c.name : 'คุณลูกค้า';
-    const surveyMessage = `สวัสดีค่ะ ✨\nวันนี้ ${brandName} มีกิจกรรมสนุกๆ มาชวนคุณร่วมสนุกแบบไม่กี่วินาทีค่ะ\n\nมาร่วมไขความลับเพื่อรับบริการที่ฟินกว่าเดิม พร้อมสุ่มรับ 🎁 'ของรางวัลปริศนา' ที่ทีมงานตั้งใจเตรียมไว้ให้คุณโดยเฉพาะ!\n\nจิ้มเปิดกล่องสุ่มตรงนี้ได้เลยค่ะ 👇\n${surveyLink}\n\nขอบคุณที่ให้เราดูแลนะคะ 💙`;
+    const surveyMessage = `สวัสดีค่ะคุณลูกค้า ✨\n\n${brandName} อยากฟังความเห็นของคุณลูกค้าเพื่อนำไปปรับปรุงบริการให้ดียิ่งขึ้น\nตอบแบบสอบถามสั้นๆ พร้อมรับของตอบแทนจากทางร้าน จัดส่งให้ถึงบ้าน🎁\n\nคลิกตอบแบบสอบถาม (ใช้เวลา 30 วินาที): ${surveyLink}\nขอบคุณมากค่ะ 💙`;
     
     document.getElementById('drawer-btn-line').onclick = () => {
         window.open(`https://line.me/R/msg/text/?${encodeURIComponent(surveyMessage)}`, '_blank');
