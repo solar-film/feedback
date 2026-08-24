@@ -3,7 +3,8 @@
 // Global state variables
 const state = {
     currentTab: 'dashboard',
-    googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbxcFOZ3VdBW0MkqtPTtkCvJNsWXS3cUCYM_U6BDFDSvxta2RZwTmymobnQPpDYoyIDjLQ/exec',
+    googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbx6KYO_vGxUN11eZO7u-QU7OFcZr_VMfAodv2mvj2YXlSdGSV83J6IDYwp4nYH5DHhYyA/exec',
+    presentationOverridesEnabled: false,
     allCustomers: [],
     customers: [],
     charts: {
@@ -216,9 +217,10 @@ function loadData() {
     const cachedUrl = localStorage.getItem('google_sheets_apps_script_url');
     if (cachedUrl === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec' ||
         cachedUrl === 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec' ||
-        cachedUrl === 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec') {
+        cachedUrl === 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec' ||
+        cachedUrl === 'https://script.google.com/macros/s/AKfycbxcFOZ3VdBW0MkqtPTtkCvJNsWXS3cUCYM_U6BDFDSvxta2RZwTmymobnQPpDYoyIDjLQ/exec') {
         localStorage.removeItem('google_sheets_apps_script_url');
-        state.googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbxcFOZ3VdBW0MkqtPTtkCvJNsWXS3cUCYM_U6BDFDSvxta2RZwTmymobnQPpDYoyIDjLQ/exec';
+        state.googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbx6KYO_vGxUN11eZO7u-QU7OFcZr_VMfAodv2mvj2YXlSdGSV83J6IDYwp4nYH5DHhYyA/exec';
     }
 
     if (!state.googleSheetsUrl || state.googleSheetsUrl.trim() === '') {
@@ -256,6 +258,7 @@ function loadData() {
         })
         .then(data => {
             if (data.status === 'success' && data.data) {
+                state.presentationOverridesEnabled = data.presentationOverridesEnabled === true;
                 // Parse returned joined rows
                 const freshCustomers = data.data.map(item => {
                     let status = item.status || 'Unsent';
@@ -291,6 +294,7 @@ function loadData() {
                         sales: item.sales || '-',
                         tech: item.tech || '-',
                         adminName: item.adminName || '-',
+                        presentationOverrides: item.presentationOverrides || null,
                         jobType: item.jobType || '-',
                         bill: item.bill || '-',
                         status: status,
@@ -374,6 +378,7 @@ function forceRefreshData() {
         })
         .then(data => {
             if (data.status === 'success' && data.data) {
+                state.presentationOverridesEnabled = data.presentationOverridesEnabled === true;
                 const freshCustomers = data.data.map(item => {
                     let status = item.status || 'Unsent';
                     
@@ -408,6 +413,7 @@ function forceRefreshData() {
                         sales: item.sales || '-',
                         tech: item.tech || '-',
                         adminName: item._col_17 || item.adminName || '-',
+                        presentationOverrides: item.presentationOverrides || null,
                         bill: item.bill || '-',
                         status: status,
                         feedback: item.feedback || null,
@@ -1930,6 +1936,125 @@ function formatInstallDate(dateStr) {
 let presentationSlides = [];
 let currentSlideIndex = 0;
 
+function getSourcePresentationTeamName(customer, team) {
+    if (team === 'admin') {
+        return (customer.adminName && customer.adminName !== '-')
+            ? customer.adminName
+            : ((customer.sales && customer.sales !== '-') ? customer.sales : '-');
+    }
+    return customer[team] || '-';
+}
+
+function getPresentationTeamName(customer, team) {
+    const override = customer.presentationOverrides && customer.presentationOverrides[team];
+    return (typeof override === 'string' && override.trim())
+        ? override.trim()
+        : getSourcePresentationTeamName(customer, team);
+}
+
+function escapePresentationHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function openPresentationOverrideModal(customerId) {
+    if (!state.presentationOverridesEnabled) {
+        showToast('กรุณาปรับใช้ Apps Script เวอร์ชันที่รองรับ Presentation Overrides ก่อนบันทึกชื่อทีม', 'warning');
+        return;
+    }
+
+    const customer = state.allCustomers.find(item => item.id === customerId);
+    if (!customer) return;
+
+    const overrides = customer.presentationOverrides || {};
+    const teams = ['admin', 'sales', 'tech'];
+    document.getElementById('presentation-override-customer-id').value = customer.id;
+    document.getElementById('presentation-override-customer-name').innerText = `${customer.name || '-'} (#${customer.id})`;
+
+    teams.forEach(team => {
+        const input = document.getElementById(`presentation-override-${team}`);
+        const source = document.getElementById(`presentation-source-${team}`);
+        input.value = overrides[team] || '';
+        input.placeholder = getSourcePresentationTeamName(customer, team);
+        source.innerText = `ข้อมูลต้นทาง: ${getSourcePresentationTeamName(customer, team)}`;
+    });
+
+    document.getElementById('presentation-overrides-modal').style.display = 'flex';
+    lucide.createIcons();
+}
+
+function closePresentationOverrideModal() {
+    document.getElementById('presentation-overrides-modal').style.display = 'none';
+}
+
+function useSourcePresentationNames() {
+    ['admin', 'sales', 'tech'].forEach(team => {
+        document.getElementById(`presentation-override-${team}`).value = '';
+    });
+}
+
+function normalisePresentationName(value) {
+    return String(value || '')
+        .split(',')
+        .map(name => name.trim())
+        .filter(Boolean)
+        .join(', ');
+}
+
+async function savePresentationOverrides(event) {
+    event.preventDefault();
+    if (!state.presentationOverridesEnabled) {
+        showToast('Apps Script ยังไม่รองรับการบันทึกชื่อทีมสำหรับโหมดนำเสนอ', 'warning');
+        return;
+    }
+
+    const id = document.getElementById('presentation-override-customer-id').value;
+    const customer = state.allCustomers.find(item => item.id === id);
+    if (!customer) return;
+
+    const overrides = {
+        admin: normalisePresentationName(document.getElementById('presentation-override-admin').value),
+        sales: normalisePresentationName(document.getElementById('presentation-override-sales').value),
+        tech: normalisePresentationName(document.getElementById('presentation-override-tech').value)
+    };
+    const saveButton = document.getElementById('save-presentation-overrides');
+    const originalLabel = saveButton.innerHTML;
+    saveButton.disabled = true;
+    saveButton.innerHTML = '<i data-lucide="loader-2" class="spin-icon"></i> กำลังบันทึก...';
+
+    try {
+        const response = await fetch(state.googleSheetsUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'savePresentationOverride',
+                password: localStorage.getItem('admin_password'),
+                id,
+                presentationOverrides: overrides
+            })
+        });
+        const result = await response.json();
+        if (result.status !== 'success') {
+            throw new Error(result.message || 'ไม่สามารถบันทึกข้อมูลได้');
+        }
+
+        customer.presentationOverrides = Object.values(overrides).some(Boolean) ? overrides : null;
+        closePresentationOverrideModal();
+        renderPresentationSlide();
+        showToast('บันทึกชื่อทีมสำหรับโหมดนำเสนอแล้ว', 'success');
+    } catch (error) {
+        console.error('Failed to save presentation overrides:', error);
+        showToast(`บันทึกชื่อทีมไม่สำเร็จ: ${error.message}`, 'error');
+    } finally {
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalLabel;
+        lucide.createIcons();
+    }
+}
+
 function initPresentation() {
     const monthVal = document.getElementById('global-filter-month')?.value || 'all';
     const companyVal = document.getElementById('global-filter-company')?.value || 'all';
@@ -2040,6 +2165,13 @@ function renderPresentationSlide() {
     if (fb.comments?.sales) additionalComments.push(`<b>ฝ่ายขาย:</b> ${fb.comments.sales}`);
     if (fb.comments?.tech) additionalComments.push(`<b>ทีมช่าง:</b> ${fb.comments.tech}`);
     if (fb.supportDetails) additionalComments.push(`<b style="color:var(--danger)">รายละเอียดเพิ่มเติม (ปรับปรุง):</b> ${fb.supportDetails}`);
+
+    const teamDisplayNames = {
+        admin: getPresentationTeamName(c, 'admin'),
+        sales: getPresentationTeamName(c, 'sales'),
+        tech: getPresentationTeamName(c, 'tech')
+    };
+    const companyLabel = /MHL|MAHOLAN/i.test(`${c.company || ''} ${c.id || ''}`) ? 'MHL' : 'GFS';
     
     
     
@@ -2054,12 +2186,12 @@ function renderPresentationSlide() {
                 if (mvpLower === 'all') {
                     mvpText = 'ทุกทีม';
                 } else if (mvpLower === 'admin') {
-                    const adminDisplayName = (c.adminName && c.adminName !== '-') ? c.adminName : (c.sales && c.sales !== '-' ? c.sales : '');
+                    const adminDisplayName = teamDisplayNames.admin !== '-' ? teamDisplayNames.admin : '';
                     mvpText = `แอดมิน${adminDisplayName ? ' (' + adminDisplayName + ')' : ''}`;
                 } else if (mvpLower === 'sale' || mvpLower === 'sales') {
-                    mvpText = `ฝ่ายขาย${c.sales ? ' (' + c.sales + ')' : ''}`;
+                    mvpText = `ฝ่ายขาย${teamDisplayNames.sales !== '-' ? ' (' + teamDisplayNames.sales + ')' : ''}`;
                 } else if (mvpLower === 'tech') {
-                    mvpText = `ทีมช่าง${c.tech ? ' (' + c.tech + ')' : ''}`;
+                    mvpText = `ทีมช่าง${teamDisplayNames.tech !== '-' ? ' (' + teamDisplayNames.tech + ')' : ''}`;
                 } else {
                     mvpText = mvpRaw;
                 }
@@ -2094,50 +2226,75 @@ function renderPresentationSlide() {
     const getScorePercent = (score) => score ? (score / 5 * 100) : 0;
 
     container.innerHTML = `
-        <!-- Custom Toolbar for Presentation -->
-        <div id="presentation-toolbar">
-            <div class="pp-toolbar-left">
-                <div class="pp-toolbar-icon">
-                    <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i>
-                </div>
-                <div class="pp-toolbar-title">ข้อมูลฟีดแบคจากลูกค้า (Customer Feedback)</div>
-            </div>
-            <div style="display: flex; gap: 16px; align-items: center;">
-                <span id="slide-counter-pp" style="font-size: 1rem; font-weight: 700; color: #1e293b;">${currentSlideIndex + 1} / ${presentationSlides.length}</span>
-                <button class="btn-secondary" onclick="toggleFullScreen()" title="ขยายเต็มหน้าจอ" style="padding: 6px; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid #e2e8f0;">
-                    <i data-lucide="maximize" style="width: 16px;"></i>
-                </button>
-            </div>
-        </div>
-
         <div class="slide-container-main">
-            <!-- Header Card -->
-            <div class="pp-card pp-header-card">
-                <div class="pp-cust-left">
-                    <div class="pp-avatar">
-                        <i data-lucide="user" style="width: 40px; height: 40px;" stroke-width="1.5"></i>
+            <div class="pp-header-row">
+                <!-- Header Card -->
+                <div class="pp-card pp-header-card">
+                    <div class="pp-cust-left">
+                        <div class="pp-avatar">
+                            <i data-lucide="user-round" stroke-width="1.5"></i>
+                        </div>
+                        <div class="pp-cust-info">
+                            <h3>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]}</h3>
+                            <div class="pp-customer-badges">
+                                <span class="pp-company-badge ${companyLabel.toLowerCase()}"><i data-lucide="building"></i>${companyLabel}</span>
+                                <span class="pp-customer-id"><i data-lucide="badge-check"></i>#${c.id || ''}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="pp-cust-info">
-                        <h3>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]} <span style="font-size: 1rem; color: #94a3b8; font-weight: 500; margin-left: 8px;">#${c.id || ''}</span></h3>
+                    <div class="pp-cust-details">
                         <div class="pp-meta-row">
-                            <i data-lucide="map-pin" class="pp-meta-icon"></i>
-                            <span>สถานที่: ${c.addressFromData || '-'}</span>
+                            <div class="pp-meta-icon">
+                                <i data-lucide="map-pin"></i>
+                            </div>
+                            <div class="pp-meta-content">
+                                <strong>สถานที่:</strong>
+                                <span>${c.addressFromData || '-'}</span>
+                            </div>
                         </div>
                         <div class="pp-meta-row">
-                            <i data-lucide="calendar" class="pp-meta-icon"></i>
-                            <span>วันที่ติดตั้ง: ${c.installDate}</span>
+                            <div class="pp-meta-icon">
+                                <i data-lucide="calendar-days"></i>
+                            </div>
+                            <div class="pp-meta-content">
+                                <strong>วันที่ติดตั้ง:</strong>
+                                <span>${c.installDate || '-'}</span>
+                            </div>
                         </div>
+                    </div>
+                    <div class="pp-score-right">
+                        <div class="pp-score-crown"><img src="../images/premium-score-crown.png" alt="" aria-hidden="true"></div>
+                        <div class="pp-circular-progress" style="--progress: ${avgScorePercent}%">
+                            <div class="pp-circular-inner">
+                                <span class="title">คะแนนรวม</span>
+                                <span class="score">${avgScoreStr}</span>
+                                <span class="max">/5</span>
+                            </div>
+                        </div>
+                        <div class="pp-emoji">${fb.overallMood || '😊'}</div>
                     </div>
                 </div>
-                <div class="pp-score-right">
-                    <div class="pp-circular-progress" style="--progress: ${avgScorePercent}%">
-                        <div class="pp-circular-inner">
-                            <span class="title">คะแนนรวม</span>
-                            <span class="score">${avgScoreStr}</span>
-                            <span class="max">/5</span>
+
+                <div class="pp-card pp-slide-navigation-card">
+                    <div class="pp-slide-tools">
+                        <button class="pp-mini-tool" type="button" data-customer-id="${escapePresentationHtml(c.id)}" onclick="openPresentationOverrideModal(this.dataset.customerId)" title="แก้ไขชื่อทีมที่แสดงในสไลด์" aria-label="แก้ไขชื่อทีมที่แสดงในสไลด์">
+                            <i data-lucide="pencil-line"></i>
+                        </button>
+                        <button class="pp-mini-tool" type="button" onclick="toggleFullScreen()" title="ขยายเต็มหน้าจอ" aria-label="ขยายเต็มหน้าจอ">
+                            <i data-lucide="maximize"></i>
+                        </button>
+                    </div>
+                    <div class="pp-slide-navigation-content">
+                        <span id="slide-counter-pp" class="pp-slide-counter">${currentSlideIndex + 1} / ${presentationSlides.length}</span>
+                        <div class="pp-nav-buttons">
+                            <button class="pp-btn pp-btn-prev" onclick="prevSlide()">
+                                <i data-lucide="chevron-left" style="width: 18px;"></i> ก่อนหน้า
+                            </button>
+                            <button class="pp-btn pp-btn-next" onclick="nextSlide()">
+                                ถัดไป <i data-lucide="chevron-right" style="width: 18px;"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="pp-emoji">${fb.overallMood || '😊'}</div>
                 </div>
             </div>
 
@@ -2150,7 +2307,7 @@ function renderPresentationSlide() {
                             <i data-lucide="headphones" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div class="pp-tc-info">
-                            <h4>แอดมิน (${(c.adminName && c.adminName !== '-') ? c.adminName : (c.sales && c.sales !== '-' ? c.sales : '-')})</h4>
+                            <h4><span class="pp-team-title">แอดมิน</span><span class="pp-team-member">: ${escapePresentationHtml(teamDisplayNames.admin || '-')}</span></h4>
                             <div class="pp-tc-score-row">
                                 <div class="pp-tc-score">${getScoreStr(fb.ratings?.admin)}<span> / 5</span></div>
                                 <div class="pp-progress-bar">
@@ -2176,7 +2333,7 @@ function renderPresentationSlide() {
                             <i data-lucide="briefcase" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div class="pp-tc-info">
-                            <h4>ฝ่ายขาย (${c.sales || '-'})</h4>
+                            <h4><span class="pp-team-title">ฝ่ายขาย</span><span class="pp-team-member">: ${escapePresentationHtml(teamDisplayNames.sales || '-')}</span></h4>
                             <div class="pp-tc-score-row">
                                 <div class="pp-tc-score">${getScoreStr(fb.ratings?.sales)}<span> / 5</span></div>
                                 <div class="pp-progress-bar">
@@ -2202,7 +2359,7 @@ function renderPresentationSlide() {
                             <i data-lucide="wrench" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div class="pp-tc-info">
-                            <h4>ทีมช่าง (${c.tech || '-'})</h4>
+                            <h4><span class="pp-team-title">ทีมช่าง</span><span class="pp-team-member">: ${escapePresentationHtml(teamDisplayNames.tech || '-')}</span></h4>
                             <div class="pp-tc-score-row">
                                 <div class="pp-tc-score">${getScoreStr(fb.ratings?.tech)}<span> / 5</span></div>
                                 <div class="pp-progress-bar">
@@ -2220,28 +2377,30 @@ function renderPresentationSlide() {
                     </div>
                     ` : ''}
                 </div>
-            </div>
 
-            <!-- MVP Banner -->
-            ${(showMvp) ? `
-            <div class="pp-mvp-banner" style="background-image: url('../images/mvp.png'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: none; padding: 130px 40px 60px 29%; height: 400px; box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin-top: 24px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                <div class="pp-banner-content" style="width: 100%; max-width: 800px; display: flex; flex-direction: column; align-items: center; transform: translateX(-15px);">
-                    <div class="pp-mvp-title" style="margin-top: -15px; text-align: center;">
-                        ขอมอบมงให้แก่... <span class="pp-mvp-highlight">${mvpText} 🎉</span>
-                    </div>
-                    ${customerComment ? `
-                    <div style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 16px 50px; margin-top: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid rgba(255,255,255,0.8); position: relative; width: 90%; text-align: center;">
-                        <div style="position: absolute; left: 15px; top: 50%; transform: translateY(-30%); font-size: 4rem; color: #7cb3ff; font-family: Georgia, serif; line-height: 0;">“</div>
-                        <div style="position: absolute; right: 15px; top: 50%; transform: translateY(-10%); font-size: 4rem; color: #7cb3ff; font-family: Georgia, serif; line-height: 0;">”</div>
-                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px; font-weight: 500;">ข้อความฝากถึงทีมงาน</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: #1e3a8a; line-height: 1.5; position: relative; z-index: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; max-height: 4.5em;">
-                            ${customerComment}
+                <!-- Favourite Team -->
+                <div class="pp-team-card mvp">
+                    <div class="pp-mvp-showcase">
+                        <div class="pp-mvp-medallion">
+                            <img src="../images/mvp-award-emblem.png" alt="ตราทีมที่ประทับใจ">
                         </div>
+                        <h4>ทีมที่ประทับใจ</h4>
+                        <div class="pp-mvp-rule"><span>★</span></div>
+                        ${showMvp ? `
+                        <div class="pp-mvp-team-name">${escapePresentationHtml(mvpText)} 🎉</div>
+                        ` : `
+                        <div class="pp-mvp-team-empty">ยังไม่มีข้อมูล</div>
+                        `}
+                    </div>
+                    ${showMvp && customerComment ? `
+                    <div class="pp-divider"></div>
+                    <div class="pp-comment-box">
+                        <i data-lucide="message-circle" class="pp-comment-icon"></i>
+                        <span>${customerComment}</span>
                     </div>
                     ` : ''}
                 </div>
             </div>
-            ` : ''}
             
             ${fb.supportDetails ? `
             <div class="pp-support-details">
@@ -2254,14 +2413,6 @@ function renderPresentationSlide() {
                 </div>
             </div>
             ` : ''}
-            <div class="pp-nav-buttons">
-                <button class="pp-btn pp-btn-prev" onclick="prevSlide()">
-                    <i data-lucide="chevron-left" style="width: 18px;"></i> ก่อนหน้า
-                </button>
-                <button class="pp-btn pp-btn-next" onclick="nextSlide()">
-                    ถัดไป <i data-lucide="chevron-right" style="width: 18px;"></i>
-                </button>
-            </div>
         </div>
     `;
     

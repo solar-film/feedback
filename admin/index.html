@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFS Care Admin Dashboard - ระบบบริหารแบบสอบถามหลังการขาย</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=43">
     
     <!-- Lucide Icons & Chart.js (Optimized CDNs) -->
     <script defer src="https://unpkg.com/lucide@0.400.0/dist/umd/lucide.min.js"></script>
@@ -660,13 +660,58 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Presentation-only team-name overrides. These values never alter source customer data. -->
+    <div class="drawer-modal presentation-overrides-modal" id="presentation-overrides-modal" onclick="if(event.target===this) closePresentationOverrideModal()">
+        <div class="drawer-content presentation-overrides-content" role="dialog" aria-modal="true" aria-labelledby="presentation-overrides-title">
+            <div class="modal-header presentation-overrides-header">
+                <div class="presentation-overrides-heading">
+                    <div class="presentation-overrides-heading-icon"><i data-lucide="users-round"></i></div>
+                    <div>
+                        <p class="presentation-overrides-eyebrow">ตั้งค่าสำหรับสไลด์นี้</p>
+                        <h2 id="presentation-overrides-title">ชื่อทีมสำหรับโหมดนำเสนอ</h2>
+                        <p id="presentation-override-customer-name"></p>
+                    </div>
+                </div>
+                <button type="button" class="drawer-close presentation-overrides-close" onclick="closePresentationOverrideModal()" aria-label="ปิด"><i data-lucide="x"></i></button>
+            </div>
+
+            <form id="presentation-overrides-form" onsubmit="savePresentationOverrides(event)">
+                <input type="hidden" id="presentation-override-customer-id">
+                <p class="presentation-overrides-note"><i data-lucide="circle-info"></i><span>ใส่ชื่อสมาชิกหลายคนโดยคั่นด้วยเครื่องหมายจุลภาค หากเว้นว่าง ระบบจะแสดงข้อมูลต้นทางและไม่แก้ไขชีต <strong>Data</strong></span></p>
+
+                <div class="form-group presentation-override-field admin">
+                    <label class="form-label" for="presentation-override-admin"><span class="presentation-team-icon"><i data-lucide="headphones"></i></span>แอดมิน</label>
+                    <input type="text" id="presentation-override-admin" class="form-control" autocomplete="off">
+                    <small id="presentation-source-admin"></small>
+                </div>
+
+                <div class="form-group presentation-override-field sales">
+                    <label class="form-label" for="presentation-override-sales"><span class="presentation-team-icon"><i data-lucide="briefcase"></i></span>ฝ่ายขาย</label>
+                    <input type="text" id="presentation-override-sales" class="form-control" autocomplete="off">
+                    <small id="presentation-source-sales"></small>
+                </div>
+
+                <div class="form-group presentation-override-field tech">
+                    <label class="form-label" for="presentation-override-tech"><span class="presentation-team-icon"><i data-lucide="wrench"></i></span>ทีมช่าง</label>
+                    <input type="text" id="presentation-override-tech" class="form-control" autocomplete="off">
+                    <small id="presentation-source-tech"></small>
+                </div>
+
+                <div class="presentation-override-actions">
+                    <button type="button" class="btn-secondary" onclick="useSourcePresentationNames()"><i data-lucide="rotate-ccw"></i> ใช้ข้อมูลต้นทาง</button>
+                    <button type="submit" class="btn-primary" id="save-presentation-overrides"><i data-lucide="save"></i> บันทึกชื่อที่แสดง</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Print Layout (Hidden by default, used only when printing) -->
     <div id="print-layout" style="display: none;"></div>
     <!-- Modal for Editing Address -->
 
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=74"></script>
+    <script defer src="app.js?v=90"></script>
 </body>
 </html>
