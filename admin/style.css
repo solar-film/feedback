@@ -3095,9 +3095,9 @@ body {
 }
 
 .pp-avatar {
-    width: 160px;
-    height: 160px;
-    flex-basis: 160px;
+    width: 140px;
+    height: 140px;
+    flex-basis: 140px;
     color: #0865e5;
     background: radial-gradient(circle at 38% 32%, #ffffff, #f4f9ff 72%);
     border: 3px solid #e6a01d;
@@ -3110,13 +3110,43 @@ body {
 
 .pp-avatar i,
 .pp-avatar svg {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     stroke-width: 1.7;
 }
 
+.pp-avatar--excellent {
+    color: #ffffff;
+    background: #16a34a;
+}
+
+.pp-avatar--good {
+    color: #ffffff;
+    background: #1677ff;
+}
+
+.pp-avatar--fair {
+    color: #ffffff;
+    background: #d99300;
+}
+
+.pp-avatar--low {
+    color: #ffffff;
+    background: #f26b19;
+}
+
+.pp-avatar--poor {
+    color: #ffffff;
+    background: #df3346;
+}
+
+.pp-avatar--unrated {
+    color: #ffffff;
+    background: #7d8ea3;
+}
+
 .pp-cust-info h3 {
-    font-size: clamp(2.45rem, 3.65vw, 4.7rem);
+    font-size: clamp(2.2rem, 3.2vw, 4.1rem);
     line-height: 0.92;
     letter-spacing: -0.06em;
     text-shadow: 0 5px 14px rgba(6, 48, 124, 0.16);
@@ -3258,9 +3288,9 @@ body {
         gap: 24px;
         padding: 26px 30px;
     }
-    .pp-avatar { width: 138px; height: 138px; flex-basis: 138px; }
-    .pp-avatar i, .pp-avatar svg { width: 68px; height: 68px; }
-    .pp-cust-info h3 { font-size: clamp(2.3rem, 3.5vw, 4.2rem); }
+    .pp-avatar { width: 124px; height: 124px; flex-basis: 124px; }
+    .pp-avatar i, .pp-avatar svg { width: 62px; height: 62px; }
+    .pp-cust-info h3 { font-size: clamp(2.1rem, 3.1vw, 3.8rem); }
     .pp-meta-icon { width: 64px; height: 64px; flex-basis: 64px; }
     .pp-meta-icon i, .pp-meta-icon svg { width: 34px; height: 34px; }
     .pp-score-right { width: 212px; height: 212px; }
@@ -3272,8 +3302,8 @@ body {
 
 @media (max-width: 760px) {
     .pp-cust-left { gap: 20px; }
-    .pp-avatar { width: 90px; height: 90px; flex-basis: 90px; box-shadow: 0 0 0 4px #0757cb, 0 0 0 7px #aad9ff, 0 8px 16px rgba(7, 67, 159, 0.2); }
-    .pp-avatar i, .pp-avatar svg { width: 48px; height: 48px; }
-    .pp-cust-info h3 { font-size: clamp(2.1rem, 10.3vw, 3.4rem); }
+    .pp-avatar { width: 84px; height: 84px; flex-basis: 84px; box-shadow: 0 0 0 4px #0757cb, 0 0 0 7px #aad9ff, 0 8px 16px rgba(7, 67, 159, 0.2); }
+    .pp-avatar i, .pp-avatar svg { width: 44px; height: 44px; }
+    .pp-cust-info h3 { font-size: clamp(2rem, 9.5vw, 3.15rem); }
     .pp-cust-details { padding-left: 0; border-left: 0; }
 }

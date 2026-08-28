@@ -2205,6 +2205,12 @@ function renderPresentationSlide() {
     const avgScore = scoreCount > 0 ? (totalScore / scoreCount) : 0;
     const avgScoreStr = avgScore > 0 ? avgScore.toFixed(1) : '-';
     const avgScorePercent = avgScore > 0 ? (avgScore / 5 * 100) : 0;
+    const avatarScoreTone = avgScore >= 4.5 ? 'excellent'
+        : avgScore >= 3.5 ? 'good'
+        : avgScore >= 2.5 ? 'fair'
+        : avgScore >= 1.5 ? 'low'
+        : avgScore > 0 ? 'poor'
+        : 'unrated';
     
     // Tag generation helper
     const makeTags = (tagsData) => {
@@ -2231,7 +2237,7 @@ function renderPresentationSlide() {
                 <!-- Header Card -->
                 <div class="pp-card pp-header-card">
                     <div class="pp-cust-left">
-                        <div class="pp-avatar">
+                        <div class="pp-avatar pp-avatar--${avatarScoreTone}">
                             <i data-lucide="user-round" stroke-width="1.5"></i>
                         </div>
                         <div class="pp-cust-info">
