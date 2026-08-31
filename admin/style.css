@@ -254,8 +254,8 @@ body {
 }
 
 .api-status-badge.connected {
-    background-color: var(--success-light);
-    color: var(--success);
+    background-color: var(--danger-light);
+    color: var(--danger);
 }
 
 .api-status-dot {
@@ -563,6 +563,19 @@ body {
 .status-badge.sent { background-color: var(--warning-light); color: var(--warning); }
 .status-badge.completed { background-color: var(--success-light); color: var(--success); }
 .status-badge.action { background-color: var(--danger-light); color: var(--danger); }
+
+.status-cell {
+    min-width: 112px;
+}
+
+.status-assessment-date {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
 
 /* Quick Link Action buttons inside Table */
 .table-actions {

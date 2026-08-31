@@ -735,6 +735,9 @@ function renderCustomerTable() {
         if (c.status === 'Sent') { statusText = 'ส่งลิงก์แล้ว'; statusClass = 'sent'; }
         else if (c.status === 'Completed') { statusText = 'ประเมินสำเร็จ'; statusClass = 'completed'; }
         else if (c.status === 'Action Required') { statusText = 'ต้องการดูแลด่วน'; statusClass = 'action'; }
+        const completedAssessmentDate = c.status === 'Completed'
+            ? formatLinkSentDate(c.feedback?.timestamp)
+            : '';
 
         // Dynamic LINE Message
         const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
@@ -752,8 +755,9 @@ function renderCustomerTable() {
             <td>${formatCustomerDatabaseInstallDate(c)}</td>
             <td>${c.sales || '-'}</td>
             <td>${c.tech || '-'}</td>
-            <td>
+            <td class="status-cell">
                 <span class="status-badge ${statusClass}">${statusText}</span>
+                ${completedAssessmentDate && completedAssessmentDate !== '-' ? `<small class="status-assessment-date">${completedAssessmentDate}</small>` : ''}
             </td>
             <td class="link-sent-date-column">${formatLinkSentDate(c.linkSentAt)}</td>
             <td onclick="event.stopPropagation()">
