@@ -354,6 +354,8 @@ function updateApiBadge(type, text) {
     const badgeText = document.getElementById('api-status-text');
     
     badge.className = 'api-status-badge';
+    badge.style.backgroundColor = '';
+    badge.style.color = '';
     badgeText.innerText = text;
 
     if (type === 'connected') {

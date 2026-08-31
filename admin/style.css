@@ -254,8 +254,8 @@ body {
 }
 
 .api-status-badge.connected {
-    background-color: var(--danger-light);
-    color: var(--danger);
+    background-color: var(--success-light);
+    color: var(--success);
 }
 
 .api-status-dot {
