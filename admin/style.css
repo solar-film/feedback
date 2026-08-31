@@ -198,6 +198,41 @@ body {
     color: var(--primary);
 }
 
+.navbar-title-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.navbar-sheet-link {
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #118544;
+    background: #ecfaf1;
+    border: 1px solid #bdeccd;
+    border-radius: 7px;
+    transition: 0.18s ease;
+}
+
+.navbar-sheet-link:hover,
+.navbar-sheet-link:focus-visible {
+    color: #ffffff;
+    background: #0f9d58;
+    border-color: #0f9d58;
+    outline: none;
+}
+
+.navbar-sheet-link i,
+.navbar-sheet-link svg {
+    width: 16px;
+    height: 16px;
+}
+
 .navbar-right {
     display: flex;
     align-items: center;
@@ -254,9 +289,22 @@ body {
 /* Dashboard Cards (KPI Grid) */
 .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(10, 1fr);
     gap: 20px;
     margin-bottom: 32px;
+}
+
+.dashboard-kpi-card {
+    grid-column: span 2;
+}
+
+.dashboard-kpi-card.dashboard-kpi-wide {
+    grid-column: span 3;
+}
+
+.dashboard-summary-card {
+    grid-column: 7 / span 4;
+    grid-row: 1 / span 2;
 }
 
 .kpi-card {
@@ -355,6 +403,11 @@ body {
     position: relative;
     width: 100%;
     height: 280px;
+}
+
+/* Performance charts reserve room above each bar for its icon and score. */
+.performance-chart-container {
+    height: 330px;
 }
 
 /* Database Table Controls */
@@ -469,6 +522,17 @@ body {
     border-bottom: 1px solid var(--border);
     color: var(--text-main);
     vertical-align: middle;
+}
+
+/* Keep the link-sent timestamp readable without giving the table a wide column. */
+.admin-table .link-sent-date-column {
+    width: 120px;
+    min-width: 120px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    white-space: nowrap;
 }
 
 .admin-table tr:last-child td {
@@ -815,6 +879,16 @@ body {
     .kpi-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .dashboard-kpi-card,
+    .dashboard-kpi-card.dashboard-kpi-wide {
+        grid-column: auto;
+    }
+
+    .dashboard-summary-card {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
     
     .charts-grid, .charts-grid-3 {
         grid-template-columns: 1fr;
@@ -846,6 +920,10 @@ body {
     
     .kpi-grid {
         grid-template-columns: 1fr;
+    }
+
+    .dashboard-summary-card {
+        grid-column: auto;
     }
     
     .table-controls {
@@ -2456,6 +2534,40 @@ body {
     font-weight: 700;
 }
 
+.pp-assessment-date {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    color: #4b6286;
+    font-size: 0.65rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.pp-assessment-date-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.pp-assessment-date-label i,
+.pp-assessment-date-label svg {
+    width: 12px;
+    height: 12px;
+    color: #0a68ea;
+}
+
+.pp-assessment-date strong {
+    color: #061e62;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
 .pp-nav-buttons {
     gap: 10px;
 }
@@ -2977,20 +3089,117 @@ body {
 
 .presentation-override-field.sales .presentation-team-icon { color: #ef6910; background: #fff0e3; }
 .presentation-override-field.tech .presentation-team-icon { color: #17994a; background: #e5f8eb; }
+.presentation-override-field.worksite-type .presentation-team-icon { color: #8f5b00; background: #fff5d6; }
 
 .presentation-override-field .form-control {
     box-sizing: border-box;
-    padding: 9px 11px;
-    color: #18325f;
-    background: #ffffff;
-    border-color: #d7e5f6;
+    min-height: 42px;
+    padding: 9px 12px;
+    color: #102f62;
+    background: linear-gradient(135deg, #f6fbff 0%, #ffffff 100%);
+    border: 2px solid #9dc9ff;
     border-radius: 10px;
-    font-size: 0.93rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 3px 9px rgba(34, 105, 198, 0.11);
+    font-size: 0.96rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.presentation-override-field .form-control::placeholder {
+    color: #7c93b6;
+    font-weight: 500;
+    opacity: 1;
 }
 
 .presentation-override-field .form-control:focus {
-    border-color: #1970e9;
-    box-shadow: 0 0 0 3px rgba(25, 112, 233, 0.12);
+    background: #ffffff;
+    border-color: #0b63df;
+    box-shadow: 0 0 0 4px rgba(11, 99, 223, 0.16), 0 7px 16px rgba(18, 98, 219, 0.18);
+}
+
+.presentation-field-input-actions {
+    display: flex !important;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.presentation-field-input-actions .form-control {
+    width: 0 !important;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.presentation-field-action-group {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+}
+
+.presentation-field-save,
+.presentation-field-reset {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.presentation-field-save {
+    flex: 0 0 40px;
+    color: #ffffff;
+    background: #1262db;
+    border: 1px solid #1262db;
+    box-shadow: 0 6px 13px rgba(18, 98, 219, 0.24);
+}
+
+.presentation-field-save:hover,
+.presentation-field-save:focus-visible {
+    background: #0d4fb8;
+    border-color: #0d4fb8;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 15px rgba(18, 98, 219, 0.3);
+    outline: none;
+}
+
+.presentation-field-save:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.presentation-field-reset {
+    flex: 0 0 40px;
+    color: #537096;
+    background: #ffffff;
+    border: 1px solid #d7e5f6;
+    box-shadow: 0 4px 10px rgba(56, 103, 161, 0.1);
+}
+
+.presentation-field-reset:hover,
+.presentation-field-reset:focus-visible {
+    color: #1262db;
+    background: #f1f7ff;
+    border-color: #a9cef7;
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.presentation-field-save i,
+.presentation-field-save svg,
+.presentation-field-reset i,
+.presentation-field-reset svg {
+    width: 17px;
+    height: 17px;
 }
 
 .presentation-override-field small {
@@ -3223,6 +3432,23 @@ body {
     gap: 4px;
     font-size: clamp(1.08rem, 1.35vw, 1.5rem);
     line-height: 1.32;
+}
+
+.pp-meta-location-heading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.45em;
+}
+
+.pp-meta-content .pp-meta-location-heading .pp-worksite-type {
+    color: #112b68;
+    font-weight: 800;
+}
+
+.pp-meta-content .pp-worksite-address {
+    display: block;
+    color: #112b68;
 }
 
 .pp-score-right {

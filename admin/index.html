@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFS Care Admin Dashboard - ระบบบริหารแบบสอบถามหลังการขาย</title>
+    <title>GFS Care Admin รายงานลูกค้ารีวิว - ระบบบริหารแบบสอบถามหลังการขาย</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
-    <link rel="stylesheet" href="style.css?v=46">
+    <link rel="stylesheet" href="style.css?v=55">
     
     <!-- Lucide Icons & Chart.js (Optimized CDNs) -->
     <script defer src="https://unpkg.com/lucide@0.400.0/dist/umd/lucide.min.js"></script>
@@ -39,21 +39,19 @@
         
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
-            <a href="https://docs.google.com/spreadsheets/d/1IRU1ZjQIUbpBmz_MAzVtXdQQ93eQbJNJO9nC7fGvAKs/edit?gid=2056659298#gid=2056659298" target="_blank" style="text-decoration: none; color: inherit; display: block;">
-                <div class="sidebar-brand" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
-                    <img src="../images/logo.png" alt="Logo" class="brand-logo" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px;">
-                    <div>
-                        <h1 class="brand-name">Feedback Panel</h1>
-                        <span class="brand-subtitle">ประเมินความพึงพอใจหลังการขาย </span>
-                    </div>
+            <div class="sidebar-brand">
+                <img src="../images/logo.png" alt="Logo" class="brand-logo" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px;">
+                <div>
+                    <h1 class="brand-name">Feedback Panel</h1>
+                    <span class="brand-subtitle">ประเมินความพึงพอใจหลังการขาย </span>
                 </div>
-            </a>
+            </div>
             
             <ul class="sidebar-menu">
                 <li class="menu-item active" data-tab="dashboard">
                     <a href="#">
                         <i data-lucide="layout-dashboard"></i>
-                        <span>Dashboard ภาพรวม</span>
+                        <span>รายงานลูกค้ารีวิว</span>
                     </a>
                 </li>
                 <li class="menu-item" data-tab="database">
@@ -101,7 +99,9 @@
                     <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="เปิด/ปิด เมนูด้านข้าง">
                         <i data-lucide="menu"></i>
                     </button>
-                    <h2 class="navbar-title" id="page-title">Dashboard ภาพรวม</h2>
+                    <div class="navbar-title-wrap">
+                        <h2 class="navbar-title" id="page-title">รายงานลูกค้ารีวิว</h2>
+                    </div>
                 </div>
                 
                 <div class="navbar-right" style="display: flex; gap: 10px; align-items: center;">
@@ -142,7 +142,7 @@
                 <div class="tab-pane active" id="tab-dashboard">
                     <!-- KPI Cards Grid -->
                     <div class="kpi-grid">
-                        <div class="kpi-card">
+                        <div class="kpi-card dashboard-kpi-card">
                             <div class="kpi-details">
                                 <span class="kpi-title">รายชื่อลูกค้าทั้งหมด</span>
                                 <span class="kpi-value" id="kpi-total-cust">0</span>
@@ -153,7 +153,7 @@
                             </div>
                         </div>
                         
-                        <div class="kpi-card">
+                        <div class="kpi-card dashboard-kpi-card">
                             <div class="kpi-details">
                                 <span class="kpi-title">ประเมินสำเร็จแล้ว</span>
                                 <span class="kpi-value" id="kpi-done-survey">0</span>
@@ -164,7 +164,18 @@
                             </div>
                         </div>
 
-                        <div class="chart-card" style="grid-column: 3 / span 2; grid-row: 1 / span 2; display: flex; flex-direction: column;">
+                        <div class="kpi-card dashboard-kpi-card">
+                            <div class="kpi-details">
+                                <span class="kpi-title">สรุปจำนวนลูกค้าที่รีวิว</span>
+                                <span class="kpi-value" id="kpi-google-reviews">0</span>
+                                <span class="kpi-subtext text-success" id="kpi-google-review-rate">0% ของผู้ตอบแบบประเมิน</span>
+                            </div>
+                            <div class="kpi-icon-box success">
+                                <i data-lucide="message-square-heart"></i>
+                            </div>
+                        </div>
+
+                        <div class="chart-card dashboard-summary-card" style="display: flex; flex-direction: column;">
                             <div class="chart-card-header">
                                 <h3 class="chart-card-title">สรุปคะแนนเฉลี่ยผลงานรายแผนก (เต็ม 5.0)</h3>
                             </div>
@@ -195,7 +206,7 @@
                             </div>
                         </div>
 
-                        <div class="kpi-card">
+                        <div class="kpi-card dashboard-kpi-card dashboard-kpi-wide">
                             <div class="kpi-details">
                                 <span class="kpi-title">รอดำเนินการประเมิน</span>
                                 <span class="kpi-value" id="kpi-pending-survey">0</span>
@@ -206,7 +217,7 @@
                             </div>
                         </div>
 
-                        <div class="kpi-card">
+                        <div class="kpi-card dashboard-kpi-card dashboard-kpi-wide">
                             <div class="kpi-details">
                                 <span class="kpi-title">คะแนนเฉลี่ยรวม</span>
                                 <span class="kpi-value" id="kpi-avg-rating">0.0</span>
@@ -225,7 +236,7 @@
                                 <h3 class="chart-card-title">ความพึงพอใจการประเมินทีมบริการ (Touchpoints Score)</h3>
                                 <i data-lucide="trending-up" class="text-muted" style="width: 18px;"></i>
                             </div>
-                            <div class="chart-container">
+                            <div class="chart-container performance-chart-container">
                                 <canvas id="chart-scores-bar"></canvas>
                             </div>
                         </div>
@@ -248,7 +259,7 @@
                                 <h3 class="chart-card-title">สรุปคะแนนฝ่ายขาย (Sales Performance)</h3>
                                 <i data-lucide="bar-chart-2" class="text-muted" style="width: 18px;"></i>
                             </div>
-                            <div class="chart-container">
+                            <div class="chart-container performance-chart-container">
                                 <canvas id="chart-sales-perf"></canvas>
                             </div>
                         </div>
@@ -258,7 +269,7 @@
                                 <h3 class="chart-card-title">สรุปคะแนนทีมช่าง (Tech Performance)</h3>
                                 <i data-lucide="tool" class="text-muted" style="width: 18px;"></i>
                             </div>
-                            <div class="chart-container">
+                            <div class="chart-container performance-chart-container">
                                 <canvas id="chart-tech-perf"></canvas>
                             </div>
                         </div>
@@ -268,9 +279,9 @@
                     <div class="charts-grid" style="margin-top: 24px;">
                         <div class="chart-card">
                             <div class="chart-card-header">
-                                <h3 class="chart-card-title">สรุปคะแนนสัดส่วนโหวตทีมผู้ครอง MVP 🏆</h3>
+                                <h3 class="chart-card-title">สรุปคะแนนทีมที่ลูกค้าประทับใจมากที่สุด</h3>
                             </div>
-                            <div class="chart-container">
+                            <div class="chart-container performance-chart-container">
                                 <canvas id="chart-mvps-bar"></canvas>
                             </div>
                         </div>
@@ -357,12 +368,13 @@
                                     <th>ฝ่ายขาย</th>
                                     <th>ทีมช่าง</th>
                                     <th>สถานะ</th>
+                                    <th class="link-sent-date-column">วันที่ส่งลิงก์</th>
                                     <th style="width: 120px;">การจัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="customer-table-body">
                                 <tr>
-                                    <td colspan="10" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูลรายชื่อจาก Google Sheet...</td>
+                                    <td colspan="12" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูลรายชื่อจาก Google Sheet...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -424,8 +436,10 @@
             <div class="tab-pane" id="tab-gifts">
                 <div style="background-color: var(--surface); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow: hidden;">
                     <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-                        <h3 style="margin: 0; color: var(--text-main); font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                            <i data-lucide="gift" style="color: #ec4899;"></i> สถานะจัดส่งของรางวัลสำหรับลูกค้ารีวิว
+                        <h3 style="margin: 0; color: var(--text-main); font-size: 1.1rem; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+                            <i data-lucide="gift" style="color: #ec4899;"></i>
+                            <span>สถานะจัดส่งของรางวัลสำหรับลูกค้ารีวิว</span>
+                            <span id="gift-review-count" style="display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; background: var(--success-light); color: var(--success); font-size: 0.78rem; font-weight: 700;">ลูกค้าที่รีวิว 0 คน</span>
                         </h3>
                     </div>
                     
@@ -433,6 +447,8 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
+                                    <th>วันที่/เวลาส่งลิงก์</th>
+                                    <th>วันที่ทำแบบประเมิน</th>
                                     <th>รหัสลูกค้า</th>
                                     <th>ชื่อลูกค้า</th>
                                     <th>เบอร์โทร</th>
@@ -669,40 +685,65 @@
                     <div class="presentation-overrides-heading-icon"><i data-lucide="users-round"></i></div>
                     <div>
                         <p class="presentation-overrides-eyebrow">ตั้งค่าสำหรับสไลด์นี้</p>
-                        <h2 id="presentation-overrides-title">ชื่อทีมสำหรับโหมดนำเสนอ</h2>
+                        <h2 id="presentation-overrides-title">ข้อมูลสำหรับโหมดนำเสนอ</h2>
                         <p id="presentation-override-customer-name"></p>
                     </div>
                 </div>
                 <button type="button" class="drawer-close presentation-overrides-close" onclick="closePresentationOverrideModal()" aria-label="ปิด"><i data-lucide="x"></i></button>
             </div>
 
-            <form id="presentation-overrides-form" onsubmit="savePresentationOverrides(event)">
+            <div id="presentation-overrides-form">
                 <input type="hidden" id="presentation-override-customer-id">
-                <p class="presentation-overrides-note"><i data-lucide="circle-info"></i><span>ใส่ชื่อสมาชิกหลายคนโดยคั่นด้วยเครื่องหมายจุลภาค หากเว้นว่าง ระบบจะแสดงข้อมูลต้นทางและไม่แก้ไขชีต <strong>Data</strong></span></p>
+                <p class="presentation-overrides-note"><i data-lucide="circle-info"></i><span>แก้ไขแต่ละช่องแล้วกดบันทึกได้ทันที หากต้องการกลับไปใช้ข้อมูลต้นทาง ให้กดปุ่มรีเซ็ตในช่องนั้น</span></p>
 
                 <div class="form-group presentation-override-field admin">
                     <label class="form-label" for="presentation-override-admin"><span class="presentation-team-icon"><i data-lucide="headphones"></i></span>แอดมิน</label>
-                    <input type="text" id="presentation-override-admin" class="form-control" autocomplete="off">
+                    <div class="presentation-field-input-actions">
+                        <input type="text" id="presentation-override-admin" class="form-control" autocomplete="off">
+                        <div class="presentation-field-action-group">
+                            <button type="button" class="presentation-field-save" data-presentation-save="admin" onclick="savePresentationOverrideField('admin')" title="บันทึกแอดมิน" aria-label="บันทึกแอดมิน"><i data-lucide="save"></i></button>
+                            <button type="button" class="presentation-field-reset" onclick="useSourcePresentationField('admin')" title="ใช้ข้อมูลต้นทาง" aria-label="ใช้ข้อมูลต้นทางแอดมิน"><i data-lucide="rotate-ccw"></i></button>
+                        </div>
+                    </div>
                     <small id="presentation-source-admin"></small>
                 </div>
 
                 <div class="form-group presentation-override-field sales">
                     <label class="form-label" for="presentation-override-sales"><span class="presentation-team-icon"><i data-lucide="briefcase"></i></span>ฝ่ายขาย</label>
-                    <input type="text" id="presentation-override-sales" class="form-control" autocomplete="off">
+                    <div class="presentation-field-input-actions">
+                        <input type="text" id="presentation-override-sales" class="form-control" autocomplete="off">
+                        <div class="presentation-field-action-group">
+                            <button type="button" class="presentation-field-save" data-presentation-save="sales" onclick="savePresentationOverrideField('sales')" title="บันทึกฝ่ายขาย" aria-label="บันทึกฝ่ายขาย"><i data-lucide="save"></i></button>
+                            <button type="button" class="presentation-field-reset" onclick="useSourcePresentationField('sales')" title="ใช้ข้อมูลต้นทาง" aria-label="ใช้ข้อมูลต้นทางฝ่ายขาย"><i data-lucide="rotate-ccw"></i></button>
+                        </div>
+                    </div>
                     <small id="presentation-source-sales"></small>
                 </div>
 
                 <div class="form-group presentation-override-field tech">
                     <label class="form-label" for="presentation-override-tech"><span class="presentation-team-icon"><i data-lucide="wrench"></i></span>ทีมช่าง</label>
-                    <input type="text" id="presentation-override-tech" class="form-control" autocomplete="off">
+                    <div class="presentation-field-input-actions">
+                        <input type="text" id="presentation-override-tech" class="form-control" autocomplete="off">
+                        <div class="presentation-field-action-group">
+                            <button type="button" class="presentation-field-save" data-presentation-save="tech" onclick="savePresentationOverrideField('tech')" title="บันทึกทีมช่าง" aria-label="บันทึกทีมช่าง"><i data-lucide="save"></i></button>
+                            <button type="button" class="presentation-field-reset" onclick="useSourcePresentationField('tech')" title="ใช้ข้อมูลต้นทาง" aria-label="ใช้ข้อมูลต้นทางทีมช่าง"><i data-lucide="rotate-ccw"></i></button>
+                        </div>
+                    </div>
                     <small id="presentation-source-tech"></small>
                 </div>
 
-                <div class="presentation-override-actions">
-                    <button type="button" class="btn-secondary" onclick="useSourcePresentationNames()"><i data-lucide="rotate-ccw"></i> ใช้ข้อมูลต้นทาง</button>
-                    <button type="submit" class="btn-primary" id="save-presentation-overrides"><i data-lucide="save"></i> บันทึกชื่อที่แสดง</button>
+                <div class="form-group presentation-override-field worksite-type">
+                    <label class="form-label" for="presentation-override-worksite-type"><span class="presentation-team-icon"><i data-lucide="house"></i></span>ประเภทหน้างาน</label>
+                    <div class="presentation-field-input-actions">
+                        <input type="text" id="presentation-override-worksite-type" class="form-control" autocomplete="off" placeholder="เช่น บ้านเดี่ยว">
+                        <div class="presentation-field-action-group">
+                            <button type="button" class="presentation-field-save" data-presentation-save="worksiteType" onclick="savePresentationOverrideField('worksiteType')" title="บันทึกประเภทหน้างาน" aria-label="บันทึกประเภทหน้างาน"><i data-lucide="save"></i></button>
+                            <button type="button" class="presentation-field-reset" onclick="useSourcePresentationField('worksiteType')" title="ใช้ข้อมูลต้นทาง" aria-label="ใช้ข้อมูลต้นทางประเภทหน้างาน"><i data-lucide="rotate-ccw"></i></button>
+                        </div>
+                    </div>
+                    <small id="presentation-source-worksite-type"></small>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -712,6 +753,6 @@
 
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=91"></script>
+    <script defer src="app.js?v=114"></script>
 </body>
 </html>

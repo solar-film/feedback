@@ -152,6 +152,14 @@ function setupSidebarTabEvents() {
 
 function switchTab(tabId) {
     state.currentTab = tabId;
+
+    // The month list follows the date basis of the active page. In particular,
+    // the customer database uses installation dates while other pages retain
+    // their existing date basis.
+    if (state.allCustomers.length > 0) {
+        populateFilters(false);
+        applyGlobalFilter();
+    }
     
     // Highlight sidebar item
     document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
@@ -173,14 +181,18 @@ function switchTab(tabId) {
 
     // Update Header navbar Title
     const titles = {
-        dashboard: "Dashboard ภาพรวม",
+        dashboard: "รายงานลูกค้ารีวิว",
         database: "ฐานข้อมูลรายชื่อลูกค้า",
         kanban: "ติดตามสถานะแบบประเมิน (Kanban)",
         reports: "รายงานคะแนนประเมินทีมบริการ",
         settings: "ตั้งค่าการเชื่อมต่อ Google Sheets API",
         presentation: "โหมดนำเสนอข้อมูลฟีดแบคจากลูกค้า (Customer Feedback)"
     };
-    document.getElementById('page-title').innerText = titles[tabId] || "Dashboard";
+    document.getElementById('page-title').innerText = titles[tabId] || "รายงานลูกค้ารีวิว";
+    const presentationSheetLink = document.getElementById('presentation-sheet-link');
+    if (presentationSheetLink) {
+        presentationSheetLink.hidden = tabId !== 'presentation';
+    }
     
     // Close sidebar on mobile after switching
     if (window.innerWidth <= 768) {
@@ -210,6 +222,17 @@ function toggleSidebar() {
         sidebar.classList.toggle('collapsed');
         mainContent.classList.toggle('expanded');
     }
+}
+
+function getDataWorksiteType(item) {
+    const values = [
+        item?.jobType,
+        item?.worksiteType,
+        item?.['ประเภทหน้างาน'],
+        item?._col_15,
+        item?._col_16
+    ];
+    return values.find(value => typeof value === 'string' && value.trim())?.trim() || '-';
 }
 
 // LOAD DATABASE
@@ -295,9 +318,10 @@ function loadData() {
                         tech: item.tech || '-',
                         adminName: item.adminName || '-',
                         presentationOverrides: item.presentationOverrides || null,
-                        jobType: item.jobType || '-',
+                        jobType: getDataWorksiteType(item),
                         bill: item.bill || '-',
                         status: status,
+                        linkSentAt: item.linkSentAt || '',
                         feedback: item.feedback || null,
                         giftData: item.giftData || null,
                         addressFromData: item.addressFromData || ''
@@ -414,8 +438,10 @@ function forceRefreshData() {
                         tech: item.tech || '-',
                         adminName: item._col_17 || item.adminName || '-',
                         presentationOverrides: item.presentationOverrides || null,
+                        jobType: getDataWorksiteType(item),
                         bill: item.bill || '-',
                         status: status,
+                        linkSentAt: item.linkSentAt || '',
                         feedback: item.feedback || null,
                         giftData: item.giftData || null,
                         addressFromData: item.addressFromData || ''
@@ -450,11 +476,38 @@ function forceRefreshData() {
         });
 }
 
-function getCustomerTargetDate(c) {
-    if (c.feedback && c.feedback.timestamp) {
-        const d = new Date(c.feedback.timestamp);
-        if (!isNaN(d.getTime())) return d;
+function parseSpreadsheetTimestamp(timestamp) {
+    const rawTimestamp = String(timestamp || '').trim();
+    if (!rawTimestamp) return null;
+
+    // Apps Script serializes sheet dates as DD/MM/YYYY HH:mm:ss. Parse that
+    // format explicitly; new Date('12/08/2026') is browser-dependent.
+    const thaiDateMatch = rawTimestamp.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (thaiDateMatch) {
+        const [, dayText, monthText, yearText, hourText = '0', minuteText = '0', secondText = '0'] = thaiDateMatch;
+        const day = Number(dayText);
+        const month = Number(monthText);
+        const year = Number(yearText);
+        const hour = Number(hourText);
+        const minute = Number(minuteText);
+        const second = Number(secondText);
+        const date = new Date(year, month - 1, day, hour, minute, second);
+        const isValidDate = date.getFullYear() === year
+            && date.getMonth() === month - 1
+            && date.getDate() === day
+            && date.getHours() === hour
+            && date.getMinutes() === minute
+            && date.getSeconds() === second;
+        return isValidDate ? date : null;
     }
+
+    const date = new Date(rawTimestamp);
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getCustomerTargetDate(c) {
+    const feedbackDate = parseSpreadsheetTimestamp(c.feedback?.timestamp);
+    if (feedbackDate) return feedbackDate;
     const installD = c.filterDate || c.installDate;
     if (installD && installD !== '-') {
         return parseDateObj(installD);
@@ -468,6 +521,66 @@ function getCustomerInstallDate(c) {
         return parseDateObj(installD);
     }
     return new Date(0);
+}
+
+function getCustomerDatabaseInstallDate(c) {
+    const rawInstallDate = String(c.installDate || '').trim();
+    if (!rawInstallDate || rawInstallDate === '-') return new Date(0);
+
+    // Some rows contain a spreadsheet time suffix such as "00:00:00".
+    // The database table filters and sorts by the date portion only.
+    const installDate = rawInstallDate.split(/[T\s,]+/)[0];
+    const date = parseDateObj(installDate);
+    return Number.isNaN(date.getTime()) ? new Date(0) : date;
+}
+
+function formatCustomerDatabaseInstallDate(c) {
+    const date = getCustomerDatabaseInstallDate(c);
+    if (date.getTime() === 0) return c.installDate || '-';
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${day}/${month}/${date.getFullYear()}`;
+}
+
+function formatLinkSentDate(timestamp) {
+    const date = parseSpreadsheetTimestamp(timestamp);
+    if (!date) return '-';
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+function matchesCustomerDatabaseFilters(customer, monthVal, companyVal, startVal, endVal) {
+    if (companyVal !== 'all' && customer.company !== companyVal) return false;
+
+    const installDate = getCustomerDatabaseInstallDate(customer);
+    const hasInstallDate = installDate.getTime() > 0;
+    if (monthVal !== 'all') {
+        if (!hasInstallDate) return false;
+        const installMonth = `${installDate.getMonth() + 1}-${installDate.getFullYear()}`;
+        if (installMonth !== monthVal) return false;
+    }
+
+    if (startVal || endVal) {
+        if (!hasInstallDate) return false;
+        if (startVal) {
+            const startDate = new Date(startVal);
+            startDate.setHours(0, 0, 0, 0);
+            if (installDate < startDate) return false;
+        }
+        if (endVal) {
+            const endDate = new Date(endVal);
+            endDate.setHours(23, 59, 59, 999);
+            if (installDate > endDate) return false;
+        }
+    }
+
+    return true;
 }
 
 // DATA PROCESSING AND RENDERING
@@ -556,13 +669,20 @@ function renderKPIs() {
     const total = state.customers.length;
     const completed = state.customers.filter(c => c.status === 'Completed' || (c.status === 'Action Required' && c.feedback)).length;
     const pending = state.customers.filter(c => c.status === 'Sent').length;
+    const googleReviews = state.customers.filter(c => {
+        const reviewStatus = c.feedback?.googleReviewClicked;
+        return ['TRUE', 'YES', 'Y'].includes(String(reviewStatus || '').trim().toUpperCase());
+    }).length;
     
     const responseRate = total > 0 ? Math.round((completed / total) * 100) : 0;
     const pendingRate = total > 0 ? Math.round((pending / total) * 100) : 0;
+    const googleReviewRate = completed > 0 ? Math.round((googleReviews / completed) * 100) : 0;
 
     document.getElementById('kpi-total-cust').innerText = total;
     document.getElementById('kpi-done-survey').innerText = completed;
     document.getElementById('kpi-done-rate').innerText = `${responseRate}% Response Rate`;
+    document.getElementById('kpi-google-reviews').innerText = googleReviews;
+    document.getElementById('kpi-google-review-rate').innerText = `${googleReviewRate}% ของผู้ตอบแบบประเมิน`;
     document.getElementById('kpi-pending-survey').innerText = pending;
     document.getElementById('kpi-pending-rate').innerText = `${pendingRate}% ส่งคำขอประเมินแล้ว`;
 
@@ -587,14 +707,22 @@ function renderCustomerTable() {
     const tbody = document.getElementById('customer-table-body');
     tbody.innerHTML = '';
 
-    if (state.customers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:var(--text-muted);">ไม่มีข้อมูลลูกค้า กรุณากดปุ่มเพิ่มลูกค้าใหม่ด้านขวาบน</td></tr>';
+    const monthVal = document.getElementById('global-filter-month')?.value || 'all';
+    const companyVal = document.getElementById('global-filter-company')?.value || 'all';
+    const startVal = document.getElementById('global-filter-start')?.value;
+    const endVal = document.getElementById('global-filter-end')?.value;
+    const customerRows = state.allCustomers.filter(customer =>
+        matchesCustomerDatabaseFilters(customer, monthVal, companyVal, startVal, endVal)
+    );
+
+    if (customerRows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:var(--text-muted);">ไม่มีข้อมูลลูกค้า กรุณากดปุ่มเพิ่มลูกค้าใหม่ด้านขวาบน</td></tr>';
         return;
     }
 
-    // Sort customers by date descending (latest date on top)
-    const sortedCustomers = [...state.customers].sort((a, b) => {
-        return getCustomerInstallDate(b) - getCustomerInstallDate(a);
+    // Sort by the installation date shown in this table, newest first.
+    const sortedCustomers = [...customerRows].sort((a, b) => {
+        return getCustomerDatabaseInstallDate(b) - getCustomerDatabaseInstallDate(a);
     });
 
     sortedCustomers.forEach((c, index) => {
@@ -621,12 +749,13 @@ function renderCustomerTable() {
             <td style="font-weight: 700;">${c.name}</td>
             <td>${c.phone}</td>
             <td>${c.lineAt || '-'}</td>
-            <td>${c.installDate || '-'}</td>
+            <td>${formatCustomerDatabaseInstallDate(c)}</td>
             <td>${c.sales || '-'}</td>
             <td>${c.tech || '-'}</td>
             <td>
                 <span class="status-badge ${statusClass}">${statusText}</span>
             </td>
+            <td class="link-sent-date-column">${formatLinkSentDate(c.linkSentAt)}</td>
             <td onclick="event.stopPropagation()">
                 <div class="table-actions">
                     <button class="icon-btn" onclick="copySurveyLink('${c.id}', this)" title="คัดลอกลิงก์ประเมิน">
@@ -663,7 +792,7 @@ function filterCustomerTable() {
     const rows = document.querySelectorAll('#customer-table-body tr');
     
     rows.forEach(row => {
-        if (row.cells.length < 10) return; // Skip headers/empty rows
+        if (row.cells.length < 12) return; // Skip headers/empty rows
 
         const company = row.cells[1].innerText;
         const id = row.cells[2].innerText.toLowerCase();
@@ -679,8 +808,9 @@ function filterCustomerTable() {
         else if (rowStatusTag && rowStatusTag.classList.contains('completed')) rowStatus = 'Completed';
         else if (rowStatusTag && rowStatusTag.classList.contains('action')) rowStatus = 'Action Required';
 
-        const dateStr = row.cells[6].innerText.toLowerCase();
-        const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || lineAt.includes(query) || sales.includes(query) || tech.includes(query) || company.toLowerCase().includes(query) || dateStr.includes(query);
+        const installDate = row.cells[6].innerText.toLowerCase();
+        const linkSentDate = row.cells[10].innerText.toLowerCase();
+        const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || lineAt.includes(query) || sales.includes(query) || tech.includes(query) || company.toLowerCase().includes(query) || installDate.includes(query) || linkSentDate.includes(query);
         const matchesStatus = status === 'all' || rowStatus === status;
 
         if (matchesQuery && matchesStatus) {
@@ -731,8 +861,8 @@ function renderKanbanBoard() {
 
     // 2. Completed & Action Required: Sort by evaluation date (feedback.timestamp) descending (newest first)
     const sortByFeedbackTime = (a, b) => {
-        const timeA = a.feedback && a.feedback.timestamp ? new Date(a.feedback.timestamp).getTime() : 0;
-        const timeB = b.feedback && b.feedback.timestamp ? new Date(b.feedback.timestamp).getTime() : 0;
+        const timeA = parseSpreadsheetTimestamp(a.feedback?.timestamp)?.getTime() || 0;
+        const timeB = parseSpreadsheetTimestamp(b.feedback?.timestamp)?.getTime() || 0;
         return timeB - timeA;
     };
     groups['Completed'].sort(sortByFeedbackTime);
@@ -807,13 +937,24 @@ function moveKanbanCard(customerId, targetStatus, e) {
     updateCustomerStatus(customerId, targetStatus);
 }
 
+function findCustomerRecord(customerId) {
+    return state.allCustomers.find(customer => customer.id === customerId)
+        || state.customers.find(customer => customer.id === customerId);
+}
+
 function updateCustomerStatus(customerId, targetStatus) {
-    const customer = state.customers.find(c => c.id === customerId);
+    const customer = findCustomerRecord(customerId);
     if (!customer) return;
 
     if (customer.status === targetStatus) return;
 
     customer.status = targetStatus;
+    if (targetStatus === 'Sent') {
+        customer.linkSentAt = new Date().toLocaleString('en-GB', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+        }).replace(',', '');
+    }
     localStorage.setItem('local_status_' + customerId, targetStatus);
 
     // Refresh display
@@ -852,7 +993,7 @@ function handleDrop(e, targetStatus) {
 }
 
 function markAsSent(id) {
-    const customer = state.customers.find(c => c.id === id);
+    const customer = findCustomerRecord(id);
     if (customer && (!customer.status || customer.status === 'Unsent')) {
         updateCustomerStatus(id, 'Sent');
     }
@@ -860,7 +1001,7 @@ function markAsSent(id) {
 
 // Copy link action helper
 function copySurveyLink(id, btn) {
-    const c = state.customers.find(x => x.id === id);
+    const c = findCustomerRecord(id);
     const companyName = (c && c.company === 'MHL') ? 'Maholan film' : 'Goodfilm';
     const custName = (c && c.name) ? c.name : 'คุณลูกค้า';
     const baseUrl = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(id)}`;
@@ -874,7 +1015,7 @@ function copySurveyLink(id, btn) {
 
         setTimeout(() => {
             // Auto-move to 'Sent' if currently 'Unsent'
-            const customer = state.customers.find(c => c.id === id);
+            const customer = findCustomerRecord(id);
             if (customer && (!customer.status || customer.status === 'Unsent')) {
                 updateCustomerStatus(id, 'Sent');
             }
@@ -892,7 +1033,7 @@ function copySurveyLink(id, btn) {
 
 // DETAIL DRAWER & TIMELINE
 function openCustomerDrawer(id) {
-    const c = state.customers.find(item => item.id === id);
+    const c = findCustomerRecord(id);
     if (!c) return;
 
     // Fill metadata
@@ -1058,8 +1199,8 @@ function renderJourneyTimeline(customer) {
     if (hasFeedback) {
         step3.className = 'timeline-step completed';
         let timeStr = customer.feedback.timestamp || "-";
-        const dateObj = new Date(timeStr);
-        if (!isNaN(dateObj.getTime())) {
+        const dateObj = parseSpreadsheetTimestamp(timeStr);
+        if (dateObj) {
             timeStr = dateObj.toLocaleDateString('th-TH');
         }
         step3.innerHTML = `
@@ -1216,17 +1357,31 @@ function renderDashboardCharts() {
             plugins: { 
                 legend: { display: false },
                 datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    formatter: (value) => getEmojiForScore(value),
-                    font: { size: 18 }
+                    clip: false,
+                    labels: {
+                        icon: {
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 28,
+                            formatter: (value) => value > 0 ? getEmojiForScore(value) : '',
+                            font: { size: 18, lineHeight: 1 }
+                        },
+                        score: {
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 7,
+                            color: '#334155',
+                            formatter: (value) => value > 0 ? Number(value).toFixed(2) : '',
+                            font: { size: 11, weight: '700', lineHeight: 1 }
+                        }
+                    }
                 }
             },
             scales: {
                 y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
                 x: { grid: { display: false } }
             },
-            layout: { padding: { top: 35 } }
+            layout: { padding: { top: 60 } }
         }
     });
 
@@ -1332,10 +1487,24 @@ function renderDashboardCharts() {
                 plugins: { 
                     legend: { display: false },
                     datalabels: {
-                        anchor: 'end',
-                        align: 'top',
-                        formatter: (value) => getEmojiForScore(value),
-                        font: { size: 16 }
+                        clip: false,
+                        labels: {
+                            icon: {
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 28,
+                                formatter: (value) => value > 0 ? getEmojiForScore(value) : '',
+                                font: { size: 17, lineHeight: 1 }
+                            },
+                            score: {
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 7,
+                                color: '#334155',
+                                formatter: (value) => value > 0 ? Number(value).toFixed(2) : '',
+                                font: { size: 11, weight: '700', lineHeight: 1 }
+                            }
+                        }
                     },
                     tooltip: {
                         callbacks: {
@@ -1349,7 +1518,7 @@ function renderDashboardCharts() {
                     y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
                     x: { grid: { display: false } }
                 },
-                layout: { padding: { top: 35 } }
+                layout: { padding: { top: 60 } }
             }
         });
 
@@ -1373,10 +1542,24 @@ function renderDashboardCharts() {
                 plugins: { 
                     legend: { display: false },
                     datalabels: {
-                        anchor: 'end',
-                        align: 'top',
-                        formatter: (value) => getEmojiForScore(value),
-                        font: { size: 16 }
+                        clip: false,
+                        labels: {
+                            icon: {
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 28,
+                                formatter: (value) => value > 0 ? getEmojiForScore(value) : '',
+                                font: { size: 17, lineHeight: 1 }
+                            },
+                            score: {
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 7,
+                                color: '#334155',
+                                formatter: (value) => value > 0 ? Number(value).toFixed(2) : '',
+                                font: { size: 11, weight: '700', lineHeight: 1 }
+                            }
+                        }
                     },
                     tooltip: {
                         callbacks: {
@@ -1390,7 +1573,7 @@ function renderDashboardCharts() {
                     y: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
                     x: { grid: { display: false } }
                 },
-                layout: { padding: { top: 20 } }
+                layout: { padding: { top: 60 } }
             }
         });
     }
@@ -1581,16 +1764,24 @@ function renderDashboardCharts() {
             }
         });
 
+        const mvpTeams = [
+            { key: 'admin', label: 'แอดมิน 💬', color: '#1b437c' },
+            { key: 'sales', label: 'ฝ่ายขาย 🧭', color: '#005eb8' },
+            { key: 'tech', label: 'ทีมช่าง 🧰', color: '#10b981' },
+            { key: 'all', label: 'ทุกทีม 💙', color: '#ec4899' }
+        ].map(team => ({ ...team, votes: mvps[team.key] }))
+            .sort((a, b) => b.votes - a.votes);
+
         if (state.charts.mvpsBar) state.charts.mvpsBar.destroy();
         state.charts.mvpsBar = new Chart(ctxMvp, {
             type: 'bar',
             plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
             data: {
-                labels: ['แอดมิน 💬', 'ฝ่ายขาย 🧭', 'ทีมช่าง 🧰', 'ทุกทีม 💙'],
+                labels: mvpTeams.map(team => team.label),
                 datasets: [{
-                    label: 'คะแนนเสียงโหวต MVP',
-                    data: [mvps.admin, mvps.sales, mvps.tech, mvps.all],
-                    backgroundColor: ['#1b437c', '#005eb8', '#10b981', '#ec4899'],
+                    label: 'คะแนนทีมที่ลูกค้าประทับใจมากที่สุด',
+                    data: mvpTeams.map(team => team.votes),
+                    backgroundColor: mvpTeams.map(team => team.color),
                     borderRadius: 6,
                     barThickness: 24
                 }]
@@ -1600,13 +1791,13 @@ function renderDashboardCharts() {
                 maintainAspectRatio: false,
                 plugins: { 
                     legend: { display: false },
-                    datalabels: { anchor: 'end', align: 'top', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
+                    datalabels: { clip: false, anchor: 'end', align: 'top', formatter: (v) => v > 0 ? v : '', font: { weight: 'bold' } }
                 },
                 scales: {
                     y: { grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
                     x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } }
                 },
-                layout: { padding: { top: 20 } }
+                layout: { padding: { top: 60 } }
             }
         });
     }
@@ -1845,12 +2036,15 @@ function populateFilters(init) {
     const monthNames = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
     const uniqueMonths = new Set();
     const uniqueCompanies = new Set();
+    const getFilterDate = state.currentTab === 'database'
+        ? getCustomerDatabaseInstallDate
+        : getCustomerTargetDate;
 
     state.allCustomers.forEach(c => {
         if (c.company && c.company !== '-') uniqueCompanies.add(c.company);
 
-        const targetDate = getCustomerTargetDate(c);
-        if (targetDate.getTime() === 0) return;
+        const targetDate = getFilterDate(c);
+        if (targetDate.getTime() <= 0 || Number.isNaN(targetDate.getTime())) return;
         const m = targetDate.getMonth() + 1;
         const y = targetDate.getFullYear();
         uniqueMonths.add(`${m}-${y}`);
@@ -1888,13 +2082,25 @@ function populateFilters(init) {
             }
             monthSelect.value = currentMonthKey;
         } else if (currentMonthVal) {
-            if (currentMonthVal.indexOf('-') === -1 && currentMonthVal !== 'all') {
-                const currentYear = new Date().getFullYear();
-                const newVal = `${currentMonthVal}-${currentYear}`;
-                monthSelect.value = Array.from(monthSelect.options).some(o => o.value === newVal) ? newVal : 'all';
-            } else {
-                monthSelect.value = currentMonthVal;
+            const selectedMonthValue = currentMonthVal.indexOf('-') === -1 && currentMonthVal !== 'all'
+                ? `${currentMonthVal}-${new Date().getFullYear()}`
+                : currentMonthVal;
+            let hasSelectedOption = Array.from(monthSelect.options).some(o => o.value === selectedMonthValue);
+
+            if (!hasSelectedOption && selectedMonthValue !== 'all') {
+                const [monthText, yearText] = selectedMonthValue.split('-');
+                const month = Number(monthText);
+                const year = Number(yearText);
+                if (Number.isInteger(month) && month >= 1 && month <= 12 && Number.isInteger(year) && year >= 1900) {
+                    const opt = document.createElement('option');
+                    opt.value = selectedMonthValue;
+                    opt.textContent = `${monthNames[month]} ${year}`;
+                    monthSelect.appendChild(opt);
+                    hasSelectedOption = true;
+                }
             }
+
+            monthSelect.value = hasSelectedOption ? selectedMonthValue : 'all';
         }
     }
 
@@ -1915,9 +2121,25 @@ function populateFilters(init) {
 }
 
 function formatInstallDate(dateStr) {
-    if (!dateStr) return '-';
+    const rawDate = String(dateStr || '').trim();
+    if (!rawDate) return '-';
+
+    // Sheets may provide a value such as "21/08/2026 00:00:00".
+    // The installation date is a date-only field, so discard its time portion.
+    const dateOnly = rawDate.split(/[T\s,]+/)[0];
+    const slashDateParts = dateOnly.split('/');
+    if (slashDateParts.length === 3) {
+        const day = Number(slashDateParts[0]);
+        const month = Number(slashDateParts[1]);
+        const year = Number(slashDateParts[2]);
+        if (Number.isInteger(day) && Number.isInteger(month) && Number.isInteger(year)
+            && day >= 1 && day <= 31 && month >= 1 && month <= 12 && year >= 1900) {
+            return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+        }
+    }
+
     try {
-        const date = new Date(dateStr);
+        const date = new Date(dateOnly);
         if (!isNaN(date.getTime())) {
             const yyyy = date.getFullYear();
             const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -1927,7 +2149,7 @@ function formatInstallDate(dateStr) {
     } catch (e) {
         console.error("Error parsing date:", e);
     }
-    return dateStr;
+    return dateOnly;
 }
 
 // ==========================================
@@ -1950,6 +2172,47 @@ function getPresentationTeamName(customer, team) {
     return (typeof override === 'string' && override.trim())
         ? override.trim()
         : getSourcePresentationTeamName(customer, team);
+}
+
+function getSourcePresentationWorksiteType(customer) {
+    return (customer.jobType && customer.jobType !== '-') ? customer.jobType : '-';
+}
+
+function isPresentationTimestamp(value) {
+    return /^\d{1,2}\/\d{1,2}\/\d{4}(?:[ T]\d{1,2}:\d{2}(?::\d{2})?)?$/.test(String(value || '').trim());
+}
+
+function getPresentationWorksiteType(customer) {
+    const override = customer.presentationOverrides && customer.presentationOverrides.worksiteType;
+    return (typeof override === 'string' && override.trim() && !isPresentationTimestamp(override))
+        ? override.trim()
+        : getSourcePresentationWorksiteType(customer);
+}
+
+function formatPresentationAssessmentDate(timestamp, includeTime = false) {
+    const rawTimestamp = String(timestamp || '').trim();
+    if (!rawTimestamp) return '-';
+
+    const date = parseSpreadsheetTimestamp(rawTimestamp);
+    if (!date) {
+        // Keep the source value visible when Apps Script returns a non-ISO date string.
+        return includeTime ? rawTimestamp : rawTimestamp.split(' ')[0];
+    }
+
+    const formattedDate = new Intl.DateTimeFormat('th-TH', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    }).format(date);
+
+    if (!includeTime) return formattedDate;
+
+    const formattedTime = new Intl.DateTimeFormat('th-TH', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    }).format(date);
+    return `${formattedDate} ${formattedTime} น.`;
 }
 
 function escapePresentationHtml(value) {
@@ -1983,18 +2246,18 @@ function openPresentationOverrideModal(customerId) {
         source.innerText = `ข้อมูลต้นทาง: ${getSourcePresentationTeamName(customer, team)}`;
     });
 
+    const worksiteTypeInput = document.getElementById('presentation-override-worksite-type');
+    const worksiteTypeSource = document.getElementById('presentation-source-worksite-type');
+    worksiteTypeInput.value = overrides.worksiteType || '';
+    worksiteTypeInput.placeholder = getSourcePresentationWorksiteType(customer);
+    worksiteTypeSource.innerText = `ข้อมูลจากชีต Col O: ${getSourcePresentationWorksiteType(customer)}`;
+
     document.getElementById('presentation-overrides-modal').style.display = 'flex';
     lucide.createIcons();
 }
 
 function closePresentationOverrideModal() {
     document.getElementById('presentation-overrides-modal').style.display = 'none';
-}
-
-function useSourcePresentationNames() {
-    ['admin', 'sales', 'tech'].forEach(team => {
-        document.getElementById(`presentation-override-${team}`).value = '';
-    });
 }
 
 function normalisePresentationName(value) {
@@ -2005,26 +2268,58 @@ function normalisePresentationName(value) {
         .join(', ');
 }
 
-async function savePresentationOverrides(event) {
-    event.preventDefault();
+function normalisePresentationWorksiteType(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function getPresentationOverrideInput(field) {
+    const inputId = field === 'worksiteType'
+        ? 'presentation-override-worksite-type'
+        : `presentation-override-${field}`;
+    return document.getElementById(inputId);
+}
+
+function getPresentationOverrideFieldLabel(field) {
+    return {
+        admin: 'แอดมิน',
+        sales: 'ฝ่ายขาย',
+        tech: 'ทีมช่าง',
+        worksiteType: 'ประเภทหน้างาน'
+    }[field] || 'ข้อมูล';
+}
+
+function useSourcePresentationField(field) {
+    const input = getPresentationOverrideInput(field);
+    if (!input) return;
+    input.value = '';
+    savePresentationOverrideField(field);
+}
+
+async function savePresentationOverrideField(field) {
     if (!state.presentationOverridesEnabled) {
-        showToast('Apps Script ยังไม่รองรับการบันทึกชื่อทีมสำหรับโหมดนำเสนอ', 'warning');
+        showToast('Apps Script ยังไม่รองรับการบันทึกข้อมูลสำหรับโหมดนำเสนอ', 'warning');
         return;
     }
+
+    if (!['admin', 'sales', 'tech', 'worksiteType'].includes(field)) return;
 
     const id = document.getElementById('presentation-override-customer-id').value;
     const customer = state.allCustomers.find(item => item.id === id);
     if (!customer) return;
 
-    const overrides = {
-        admin: normalisePresentationName(document.getElementById('presentation-override-admin').value),
-        sales: normalisePresentationName(document.getElementById('presentation-override-sales').value),
-        tech: normalisePresentationName(document.getElementById('presentation-override-tech').value)
-    };
-    const saveButton = document.getElementById('save-presentation-overrides');
+    const input = getPresentationOverrideInput(field);
+    if (!input) return;
+
+    const value = field === 'worksiteType'
+        ? normalisePresentationWorksiteType(input.value)
+        : normalisePresentationName(input.value);
+    const overrides = { ...(customer.presentationOverrides || {}), [field]: value };
+    const saveButton = document.querySelector(`[data-presentation-save="${field}"]`);
+    if (!saveButton) return;
+
     const originalLabel = saveButton.innerHTML;
     saveButton.disabled = true;
-    saveButton.innerHTML = '<i data-lucide="loader-2" class="spin-icon"></i> กำลังบันทึก...';
+    saveButton.innerHTML = '<i data-lucide="loader-2" class="spin-icon"></i>';
 
     try {
         const response = await fetch(state.googleSheetsUrl, {
@@ -2042,12 +2337,11 @@ async function savePresentationOverrides(event) {
         }
 
         customer.presentationOverrides = Object.values(overrides).some(Boolean) ? overrides : null;
-        closePresentationOverrideModal();
         renderPresentationSlide();
-        showToast('บันทึกชื่อทีมสำหรับโหมดนำเสนอแล้ว', 'success');
+        showToast(`บันทึก${getPresentationOverrideFieldLabel(field)}แล้ว`, 'success');
     } catch (error) {
         console.error('Failed to save presentation overrides:', error);
-        showToast(`บันทึกชื่อทีมไม่สำเร็จ: ${error.message}`, 'error');
+        showToast(`บันทึก${getPresentationOverrideFieldLabel(field)}ไม่สำเร็จ: ${error.message}`, 'error');
     } finally {
         saveButton.disabled = false;
         saveButton.innerHTML = originalLabel;
@@ -2067,48 +2361,9 @@ function initPresentation() {
         
         if (companyVal !== 'all' && c.company !== companyVal) return false;
 
-        const tsStr = String(c.feedback.timestamp || '');
-        if (!tsStr) return false;
-
-        let rowDateObj = null;
-        let m = null, y = null;
-
-        if (tsStr.includes('T')) {
-            rowDateObj = new Date(tsStr);
-            if (!isNaN(rowDateObj.getTime())) {
-                m = rowDateObj.getMonth() + 1;
-                y = rowDateObj.getFullYear();
-            }
-        } else if (tsStr.includes('/')) {
-            const dtPart = tsStr.split(' ')[0];
-            const p = dtPart.split('/');
-            if (p.length === 3) {
-                const part0 = parseInt(p[0], 10);
-                const part1 = parseInt(p[1], 10);
-                const part2 = parseInt(p[2], 10);
-                if (part0 > 12) {
-                    rowDateObj = new Date(part2, part1 - 1, part0);
-                    m = part1; y = part2;
-                } else if (part1 > 12) {
-                    rowDateObj = new Date(part2, part0 - 1, part1);
-                    m = part0; y = part2;
-                } else {
-                    rowDateObj = new Date(part2, part1 - 1, part0);
-                    m = part1; y = part2;
-                }
-            }
-        } else if (tsStr.includes('-')) {
-            const dtPart = tsStr.split(' ')[0];
-            const p = dtPart.split('-');
-            if (p.length === 3) {
-                rowDateObj = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
-                m = parseInt(p[1], 10);
-                y = parseInt(p[0], 10);
-            }
-        }
-
-        if (rowDateObj && m && y && !isNaN(rowDateObj.getTime())) {
-            const rowMonthYear = `${m}-${y}`;
+        const rowDateObj = parseSpreadsheetTimestamp(c.feedback.timestamp);
+        if (rowDateObj) {
+            const rowMonthYear = `${rowDateObj.getMonth() + 1}-${rowDateObj.getFullYear()}`;
 
             if (monthVal !== 'all' && rowMonthYear !== monthVal) return false;
 
@@ -2129,6 +2384,14 @@ function initPresentation() {
             return false;
         }
         return true;
+    });
+
+    // Latest assessment appears first. Ties (or invalid timestamps) keep the
+    // source-sheet order so the presentation remains predictable.
+    presentationSlides.sort((a, b) => {
+        const timeA = parseSpreadsheetTimestamp(a.feedback?.timestamp)?.getTime() || 0;
+        const timeB = parseSpreadsheetTimestamp(b.feedback?.timestamp)?.getTime() || 0;
+        return timeB - timeA;
     });
 
     currentSlideIndex = 0;
@@ -2211,6 +2474,9 @@ function renderPresentationSlide() {
         : avgScore >= 1.5 ? 'low'
         : avgScore > 0 ? 'poor'
         : 'unrated';
+    const presentationWorksiteType = getPresentationWorksiteType(c);
+    // feedback.timestamp is supplied from GFS_Care_Quest column B by the Apps Script API.
+    const assessmentDate = formatPresentationAssessmentDate(fb.timestamp, true);
     
     // Tag generation helper
     const makeTags = (tagsData) => {
@@ -2254,8 +2520,11 @@ function renderPresentationSlide() {
                                 <i data-lucide="map-pin"></i>
                             </div>
                             <div class="pp-meta-content">
-                                <strong>สถานที่:</strong>
-                                <span>${c.addressFromData || '-'}</span>
+                                <div class="pp-meta-location-heading">
+                                    <strong>สถานที่:</strong>
+                                    <span class="pp-worksite-type">${escapePresentationHtml(presentationWorksiteType)}</span>
+                                </div>
+                                <span class="pp-worksite-address">${escapePresentationHtml(c.addressFromData || '-')}</span>
                             </div>
                         </div>
                         <div class="pp-meta-row">
@@ -2292,6 +2561,10 @@ function renderPresentationSlide() {
                     </div>
                     <div class="pp-slide-navigation-content">
                         <span id="slide-counter-pp" class="pp-slide-counter">${currentSlideIndex + 1} / ${presentationSlides.length}</span>
+                        <div class="pp-assessment-date" aria-label="วันที่ประเมิน">
+                            <span class="pp-assessment-date-label"><i data-lucide="calendar-days"></i> วันที่ประเมิน</span>
+                            <strong>${escapePresentationHtml(assessmentDate)}</strong>
+                        </div>
                         <div class="pp-nav-buttons">
                             <button class="pp-btn pp-btn-prev" onclick="prevSlide()">
                                 <i data-lucide="chevron-left" style="width: 18px;"></i> ก่อนหน้า
@@ -2467,19 +2740,60 @@ function toggleFullScreen() {
 // GIFT DELIVERY STATUS SYSTEM
 // ==========================================
 
+function getGiftAssessmentDate(customer) {
+    return parseSpreadsheetTimestamp(customer.feedback?.timestamp);
+}
+
+function matchesGiftFilters(customer, monthVal, companyVal, startVal, endVal) {
+    if (companyVal !== 'all' && customer.company !== companyVal) return false;
+
+    const assessmentDate = getGiftAssessmentDate(customer);
+    if (monthVal !== 'all') {
+        if (!assessmentDate) return false;
+        const assessmentMonth = `${assessmentDate.getMonth() + 1}-${assessmentDate.getFullYear()}`;
+        if (assessmentMonth !== monthVal) return false;
+    }
+
+    if (startVal || endVal) {
+        if (!assessmentDate) return false;
+        if (startVal) {
+            const startDate = new Date(startVal);
+            startDate.setHours(0, 0, 0, 0);
+            if (assessmentDate < startDate) return false;
+        }
+        if (endVal) {
+            const endDate = new Date(endVal);
+            endDate.setHours(23, 59, 59, 999);
+            if (assessmentDate > endDate) return false;
+        }
+    }
+
+    return true;
+}
+
 function renderGiftTable() {
     const tbody = document.getElementById('gifts-table-body');
     if (!tbody) return;
-    
-    // Filter customers who have googleReviewClicked === 'Yes' (robust check)
-    const giftCustomers = state.customers.filter(c => {
+
+    const monthVal = document.getElementById('global-filter-month')?.value || 'all';
+    const companyVal = document.getElementById('global-filter-company')?.value || 'all';
+    const startVal = document.getElementById('global-filter-start')?.value;
+    const endVal = document.getElementById('global-filter-end')?.value;
+
+    // This table filters from the assessment date only; the other tabs retain
+    // their existing global filter behavior.
+    const giftCustomers = state.allCustomers.filter(c => {
         if (!c.feedback || !c.feedback.googleReviewClicked) return false;
         const clicked = c.feedback.googleReviewClicked.toString().trim().toUpperCase();
-        return clicked === 'YES' || clicked === 'TRUE' || clicked === 'Y';
-    });
+        const hasClickedGoogleReview = clicked === 'YES' || clicked === 'TRUE' || clicked === 'Y';
+        return hasClickedGoogleReview && matchesGiftFilters(c, monthVal, companyVal, startVal, endVal);
+    }).sort((a, b) => (getGiftAssessmentDate(b)?.getTime() || 0) - (getGiftAssessmentDate(a)?.getTime() || 0));
+
+    const reviewCount = document.getElementById('gift-review-count');
+    if (reviewCount) reviewCount.innerText = `ลูกค้าที่รีวิว ${giftCustomers.length} คน`;
     
     if (giftCustomers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:30px;">ไม่มีข้อมูลลูกค้าที่กดรีวิว Google Maps</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:30px;">ไม่มีข้อมูลลูกค้าที่กดรีวิว Google Maps</td></tr>';
         return;
     }
     
@@ -2499,9 +2813,13 @@ function renderGiftTable() {
         if (displayRowName && !displayRowName.startsWith('คุณ')) displayRowName = 'คุณ' + displayRowName;
         let displayRowPhone = gift.phone || c.phone || '-';
         let displayRowAddress = gift.address || c.addressFromData || '-';
+        const linkSentAt = formatPresentationAssessmentDate(c.linkSentAt, true);
+        const assessmentDate = formatPresentationAssessmentDate(c.feedback?.timestamp, true);
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
+            <td style="white-space: nowrap; color: var(--text-muted);">${escapePresentationHtml(linkSentAt)}</td>
+            <td style="white-space: nowrap; color: var(--text-muted);">${escapePresentationHtml(assessmentDate)}</td>
             <td>${c.id}</td>
             <td id="name-cell-${c.id}">
                 <div style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text); padding: 6px; border: 1px dashed transparent; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.border='1px dashed var(--primary)'" onmouseout="this.style.border='1px dashed transparent'" onclick="enableNameEdit('${c.id}')" title="คลิกเพื่อแก้ไข">
