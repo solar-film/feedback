@@ -257,7 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const cachedUrl = localStorage.getItem('google_sheets_apps_script_url');
     if (cachedUrl === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec' ||
         cachedUrl === 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec' ||
-        cachedUrl === 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec') {
+        cachedUrl === 'https://script.google.com/macros/s/AKfycbyhrQWxU2tQenMMoV1OaWZUKbDdPhrDIDl_T5XMHMFBIbFtIrVBZiwmFVfUP98-fpmKlw/exec' ||
+        cachedUrl === 'https://script.google.com/macros/s/AKfycbxcFOZ3VdBW0MkqtPTtkCvJNsWXS3cUCYM_U6BDFDSvxta2RZwTmymobnQPpDYoyIDjLQ/exec') {
         localStorage.removeItem('google_sheets_apps_script_url');
     }
 
@@ -315,7 +316,7 @@ function parseUrlParameters() {
 
     // Handle short URL by fetching customer details from Google Sheets tab 'Data'
     if (id) {
-        const sheetsUrl = 'https://script.google.com/macros/s/AKfycbxcFOZ3VdBW0MkqtPTtkCvJNsWXS3cUCYM_U6BDFDSvxta2RZwTmymobnQPpDYoyIDjLQ/exec';
+        const sheetsUrl = 'https://script.google.com/macros/s/AKfycbx6KYO_vGxUN11eZO7u-QU7OFcZr_VMfAodv2mvj2YXlSdGSV83J6IDYwp4nYH5DHhYyA/exec';
 
         const loader = document.getElementById('loading-overlay');
         loader.style.display = 'flex';
@@ -725,7 +726,7 @@ function validateM5() {
 // Reviews handling
 function clickGoogleMaps() {
     state.formData.googleMapsVisited = true;
-    const sheetsUrl = localStorage.getItem('google_sheets_apps_script_url') || 'https://script.google.com/macros/s/AKfycbxcFOZ3VdBW0MkqtPTtkCvJNsWXS3cUCYM_U6BDFDSvxta2RZwTmymobnQPpDYoyIDjLQ/exec';
+    const sheetsUrl = localStorage.getItem('google_sheets_apps_script_url') || 'https://script.google.com/macros/s/AKfycbx6KYO_vGxUN11eZO7u-QU7OFcZr_VMfAodv2mvj2YXlSdGSV83J6IDYwp4nYH5DHhYyA/exec';
     
     // Get ID from URL or formData
     const urlParams = new URLSearchParams(window.location.search);
@@ -880,7 +881,7 @@ function submitSurvey() {
     }
 
     // Google Sheets apps script fetch integration
-    const sheetsUrl = localStorage.getItem('google_sheets_apps_script_url') || 'https://script.google.com/macros/s/AKfycbxcFOZ3VdBW0MkqtPTtkCvJNsWXS3cUCYM_U6BDFDSvxta2RZwTmymobnQPpDYoyIDjLQ/exec';
+    const sheetsUrl = localStorage.getItem('google_sheets_apps_script_url') || 'https://script.google.com/macros/s/AKfycbx6KYO_vGxUN11eZO7u-QU7OFcZr_VMfAodv2mvj2YXlSdGSV83J6IDYwp4nYH5DHhYyA/exec';
     const submitBtn = document.getElementById('btn-submit-survey');
     
     if (sheetsUrl) {
