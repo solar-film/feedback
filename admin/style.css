@@ -524,6 +524,34 @@ body {
     vertical-align: middle;
 }
 
+/* Compact contact fields so the customer table leaves more room for key details. */
+.admin-table .customer-phone-column {
+    width: 105px;
+    min-width: 105px;
+    padding-left: 10px;
+    padding-right: 10px;
+    white-space: nowrap;
+}
+
+.admin-table .customer-contact-channel-column {
+    width: 95px;
+    min-width: 95px;
+    padding-left: 10px;
+    padding-right: 10px;
+    white-space: nowrap;
+}
+
+.admin-table .customer-channel-name-column {
+    width: 135px;
+    min-width: 135px;
+    max-width: 135px;
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* Keep the link-sent timestamp readable without giving the table a wide column. */
 .admin-table .link-sent-date-column {
     width: 120px;
@@ -533,6 +561,127 @@ body {
     font-size: 0.72rem;
     line-height: 1.35;
     white-space: nowrap;
+}
+
+.admin-table .customer-remark-column {
+    width: 220px;
+    min-width: 190px;
+}
+
+.customer-remark-cell {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+}
+
+.customer-remark-display {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 38px;
+    gap: 8px;
+    padding: 7px 8px;
+    overflow: hidden;
+    color: var(--text-main);
+    background: transparent;
+    border: 1px dashed transparent;
+    border-radius: 9px;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+    transition: 0.18s ease;
+}
+
+.customer-remark-display:hover,
+.customer-remark-display:focus-visible {
+    background: #f4f8fd;
+    border-color: #b9d0e9;
+    outline: none;
+}
+
+.customer-remark-display svg {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    color: #7f9cbd;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+
+.customer-remark-display:hover svg,
+.customer-remark-display:focus-visible svg {
+    opacity: 1;
+}
+
+.customer-remark-text {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.35;
+}
+
+.customer-remark-empty {
+    color: #8a9aad;
+    font-size: 0.76rem;
+    font-style: italic;
+}
+
+.customer-remark-editor textarea {
+    width: 100%;
+    min-height: 54px;
+    padding: 7px 8px;
+    resize: vertical;
+    color: #1f3653;
+    background: #ffffff;
+    border: 1px solid #8db8e8;
+    border-radius: 8px;
+    font: inherit;
+    line-height: 1.35;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(72, 139, 222, 0.12);
+}
+
+.customer-remark-editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 6px;
+}
+
+.customer-remark-editor-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 26px;
+    padding: 4px 7px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.customer-remark-editor-actions svg {
+    width: 13px;
+    height: 13px;
+}
+
+.customer-remark-editor-save {
+    color: #ffffff;
+    background: #1964c2;
+    border: 1px solid #1964c2;
+}
+
+.customer-remark-editor-save:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+.customer-remark-editor-cancel {
+    color: #607995;
+    background: #ffffff;
+    border: 1px solid #cfdeed;
 }
 
 .admin-table tr:last-child td {
@@ -759,6 +908,313 @@ body {
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--text-muted);
+}
+
+.drawer-action-bar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #dbe6f2;
+}
+
+.drawer-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 800;
+    line-height: 1.2;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.drawer-action-btn svg {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.drawer-action-btn:hover,
+.drawer-action-btn:focus-visible {
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.drawer-remark-button {
+    color: #ffffff;
+    background: linear-gradient(135deg, #205eae, #15437d);
+    border: 1px solid #1a559e;
+    box-shadow: 0 7px 15px rgba(27, 67, 124, 0.22);
+}
+
+.drawer-remark-button:hover,
+.drawer-remark-button:focus-visible {
+    background: linear-gradient(135deg, #2869bd, #123b70);
+    box-shadow: 0 10px 19px rgba(27, 67, 124, 0.3);
+}
+
+.drawer-copy-button {
+    color: #355775;
+    background: #ffffff;
+    border: 1px solid #c9dbed;
+    box-shadow: 0 5px 12px rgba(41, 83, 126, 0.09);
+}
+
+.drawer-copy-button:hover,
+.drawer-copy-button:focus-visible {
+    color: #1557a3;
+    background: #f4f8fd;
+    border-color: #9fc1e3;
+    box-shadow: 0 8px 15px rgba(41, 83, 126, 0.14);
+}
+
+@media (max-width: 400px) {
+    .drawer-action-bar {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Customer remark dialog */
+.customer-remark-modal {
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(10px);
+}
+
+.customer-remark-dialog {
+    width: min(100% - 32px, 480px);
+    max-width: 480px;
+    height: auto;
+    max-height: min(680px, calc(100vh - 32px));
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.86);
+    border-radius: 22px;
+    box-shadow: 0 24px 65px rgba(15, 23, 42, 0.3), 0 3px 12px rgba(15, 23, 42, 0.12);
+    animation: customerRemarkDialogIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes customerRemarkDialogIn {
+    from { opacity: 0; transform: translateY(14px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.customer-remark-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 24px 18px;
+    background: linear-gradient(135deg, #f5f9ff 0%, #eef6ff 100%);
+    border-bottom: 1px solid #dceaf8;
+}
+
+.customer-remark-heading {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 12px;
+}
+
+.customer-remark-icon {
+    display: inline-flex;
+    flex: 0 0 40px;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: #1262db;
+    background: #dcecff;
+    border: 1px solid #c5dffb;
+    border-radius: 13px;
+    box-shadow: 0 5px 12px rgba(18, 98, 219, 0.12);
+}
+
+.customer-remark-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.customer-remark-heading h3 {
+    margin: 0;
+    color: #173e72;
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
+.customer-remark-heading p {
+    margin: 3px 0 0;
+    overflow: hidden;
+    color: #66809f;
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.customer-remark-close {
+    display: inline-flex;
+    flex: 0 0 34px;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    color: #58708e;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #d9e6f4;
+    border-radius: 10px;
+    transition: 0.18s ease;
+}
+
+.customer-remark-close:hover,
+.customer-remark-close:focus-visible {
+    color: #1a5dbd;
+    background: #ffffff;
+    border-color: #b8d4f2;
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.customer-remark-close svg {
+    width: 18px;
+    height: 18px;
+}
+
+.customer-remark-body {
+    padding: 20px 24px 22px;
+}
+
+.customer-remark-field {
+    margin: 0;
+}
+
+.customer-remark-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 7px;
+}
+
+.customer-remark-label-row .form-label {
+    margin: 0;
+    color: #315987;
+}
+
+#customer-remark-count {
+    color: #8a9aad;
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.customer-remark-textarea {
+    min-height: 132px;
+    padding: 13px 14px;
+    resize: vertical;
+    color: #1f3653;
+    background: #fbfdff;
+    border: 1px solid #d5e3f3;
+    border-radius: 14px;
+    box-shadow: inset 0 1px 2px rgba(35, 83, 140, 0.03);
+    line-height: 1.55;
+}
+
+.customer-remark-textarea::placeholder {
+    color: #9aaabd;
+}
+
+.customer-remark-textarea:focus {
+    background: #ffffff;
+    border-color: #5f9deb;
+    box-shadow: 0 0 0 4px rgba(72, 139, 222, 0.14);
+}
+
+.customer-remark-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px 20px;
+    background: #f8fbff;
+    border-top: 1px solid #e2edf8;
+}
+
+.customer-remark-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 9px 15px;
+    border-radius: 11px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    transition: 0.18s ease;
+}
+
+.customer-remark-cancel {
+    min-width: 84px;
+    color: #526a85;
+    background: #ffffff;
+    border: 1px solid #d4e1ef;
+}
+
+.customer-remark-cancel:hover,
+.customer-remark-cancel:focus-visible {
+    color: #2d5e95;
+    background: #f2f7fd;
+    border-color: #b9d0e9;
+    outline: none;
+}
+
+.customer-remark-save {
+    min-width: 145px;
+    gap: 7px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1e66c5, #0f4fa5);
+    border: 1px solid #155bb8;
+    box-shadow: 0 8px 16px rgba(18, 89, 183, 0.22);
+}
+
+.customer-remark-save:hover,
+.customer-remark-save:focus-visible {
+    background: linear-gradient(135deg, #246fce, #0e4591);
+    box-shadow: 0 10px 19px rgba(18, 89, 183, 0.3);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.customer-remark-save:disabled {
+    cursor: wait;
+    opacity: 0.75;
+    transform: none;
+}
+
+.customer-remark-save svg {
+    width: 17px;
+    height: 17px;
+}
+
+@media (max-width: 520px) {
+    .customer-remark-header {
+        padding: 18px 18px 16px;
+    }
+
+    .customer-remark-body {
+        padding: 18px;
+    }
+
+    .customer-remark-actions {
+        padding: 14px 18px 18px;
+    }
 }
 
 /* Customer Journey Timeline */

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFS Care Admin รายงานลูกค้ารีวิว - ระบบบริหารแบบสอบถามหลังการขาย</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
-    <link rel="stylesheet" href="style.css?v=56">
+    <link rel="stylesheet" href="style.css?v=61">
     
     <!-- Lucide Icons & Chart.js (Optimized CDNs) -->
     <script defer src="https://unpkg.com/lucide@0.400.0/dist/umd/lucide.min.js"></script>
@@ -39,13 +39,15 @@
         
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <img src="../images/logo.png" alt="Logo" class="brand-logo" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px;">
-                <div>
-                    <h1 class="brand-name">Feedback Panel</h1>
-                    <span class="brand-subtitle">ประเมินความพึงพอใจหลังการขาย </span>
+            <a href="https://docs.google.com/spreadsheets/d/1IRU1ZjQIUbpBmz_MAzVtXdQQ93eQbJNJO9nC7fGvAKs/edit?gid=435524808#gid=435524808" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: block;">
+                <div class="sidebar-brand">
+                    <img src="../images/logo.png" alt="Logo" class="brand-logo" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px;">
+                    <div>
+                        <h1 class="brand-name">Feedback Panel</h1>
+                        <span class="brand-subtitle">ประเมินความพึงพอใจหลังการขาย </span>
+                    </div>
                 </div>
-            </div>
+            </a>
             
             <ul class="sidebar-menu">
                 <li class="menu-item active" data-tab="dashboard">
@@ -101,6 +103,9 @@
                     </button>
                     <div class="navbar-title-wrap">
                         <h2 class="navbar-title" id="page-title">รายงานลูกค้ารีวิว</h2>
+                        <a id="presentation-sheet-link" class="navbar-sheet-link" href="https://docs.google.com/spreadsheets/d/1ycTTC_qVKRg3vOwVPNQXSNq8baARo5OoIpLNIKxRomE/edit?gid=118511021#gid=118511021" target="_blank" rel="noopener noreferrer" title="เปิด Google Sheets ข้อมูลฟีดแบค" aria-label="เปิด Google Sheets ข้อมูลฟีดแบค" hidden>
+                            <i data-lucide="file-spreadsheet"></i>
+                        </a>
                     </div>
                 </div>
                 
@@ -362,19 +367,20 @@
                                     <th>บริษัท</th>
                                     <th>รหัส ID</th>
                                     <th style="width: 12%;">ชื่อลูกค้า</th>
-                                    <th>เบอร์ติดต่อ</th>
-                                    <th style="width: 70px;">Line @</th>
+                                    <th class="customer-phone-column">เบอร์ติดต่อ</th>
+                                    <th class="customer-contact-channel-column">ช่องทางติดต่อ</th>
+                                    <th class="customer-channel-name-column">ชื่อช่องทาง</th>
                                     <th>วันที่ติดตั้ง</th>
                                     <th>ฝ่ายขาย</th>
                                     <th>ทีมช่าง</th>
                                     <th>สถานะ</th>
                                     <th class="link-sent-date-column">วันที่ส่งลิงก์</th>
-                                    <th style="width: 120px;">การจัดการ</th>
+                                    <th class="customer-remark-column">หมายเหตุ</th>
                                 </tr>
                             </thead>
                             <tbody id="customer-table-body">
                                 <tr>
-                                    <td colspan="12" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูลรายชื่อจาก Google Sheet...</td>
+                                    <td colspan="13" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูลรายชื่อจาก Google Sheet...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -561,17 +567,49 @@
             </div>
 
             <!-- Drawer Bottom Actions -->
-            <div style="border-top: 1.5px solid var(--border); padding-top: 16px; display: flex; gap: 8px;">
-                <button class="btn-action" style="flex: 1; padding: 10px; justify-content: center;" id="drawer-btn-line">
-                    <i data-lucide="message-square" style="width: 16px;"></i>
-                    <span>ส่ง LINE ซ้ำ</span>
+            <div class="drawer-action-bar">
+                <button class="drawer-action-btn drawer-remark-button" id="drawer-btn-remark">
+                    <i data-lucide="notebook-pen"></i>
+                    <span>บันทึกหมายเหตุ</span>
                 </button>
-                <button class="btn-secondary" style="flex: 1; padding: 10px; justify-content: center;" id="drawer-btn-copy">
-                    <i data-lucide="copy" style="width: 16px;"></i>
+                <button class="drawer-action-btn drawer-copy-button" id="drawer-btn-copy">
+                    <i data-lucide="copy"></i>
                     <span>คัดลอกลิงก์</span>
                 </button>
             </div>
 
+        </div>
+    </div>
+
+    <!-- CUSTOMER REMARK MODAL -->
+    <div class="drawer-modal customer-remark-modal" id="customer-remark-modal" onclick="closeCustomerRemarkModal()">
+        <div class="drawer-content customer-remark-dialog" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="customer-remark-title">
+            <div class="customer-remark-header">
+                <div class="customer-remark-heading">
+                    <div class="customer-remark-icon"><i data-lucide="notebook-pen"></i></div>
+                    <div>
+                        <h3 id="customer-remark-title">บันทึกหมายเหตุ</h3>
+                        <p id="customer-remark-customer"></p>
+                    </div>
+                </div>
+                <button class="drawer-close customer-remark-close" type="button" onclick="closeCustomerRemarkModal()" aria-label="ปิดหน้าต่าง"><i data-lucide="x"></i></button>
+            </div>
+            <div class="customer-remark-body">
+                <input type="hidden" id="customer-remark-id">
+                <div class="form-group customer-remark-field">
+                    <div class="customer-remark-label-row">
+                        <label class="form-label" for="customer-remark-text">หมายเหตุ</label>
+                        <span id="customer-remark-count">0 / 2,000</span>
+                    </div>
+                    <textarea id="customer-remark-text" class="form-control customer-remark-textarea" rows="5" placeholder="เช่น โทรติดตามลูกค้าแล้ว นัดหมายวันพรุ่งนี้..." maxlength="2000" oninput="updateCustomerRemarkCount()" aria-describedby="customer-remark-count"></textarea>
+                </div>
+            </div>
+            <div class="customer-remark-actions">
+                <button type="button" class="btn-secondary customer-remark-cancel" onclick="closeCustomerRemarkModal()">ยกเลิก</button>
+                <button type="button" class="btn-action customer-remark-save" id="customer-remark-save" onclick="saveCustomerRemark()">
+                    <i data-lucide="save"></i><span>บันทึกหมายเหตุ</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -753,6 +791,6 @@
 
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=115"></script>
+    <script defer src="app.js?v=123"></script>
 </body>
 </html>

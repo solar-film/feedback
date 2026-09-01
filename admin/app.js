@@ -322,6 +322,8 @@ function loadData() {
                         bill: item.bill || '-',
                         status: status,
                         linkSentAt: item.linkSentAt || '',
+                        linkSentAtHistory: item.linkSentAtHistory || [],
+                        remarkData: item.remarkData || null,
                         feedback: item.feedback || null,
                         giftData: item.giftData || null,
                         addressFromData: item.addressFromData || ''
@@ -444,6 +446,8 @@ function forceRefreshData() {
                         bill: item.bill || '-',
                         status: status,
                         linkSentAt: item.linkSentAt || '',
+                        linkSentAtHistory: item.linkSentAtHistory || [],
+                        remarkData: item.remarkData || null,
                         feedback: item.feedback || null,
                         giftData: item.giftData || null,
                         addressFromData: item.addressFromData || ''
@@ -545,16 +549,22 @@ function formatCustomerDatabaseInstallDate(c) {
     return `${day}/${month}/${date.getFullYear()}`;
 }
 
-function formatLinkSentDate(timestamp) {
-    const date = parseSpreadsheetTimestamp(timestamp);
-    if (!date) return '-';
+function formatLinkSentDate(timestamps) {
+    const values = (Array.isArray(timestamps) ? timestamps : [timestamps])
+        .filter(timestamp => timestamp !== null && timestamp !== undefined && String(timestamp).trim());
+    const formattedTimestamps = values.map(timestamp => {
+        const date = parseSpreadsheetTimestamp(timestamp);
+        if (!date) return escapePresentationHtml(timestamp);
 
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
+    });
+    return formattedTimestamps.length ? formattedTimestamps.join('<br>') : '-';
 }
 
 function matchesCustomerDatabaseFilters(customer, monthVal, companyVal, startVal, endVal) {
@@ -718,7 +728,7 @@ function renderCustomerTable() {
     );
 
     if (customerRows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:var(--text-muted);">ไม่มีข้อมูลลูกค้า กรุณากดปุ่มเพิ่มลูกค้าใหม่ด้านขวาบน</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; color:var(--text-muted);">ไม่มีข้อมูลลูกค้า กรุณากดปุ่มเพิ่มลูกค้าใหม่ด้านขวาบน</td></tr>';
         return;
     }
 
@@ -740,20 +750,19 @@ function renderCustomerTable() {
         const completedAssessmentDate = c.status === 'Completed'
             ? formatLinkSentDate(c.feedback?.timestamp)
             : '';
-
-        // Dynamic LINE Message
-        const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
-        const companyName = c.company === 'MHL' ? 'MHL' : 'Goodfilm';
-        const lineMessage = `สวัสดีค่ะคุณลูกค้า ✨\n\n${companyName} อยากฟังความเห็นของคุณลูกค้าเพื่อนำไปปรับปรุงบริการให้ดียิ่งขึ้น\nตอบแบบสอบถามสั้นๆ พร้อมรับของตอบแทนจากทางร้าน จัดส่งให้ถึงบ้าน🎁\n\nคลิกตอบแบบสอบถาม (ใช้เวลา 30 วินาที): ${surveyLink}\nขอบคุณมากค่ะ 💙`;
-        const lineDeepLink = `https://line.me/R/msg/text/?${encodeURIComponent(lineMessage)}`;
+        const latestRemark = String(c.remarkData?.remark || '').trim();
+        const remarkCellContent = latestRemark
+            ? `<span class="customer-remark-text">${escapePresentationHtml(latestRemark)}</span>`
+            : '<span class="customer-remark-empty">คลิกเพื่อเพิ่มหมายเหตุ</span>';
 
         tr.innerHTML = `
             <td style="text-align: center; color: var(--text-muted); font-size: 0.75rem;">${index + 1}</td>
             <td>${c.company || '-'}</td>
             <td class="customer-id">${c.id}</td>
             <td style="font-weight: 700;">${c.name}</td>
-            <td>${c.phone}</td>
-            <td>${c.lineAt || '-'}</td>
+            <td class="customer-phone-column">${c.phone}</td>
+            <td class="customer-contact-channel-column">${c.contactChannel || '-'}</td>
+            <td class="customer-channel-name-column" title="${escapePresentationHtml(c.lineAt || '-')}">${c.lineAt || '-'}</td>
             <td>${formatCustomerDatabaseInstallDate(c)}</td>
             <td>${c.sales || '-'}</td>
             <td>${c.tech || '-'}</td>
@@ -761,16 +770,12 @@ function renderCustomerTable() {
                 <span class="status-badge ${statusClass}">${statusText}</span>
                 ${completedAssessmentDate && completedAssessmentDate !== '-' ? `<small class="status-assessment-date">${completedAssessmentDate}</small>` : ''}
             </td>
-            <td class="link-sent-date-column">${formatLinkSentDate(c.linkSentAt)}</td>
-            <td onclick="event.stopPropagation()">
-                <div class="table-actions">
-                    <button class="icon-btn" onclick="copySurveyLink('${c.id}', this)" title="คัดลอกลิงก์ประเมิน">
-                        <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
-                    </button>
-                    <a href="${lineDeepLink}" target="_blank" class="icon-btn line" onclick="markAsSent('${c.id}')" title="ส่ง LINE หาลูกค้า">
-                        <i data-lucide="message-square" style="width: 14px; height: 14px;"></i>
-                    </a>
-                </div>
+            <td class="link-sent-date-column">${formatLinkSentDate(c.linkSentAtHistory?.length ? c.linkSentAtHistory : c.linkSentAt)}</td>
+            <td class="customer-remark-cell" onclick="event.stopPropagation()">
+                <button type="button" class="customer-remark-display" onclick="editCustomerRemark('${c.id}', this)" title="คลิกเพื่อแก้ไขหมายเหตุ">
+                    ${remarkCellContent}
+                    <i data-lucide="pencil-line"></i>
+                </button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -798,25 +803,27 @@ function filterCustomerTable() {
     const rows = document.querySelectorAll('#customer-table-body tr');
     
     rows.forEach(row => {
-        if (row.cells.length < 12) return; // Skip headers/empty rows
+        if (row.cells.length < 13) return; // Skip headers/empty rows
 
         const company = row.cells[1].innerText;
         const id = row.cells[2].innerText.toLowerCase();
         const name = row.cells[3].innerText.toLowerCase();
         const phone = row.cells[4].innerText.toLowerCase();
-        const lineAt = row.cells[5].innerText.toLowerCase();
-        const sales = row.cells[7].innerText.toLowerCase();
-        const tech = row.cells[8].innerText.toLowerCase();
-        const rowStatusTag = row.cells[9].querySelector('.status-badge');
+        const contactChannel = row.cells[5].innerText.toLowerCase();
+        const channelName = row.cells[6].innerText.toLowerCase();
+        const sales = row.cells[8].innerText.toLowerCase();
+        const tech = row.cells[9].innerText.toLowerCase();
+        const rowStatusTag = row.cells[10].querySelector('.status-badge');
         
         let rowStatus = 'Unsent';
         if (rowStatusTag && rowStatusTag.classList.contains('sent')) rowStatus = 'Sent';
         else if (rowStatusTag && rowStatusTag.classList.contains('completed')) rowStatus = 'Completed';
         else if (rowStatusTag && rowStatusTag.classList.contains('action')) rowStatus = 'Action Required';
 
-        const installDate = row.cells[6].innerText.toLowerCase();
-        const linkSentDate = row.cells[10].innerText.toLowerCase();
-        const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || lineAt.includes(query) || sales.includes(query) || tech.includes(query) || company.toLowerCase().includes(query) || installDate.includes(query) || linkSentDate.includes(query);
+        const installDate = row.cells[7].innerText.toLowerCase();
+        const linkSentDate = row.cells[11].innerText.toLowerCase();
+        const remark = row.cells[12].innerText.toLowerCase();
+        const matchesQuery = id.includes(query) || name.includes(query) || phone.includes(query) || contactChannel.includes(query) || channelName.includes(query) || sales.includes(query) || tech.includes(query) || company.toLowerCase().includes(query) || installDate.includes(query) || linkSentDate.includes(query) || remark.includes(query);
         const matchesStatus = status === 'all' || rowStatus === status;
 
         if (matchesQuery && matchesStatus) {
@@ -948,7 +955,7 @@ function findCustomerRecord(customerId) {
         || state.customers.find(customer => customer.id === customerId);
 }
 
-function updateCustomerStatus(customerId, targetStatus) {
+function updateCustomerStatus(customerId, targetStatus, options = {}) {
     const customer = findCustomerRecord(customerId);
     if (!customer) return;
 
@@ -969,7 +976,7 @@ function updateCustomerStatus(customerId, targetStatus) {
     renderKPIs();
 
     // Sync status to backend
-    if (state.googleSheetsUrl && (targetStatus === 'Sent' || targetStatus === 'Unsent')) {
+    if (!options.skipBackend && state.googleSheetsUrl && (targetStatus === 'Sent' || targetStatus === 'Unsent')) {
         fetch(state.googleSheetsUrl, {
             method: 'POST',
             mode: 'no-cors',
@@ -998,11 +1005,27 @@ function handleDrop(e, targetStatus) {
     updateCustomerStatus(customerId, targetStatus);
 }
 
-function markAsSent(id) {
+function markAsSent(id, options = {}) {
     const customer = findCustomerRecord(id);
     if (customer && (!customer.status || customer.status === 'Unsent')) {
-        updateCustomerStatus(id, 'Sent');
+        updateCustomerStatus(id, 'Sent', options);
     }
+}
+
+function recordLinkCopy(id) {
+    if (!id || !state.googleSheetsUrl) return false;
+
+    fetch(state.googleSheetsUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({
+            action: 'logLinkCopy',
+            id: id,
+            password: localStorage.getItem('admin_password')
+        })
+    }).catch(error => console.error('Failed to log link copy to Google Sheets:', error));
+
+    return true;
 }
 
 // Copy link action helper
@@ -1015,6 +1038,7 @@ function copySurveyLink(id, btn) {
     const copyPromise = copyTextRobust(surveyMessage);
 
     copyPromise.then(() => {
+        const copyWasLogged = recordLinkCopy(id);
         const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i data-lucide="check" style="width: 14px; height: 14px; color: var(--success);"></i>';
         lucide.createIcons();
@@ -1023,7 +1047,7 @@ function copySurveyLink(id, btn) {
             // Auto-move to 'Sent' if currently 'Unsent'
             const customer = findCustomerRecord(id);
             if (customer && (!customer.status || customer.status === 'Unsent')) {
-                updateCustomerStatus(id, 'Sent');
+                updateCustomerStatus(id, 'Sent', { skipBackend: copyWasLogged });
             }
             if (document.body.contains(btn)) {
                 btn.innerHTML = originalHtml;
@@ -1114,18 +1138,15 @@ function openCustomerDrawer(id) {
     // Dynamic LINE link & copy inside Drawer
     const surveyLink = `${window.location.href.split('/admin')[0]}/?id=${encodeURIComponent(c.id)}`;
     const brandName = c.company === 'MHL' ? 'Maholan film' : 'Goodfilm';
-    const custName = c.name ? c.name : 'คุณลูกค้า';
     const surveyMessage = `สวัสดีค่ะคุณลูกค้า ✨\n\n${brandName} อยากฟังความเห็นของคุณลูกค้าเพื่อนำไปปรับปรุงบริการให้ดียิ่งขึ้น\nตอบแบบสอบถามสั้นๆ พร้อมรับของตอบแทนจากทางร้าน จัดส่งให้ถึงบ้าน🎁\n\nคลิกตอบแบบสอบถาม (ใช้เวลา 30 วินาที): ${surveyLink}\nขอบคุณมากค่ะ 💙`;
     
-    document.getElementById('drawer-btn-line').onclick = () => {
-        window.open(`https://line.me/R/msg/text/?${encodeURIComponent(surveyMessage)}`, '_blank');
-        markAsSent(c.id);
-    };
+    document.getElementById('drawer-btn-remark').onclick = () => openCustomerRemarkModal(c);
     
     document.getElementById('drawer-btn-copy').onclick = () => {
         try {
             const copyPromise = copyTextRobust(surveyMessage);
             copyPromise.then(() => {
+                const copyWasLogged = recordLinkCopy(c.id);
                 const btn = document.getElementById('drawer-btn-copy');
                 const originalHtml = btn.innerHTML;
                 btn.innerHTML = '<i data-lucide="check" style="width: 16px;"></i><span>คัดลอกแล้ว</span>';
@@ -1136,7 +1157,7 @@ function openCustomerDrawer(id) {
                 showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
                 
                 setTimeout(() => {
-                    markAsSent(c.id);
+                    markAsSent(c.id, { skipBackend: copyWasLogged });
                     closeCustomerDrawer();
                     btn.innerHTML = originalHtml;
                     btn.style.backgroundColor = '';
@@ -1158,6 +1179,140 @@ function openCustomerDrawer(id) {
 
 function closeCustomerDrawer() {
     document.getElementById('customer-drawer').style.display = 'none';
+}
+
+function openCustomerRemarkModal(customer) {
+    const modal = document.getElementById('customer-remark-modal');
+    const input = document.getElementById('customer-remark-text');
+    document.getElementById('customer-remark-id').value = customer.id;
+    document.getElementById('customer-remark-customer').innerText = `${customer.name || '-'} (${customer.id})`;
+    input.value = '';
+    updateCustomerRemarkCount();
+    modal.style.display = 'flex';
+    lucide.createIcons();
+    setTimeout(() => input.focus(), 0);
+}
+
+function closeCustomerRemarkModal() {
+    document.getElementById('customer-remark-modal').style.display = 'none';
+}
+
+function updateCustomerRemarkCount() {
+    const input = document.getElementById('customer-remark-text');
+    const counter = document.getElementById('customer-remark-count');
+    if (!input || !counter) return;
+    counter.innerText = `${input.value.length.toLocaleString('en-US')} / 2,000`;
+}
+
+async function saveCustomerRemark() {
+    const id = document.getElementById('customer-remark-id').value;
+    const input = document.getElementById('customer-remark-text');
+    const remark = input.value.trim();
+    const saveButton = document.getElementById('customer-remark-save');
+
+    if (!remark) {
+        showToast('กรุณาระบุหมายเหตุก่อนบันทึก', 'warning');
+        input.focus();
+        return;
+    }
+    const originalHtml = saveButton.innerHTML;
+    saveButton.disabled = true;
+    saveButton.innerHTML = '<i data-lucide="loader-2" class="spin-icon"></i> กำลังบันทึก...';
+    lucide.createIcons();
+
+    try {
+        await persistCustomerRemark(id, remark);
+        const customer = findCustomerRecord(id);
+        if (customer) customer.remarkData = { remark: remark };
+        renderCustomerTable();
+        filterCustomerTable();
+
+        closeCustomerRemarkModal();
+        showToast('บันทึกหมายเหตุลงชีต remark แล้ว', 'success');
+    } catch (error) {
+        console.error('Failed to save customer remark:', error);
+        showToast(`บันทึกหมายเหตุไม่สำเร็จ: ${error.message}`, 'error');
+    } finally {
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalHtml;
+        lucide.createIcons();
+    }
+}
+
+async function persistCustomerRemark(id, remark) {
+    if (!state.googleSheetsUrl) {
+        throw new Error('ไม่พบ URL สำหรับเชื่อมต่อฐานข้อมูล');
+    }
+
+    const response = await fetch(state.googleSheetsUrl, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: 'saveRemark',
+            password: localStorage.getItem('admin_password'),
+            id: id,
+            remark: remark
+        })
+    });
+    const result = await response.json();
+    if (result.status !== 'success') {
+        throw new Error(result.message || 'ไม่สามารถบันทึกหมายเหตุได้');
+    }
+}
+
+function editCustomerRemark(customerId, button) {
+    const customer = findCustomerRecord(customerId);
+    const cell = button.closest('.customer-remark-cell');
+    if (!customer || !cell) return;
+
+    const currentRemark = String(customer.remarkData?.remark || '').trim();
+    cell.innerHTML = `
+        <div class="customer-remark-editor">
+            <textarea id="customer-remark-input-${customerId}" rows="2" maxlength="2000" placeholder="ระบุหมายเหตุ...">${escapePresentationHtml(currentRemark)}</textarea>
+            <div class="customer-remark-editor-actions">
+                <button type="button" class="customer-remark-editor-save" onclick="saveCustomerRemarkInline('${customerId}', this)"><i data-lucide="check"></i><span>บันทึก</span></button>
+                <button type="button" class="customer-remark-editor-cancel" onclick="cancelCustomerRemarkEdit()" title="ยกเลิก"><i data-lucide="x"></i></button>
+            </div>
+        </div>
+    `;
+    lucide.createIcons();
+    const input = document.getElementById(`customer-remark-input-${customerId}`);
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+}
+
+function cancelCustomerRemarkEdit() {
+    renderCustomerTable();
+    filterCustomerTable();
+}
+
+async function saveCustomerRemarkInline(customerId, button) {
+    const input = document.getElementById(`customer-remark-input-${customerId}`);
+    const remark = input?.value.trim() || '';
+    if (!remark) {
+        showToast('กรุณาระบุหมายเหตุก่อนบันทึก', 'warning');
+        input?.focus();
+        return;
+    }
+
+    const originalHtml = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i data-lucide="loader-2" class="spin-icon"></i>';
+    lucide.createIcons();
+
+    try {
+        await persistCustomerRemark(customerId, remark);
+        const customer = findCustomerRecord(customerId);
+        if (customer) customer.remarkData = { remark: remark };
+        renderCustomerTable();
+        filterCustomerTable();
+        showToast('บันทึกหมายเหตุลงชีต remark แล้ว', 'success');
+    } catch (error) {
+        console.error('Failed to save customer remark:', error);
+        showToast(`บันทึกหมายเหตุไม่สำเร็จ: ${error.message}`, 'error');
+    } finally {
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+    }
 }
 
 // Generate Customer Journey Timeline nodes
@@ -1988,6 +2143,7 @@ function copyToClipboard(text, btn, id = null) {
         const copyPromise = copyTextRobust(text);
         
         copyPromise.then(() => {
+            const copyWasLogged = id ? recordLinkCopy(id) : false;
             showToast('คัดลอกลิงก์แบบสอบถามสำเร็จแล้วค่ะ! 📋', 'success');
 
             const origText = btn.innerText;
@@ -1996,7 +2152,7 @@ function copyToClipboard(text, btn, id = null) {
             btn.style.backgroundImage = 'none'; // remove linear gradient
             
             setTimeout(() => {
-                if (id) markAsSent(id);
+                if (id) markAsSent(id, { skipBackend: copyWasLogged });
                 // We don't need to restore btn if it gets destroyed by markAsSent's re-render, 
                 // but just in case it doesn't:
                 if (document.body.contains(btn)) {
