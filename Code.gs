@@ -7,6 +7,7 @@ function getAdminPassword() {
 var FEEDBACK_SHEET = 'GFS_Care_Quest';
 var STATUS_SHEET = 'GFS_Status_Log';
 var GIFT_SHEET = 'Gift';
+var REMARK_SHEET = 'remark';
 var PRESENTATION_OVERRIDES_SHEET = 'Presentation Overrides';
 
 var FEEDBACK_HEADERS = [
@@ -52,7 +53,9 @@ function doPost(e) {
       'updateGiftStatus',
       'deleteGiftStatus',
       'getAllCustomersDetailed',
-      'savePresentationOverride'
+      'savePresentationOverride',
+      'saveRemark',
+      'logLinkCopy'
     ];
 
     var adminPassword = getAdminPassword();
@@ -65,6 +68,8 @@ function doPost(e) {
     if (action === 'updateGiftStatus') return updateGiftStatus(data);
     if (action === 'deleteGiftStatus') return deleteGiftStatus(data.id);
     if (action === 'savePresentationOverride') return savePresentationOverride(data);
+    if (action === 'saveRemark') return saveRemark(data);
+    if (action === 'logLinkCopy') return logLinkCopy(data);
     if (action === 'updateReviewStatus') return updateReviewStatus(data.id);
 
     // ไม่มี action คือการส่งแบบประเมินจากหน้าลูกค้า
@@ -184,6 +189,75 @@ function updateStatus(data) {
   var sheet = ensureSheet(STATUS_SHEET, ['ID', 'Status', 'Timestamp']);
   sheet.appendRow([data.id || '', data.status || '', new Date()]);
   return jsonResponse({ status: 'success', message: 'Status updated successfully' });
+}
+
+function getNextCopyTimestampColumn(sheet, row) {
+  var lastColumn = Math.max(sheet.getLastColumn(), 3);
+  var headers = sheet.getRange(1, 1, 1, lastColumn).getDisplayValues()[0];
+  var largestTimestampNumber = 0;
+
+  for (var column = 0; column < headers.length; column++) {
+    var match = String(headers[column] || '').trim().match(/^timestamp(\d*)$/i);
+    if (!match) continue;
+
+    var timestampNumber = match[1] ? Number(match[1]) : 1;
+    largestTimestampNumber = Math.max(largestTimestampNumber, timestampNumber);
+
+    // Reuse the first empty timestamp cell. This starts with Timestamp, then
+    // Timestamp2, Timestamp3, and so on for later copies of the same link.
+    if (!sheet.getRange(row, column + 1).getValue()) return column + 1;
+  }
+
+  var newColumn = lastColumn + 1;
+  sheet.insertColumnAfter(lastColumn);
+  sheet.getRange(1, newColumn)
+    .setValue('Timestamp' + Math.max(largestTimestampNumber + 1, 2))
+    .setFontWeight('bold')
+    .setBackground('#eef3f8');
+  return newColumn;
+}
+
+function logLinkCopy(data) {
+  var id = getText(data.id);
+  if (!id) return jsonResponse({ status: 'error', message: 'ไม่พบรหัสลูกค้า' });
+
+  // A lock prevents two very close clicks from selecting the same Timestamp
+  // column before either one has written its copy time.
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var sheet = ensureSheet(STATUS_SHEET, ['ID', 'Status', 'Timestamp']);
+    var row = findSheetRowById(sheet, id);
+    var copiedAt = new Date();
+
+    if (!row) {
+      // This is the first recorded copy for this customer.
+      sheet.appendRow([id, 'Sent', copiedAt]);
+    } else {
+      var status = getText(sheet.getRange(row, 2).getValue());
+      if (!status || status === 'Unsent') sheet.getRange(row, 2).setValue('Sent');
+
+      var timestampColumn = getNextCopyTimestampColumn(sheet, row);
+      sheet.getRange(row, timestampColumn).setValue(copiedAt);
+    }
+
+    return jsonResponse({ status: 'success', message: 'Link copy logged successfully' });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function saveRemark(data) {
+  var id = getText(data.id);
+  var remark = getText(data.remark);
+  if (!id || !remark) {
+    return jsonResponse({ status: 'error', message: 'กรุณาระบุรหัสลูกค้าและหมายเหตุ' });
+  }
+
+  // Keep every note as a separate row so the remark sheet is a complete history.
+  var sheet = ensureSheet(REMARK_SHEET, ['ID', 'Remark', 'Timestamp']);
+  sheet.appendRow([id, remark, new Date()]);
+  return jsonResponse({ status: 'success', message: 'Remark saved successfully' });
 }
 
 function updateGiftStatus(data) {
@@ -374,14 +448,38 @@ function isSurveyLinkSentStatus(status) {
     || normalizedStatus === 'ส่งแบบประเมิน';
 }
 
-function getStatusLogTimestamp(row) {
-  return getFirstText([
+function getStatusLogTimestamps(row) {
+  var timestampColumns = [
     row['Timestamp'],
+    row['Timestamp2'],
+    row['Timestamp3'],
+    row['Timestamp4'],
+    row['Timestamp5'],
+    row['Timestamp6'],
+    row['Timestamp7'],
+    row['Timestamp8'],
+    row['Timestamp9'],
+    row['Timestamp10'],
     row['วันที่/เวลาส่งลิงก์'],
     row['วันที่ส่งลิงก์'],
     row['วันที่เวลา'],
     row['_col_2']
-  ]);
+  ];
+  var timestamps = [];
+
+  for (var index = 0; index < timestampColumns.length; index++) {
+    var timestamp = getText(timestampColumns[index]);
+    if (timestamp && timestamps.indexOf(timestamp) === -1) timestamps.push(timestamp);
+  }
+  return timestamps;
+}
+
+function appendUniqueStatusLogTimestamps(existing, additions) {
+  var allTimestamps = existing.slice();
+  for (var index = 0; index < additions.length; index++) {
+    if (allTimestamps.indexOf(additions[index]) === -1) allTimestamps.push(additions[index]);
+  }
+  return allTimestamps;
 }
 
 function buildStatusDataById(rows) {
@@ -393,16 +491,35 @@ function buildStatusDataById(rows) {
     var id = getFirstText([row['ID'], row['รหัสลูกค้า'], row['รหัส ID']]);
     if (!id) continue;
 
-    // GFS_Status_Log is append-only. Keep its latest status and the timestamp
-    // of the latest event where the survey link was sent.
+    // GFS_Status_Log is append-only. Keep the complete list of timestamps from
+    // every sent-link event, including Timestamp2 through Timestamp10.
     var previous = result[id] || {};
     var status = getFirstText([row['Status'], row['สถานะ']]) || previous.status || 'Unsent';
-    var timestamp = getStatusLogTimestamp(row);
+    var previousTimestamps = previous.linkSentAtHistory || (previous.linkSentAt ? [previous.linkSentAt] : []);
+    var rowTimestamps = isSurveyLinkSentStatus(status) ? getStatusLogTimestamps(row) : [];
+    var linkSentAtHistory = appendUniqueStatusLogTimestamps(previousTimestamps, rowTimestamps);
     result[id] = {
       status: status,
-      linkSentAt: isSurveyLinkSentStatus(status) && timestamp
-        ? timestamp
-        : (previous.linkSentAt || '')
+      linkSentAt: linkSentAtHistory.length ? linkSentAtHistory[linkSentAtHistory.length - 1] : '',
+      linkSentAtHistory: linkSentAtHistory
+    };
+  }
+  return result;
+}
+
+function buildLatestRemarkById(rows) {
+  var result = {};
+  if (!rows) return result;
+
+  // The remark sheet is append-only. Each later row is a newer edit, so the
+  // table shows the latest remark while the sheet retains the full history.
+  for (var index = 0; index < rows.length; index++) {
+    var row = rows[index];
+    var id = getFirstText([row['ID'], row['รหัสลูกค้า'], row['รหัส ID']]);
+    if (!id) continue;
+    result[id] = {
+      remark: getFirstText([row['Remark'], row['หมายเหตุ'], row['_col_1']]),
+      timestamp: getFirstText([row['Timestamp'], row['วันที่/เวลา'], row['_col_2']])
     };
   }
   return result;
@@ -433,7 +550,7 @@ function getCustomerId(row) {
   return getFirstText([row['ID'], row['รหัสลูกค้า'], row['รหัส ID']]);
 }
 
-function mapCustomer(row, feedbackById, statusDataById, giftById, overridesById) {
+function mapCustomer(row, feedbackById, statusDataById, giftById, remarksById, overridesById) {
   var id = getCustomerId(row);
   var feedback = feedbackById[id] || null;
   var statusData = statusDataById[id] || {};
@@ -457,6 +574,8 @@ function mapCustomer(row, feedbackById, statusDataById, giftById, overridesById)
     bill: getFirstText([row['_col_30'], row['Bill'], row['เลขที่บิล']]) || '-',
     status: status,
     linkSentAt: statusData.linkSentAt || '',
+    linkSentAtHistory: statusData.linkSentAtHistory || [],
+    remarkData: remarksById[id] || null,
     feedback: feedback,
     giftData: giftById[id] || null,
     presentationOverrides: overridesById[id] || null,
@@ -472,11 +591,12 @@ function handleGetAllCustomersDetailed() {
   var feedbackById = buildFeedbackById(getSheetData(FEEDBACK_SHEET));
   var statusDataById = buildStatusDataById(getSheetData(STATUS_SHEET));
   var giftById = buildGiftById(getSheetData(GIFT_SHEET));
+  var remarksById = buildLatestRemarkById(getSheetData(REMARK_SHEET));
   var overridesById = getPresentationOverridesById();
   var customers = [];
 
   for (var index = 0; index < dataRows.length; index++) {
-    customers.push(mapCustomer(dataRows[index], feedbackById, statusDataById, giftById, overridesById));
+    customers.push(mapCustomer(dataRows[index], feedbackById, statusDataById, giftById, remarksById, overridesById));
   }
 
   return jsonResponse({
