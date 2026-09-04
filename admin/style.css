@@ -386,11 +386,48 @@ body {
     box-shadow: var(--shadow-md);
 }
 
+/* Dashboard charts can be opened in a larger, easier-to-read view. */
+#tab-dashboard .chart-card--expandable {
+    position: relative;
+    cursor: zoom-in;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#tab-dashboard .chart-card--expandable:hover,
+#tab-dashboard .chart-card--expandable:focus-visible {
+    border-color: #8ec5ff;
+    box-shadow: 0 14px 28px rgba(9, 78, 159, 0.14);
+    outline: none;
+    transform: translateY(-2px);
+}
+
 .chart-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+}
+
+.chart-card-expand-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    padding: 5px 8px;
+    color: #276bb4;
+    background: #eef7ff;
+    border: 1px solid #cce6ff;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.chart-card-expand-hint svg,
+.chart-card-expand-hint i {
+    width: 14px;
+    height: 14px;
 }
 
 .chart-card-title {
@@ -408,6 +445,123 @@ body {
 /* Performance charts reserve room above each bar for its icon and score. */
 .performance-chart-container {
     height: 330px;
+}
+
+/* Chart expansion modal */
+.chart-expand-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.chart-expand-modal.is-open {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.chart-expand-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 23, 55, 0.58);
+    backdrop-filter: blur(6px);
+}
+
+.chart-expand-dialog {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 1180px);
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #d9e9fb;
+    border-radius: 20px;
+    box-shadow: 0 24px 70px rgba(2, 35, 84, 0.35);
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chart-expand-modal.is-open .chart-expand-dialog {
+    transform: translateY(0) scale(1);
+}
+
+.chart-expand-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 22px 15px;
+    border-bottom: 1px solid #e3edf8;
+    background: linear-gradient(135deg, #f4faff, #ffffff 70%);
+}
+
+.chart-expand-eyebrow {
+    margin: 0 0 3px;
+    color: #3474bb;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+#chart-expand-title {
+    margin: 0;
+    color: #123f7c;
+    font-size: clamp(1rem, 2.2vw, 1.35rem);
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.chart-expand-close {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+    padding: 0;
+    color: #587197;
+    background: #ffffff;
+    border: 1px solid #d8e7f7;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: 0.18s ease;
+}
+
+.chart-expand-close:hover,
+.chart-expand-close:focus-visible {
+    color: #ffffff;
+    background: #1469d8;
+    border-color: #1469d8;
+    outline: none;
+}
+
+.chart-expand-close i,
+.chart-expand-close svg {
+    width: 20px;
+    height: 20px;
+}
+
+.chart-expand-body {
+    position: relative;
+    height: clamp(340px, 67vh, 720px);
+    padding: 20px 24px 24px;
+}
+
+.chart-expand-body canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+body.chart-modal-open {
+    overflow: hidden;
 }
 
 /* Database Table Controls */
@@ -1407,6 +1561,32 @@ body {
     .filter-group {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .chart-expand-modal {
+        padding: 10px;
+    }
+
+    .chart-expand-dialog {
+        max-height: calc(100vh - 20px);
+        border-radius: 16px;
+    }
+
+    .chart-expand-header {
+        padding: 14px 16px 12px;
+    }
+
+    .chart-expand-body {
+        height: clamp(300px, 65vh, 580px);
+        padding: 12px 10px 16px;
+    }
+
+    .chart-card-expand-hint span {
+        display: none;
+    }
+
+    .chart-card-expand-hint {
+        padding: 6px;
     }
     
     .kanban-board {

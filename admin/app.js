@@ -133,10 +133,117 @@ const MOCK_CUSTOMERS = [
 document.addEventListener('DOMContentLoaded', () => {
     // Attach Sidebar switch events
     setupSidebarTabEvents();
+    setupChartExpansion();
     
     // Check login status first
     checkLoginStatus();
 });
+
+// Dashboard chart modal ---------------------------------------------------
+// Each chart is copied into the modal so its original card stays intact in the
+// dashboard and is ready to resize normally once the modal is closed.
+let expandedChart = null;
+let expandedChartTrigger = null;
+
+function cloneChartConfig(value) {
+    if (Array.isArray(value)) return value.map(cloneChartConfig);
+    if (value && Object.prototype.toString.call(value) === '[object Object]') {
+        return Object.keys(value).reduce((copy, key) => {
+            copy[key] = cloneChartConfig(value[key]);
+            return copy;
+        }, {});
+    }
+    return value;
+}
+
+function closeChartExpansion() {
+    const modal = document.getElementById('chart-expand-modal');
+    if (!modal || !modal.classList.contains('is-open')) return;
+
+    if (expandedChart) {
+        expandedChart.destroy();
+        expandedChart = null;
+    }
+
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('chart-modal-open');
+
+    if (expandedChartTrigger) {
+        expandedChartTrigger.focus();
+        expandedChartTrigger = null;
+    }
+}
+
+function openChartExpansion(card) {
+    const sourceCanvas = card.querySelector('canvas');
+    const sourceChart = sourceCanvas && typeof Chart !== 'undefined' ? Chart.getChart(sourceCanvas) : null;
+    const modal = document.getElementById('chart-expand-modal');
+    const modalCanvas = document.getElementById('chart-expanded-canvas');
+    const modalTitle = document.getElementById('chart-expand-title');
+
+    if (!sourceChart || !modal || !modalCanvas || !modalTitle) return;
+
+    closeChartExpansion();
+    expandedChartTrigger = card;
+    modalTitle.textContent = card.querySelector('.chart-card-title')?.textContent?.trim() || 'กราฟสรุปข้อมูล';
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('chart-modal-open');
+
+    try {
+        const sourceConfig = sourceChart.config?._config || sourceChart.config;
+        expandedChart = new Chart(modalCanvas, cloneChartConfig(sourceConfig));
+    } catch (error) {
+        console.error('Unable to open expanded chart:', error);
+        closeChartExpansion();
+        return;
+    }
+
+    requestAnimationFrame(() => {
+        expandedChart?.resize();
+        document.getElementById('chart-expand-close')?.focus();
+    });
+}
+
+function setupChartExpansion() {
+    const closeButton = document.getElementById('chart-expand-close');
+    const backdrop = document.getElementById('chart-expand-backdrop');
+
+    document.querySelectorAll('#tab-dashboard .chart-card:not(.dashboard-summary-card)').forEach(card => {
+        const title = card.querySelector('.chart-card-title')?.textContent?.trim() || 'กราฟสรุปข้อมูล';
+        const header = card.querySelector('.chart-card-header');
+
+        card.classList.add('chart-card--expandable');
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `ขยาย ${title}`);
+
+        if (header && !header.querySelector('.chart-card-expand-hint')) {
+            const hint = document.createElement('span');
+            hint.className = 'chart-card-expand-hint';
+            hint.setAttribute('aria-hidden', 'true');
+            hint.innerHTML = '<span>คลิกเพื่อขยาย</span><i data-lucide="maximize-2"></i>';
+            header.appendChild(hint);
+        }
+
+        card.addEventListener('click', () => openChartExpansion(card));
+        card.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openChartExpansion(card);
+            }
+        });
+    });
+
+    closeButton?.addEventListener('click', closeChartExpansion);
+    backdrop?.addEventListener('click', closeChartExpansion);
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeChartExpansion();
+    });
+
+    if (window.lucide?.createIcons) lucide.createIcons();
+}
 
 // Sidebar navigation handler
 function setupSidebarTabEvents() {
@@ -236,6 +343,19 @@ function getDataWorksiteType(item) {
 }
 
 // LOAD DATABASE
+async function fetchDashboardData(password) {
+    // ContentService redirects to a one-time URL. Always request a fresh response.
+    const url = new URL(state.googleSheetsUrl);
+    url.searchParams.set('_request', Date.now().toString());
+    const response = await fetch(url.toString(), {
+        method: 'POST',
+        cache: 'no-store',
+        body: JSON.stringify({ action: 'getAllCustomersDetailed', password })
+    });
+    if (!response.ok) throw new Error('HTTP error ' + response.status);
+    return response.json();
+}
+
 function loadData() {
     const cachedUrl = localStorage.getItem('google_sheets_apps_script_url');
     if (cachedUrl === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec' ||
@@ -271,14 +391,7 @@ function loadData() {
     const pwd = localStorage.getItem('admin_password');
     if (!pwd) return;
 
-    fetch(state.googleSheetsUrl, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'getAllCustomersDetailed', password: pwd })
-    })
-        .then(res => {
-            if (!res.ok) throw new Error("HTTP error " + res.status);
-            return res.json();
-        })
+    fetchDashboardData(pwd)
         .then(data => {
             if (data.status === 'success' && data.data) {
                 state.presentationOverridesEnabled = data.presentationOverridesEnabled === true;
@@ -396,14 +509,7 @@ function forceRefreshData() {
     const pwd = localStorage.getItem('admin_password');
     if (!pwd) return;
 
-    fetch(state.googleSheetsUrl, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'getAllCustomersDetailed', password: pwd })
-    })
-        .then(res => {
-            if (!res.ok) throw new Error("HTTP error " + res.status);
-            return res.json();
-        })
+    fetchDashboardData(pwd)
         .then(data => {
             if (data.status === 'success' && data.data) {
                 state.presentationOverridesEnabled = data.presentationOverridesEnabled === true;
@@ -1547,9 +1653,16 @@ function renderDashboardCharts() {
     });
 
     // 2. Moods Pie Chart
+    const formatMoodValue = (value, chart, separator = ' ') => {
+        const total = chart.data.datasets[0].data.reduce((sum, count) => sum + Number(count), 0);
+        const percentage = total > 0 ? (Number(value) / total * 100).toFixed(1) : '0.0';
+        return `${Number(value).toLocaleString('th-TH')} คน${separator}(${percentage}%)`;
+    };
+
     if (state.charts.moodsPie) state.charts.moodsPie.destroy();
     state.charts.moodsPie = new Chart(ctxPie, {
         type: 'doughnut',
+        plugins: typeof ChartDataLabels !== 'undefined' ? [ChartDataLabels] : [],
         data: {
             labels: ['😍 ประทับใจมาก', '😊 พอใจ', '😐 กลาง ๆ', '😟 ต้องแก้ไข', '🚨 ด่วนที่สุด'],
             datasets: [{
@@ -1562,7 +1675,36 @@ function renderDashboardCharts() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Sarabun' } } }
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        font: { family: 'Sarabun' },
+                        generateLabels: (chart) => Chart.overrides.doughnut.plugins.legend.labels.generateLabels(chart).map(item => ({
+                            ...item,
+                            text: `${item.text}: ${formatMoodValue(chart.data.datasets[0].data[item.index], chart)}`
+                        }))
+                    }
+                },
+                datalabels: {
+                    display: (context) => context.dataset.data[context.dataIndex] > 0 ? 'auto' : false,
+                    formatter: (value, context) => `${context.chart.data.labels[context.dataIndex]}\n${formatMoodValue(value, context.chart)}`,
+                    color: '#0f172a',
+                    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                    borderRadius: 6,
+                    padding: 5,
+                    textAlign: 'center',
+                    font: (context) => ({
+                        family: 'Sarabun',
+                        size: context.chart.height > 400 ? 18 : 12,
+                        weight: '700'
+                    })
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `${context.label}: ${formatMoodValue(context.raw, context.chart)}`
+                    }
+                }
             },
             cutout: '65%'
         }
@@ -3431,11 +3573,7 @@ window.handleLogin = function(e) {
     btn.disabled = true;
     err.style.display = 'none';
     
-    fetch(state.googleSheetsUrl, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'getAllCustomersDetailed', password: pwd })
-    })
-    .then(res => res.json())
+    fetchDashboardData(pwd)
     .then(data => {
         if (data.status === 'success') {
             localStorage.setItem('admin_password', pwd);

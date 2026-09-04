@@ -785,12 +785,31 @@
         </div>
     </div>
 
+    <!-- DASHBOARD CHART EXPAND MODAL -->
+    <div class="chart-expand-modal" id="chart-expand-modal" aria-hidden="true">
+        <div class="chart-expand-backdrop" id="chart-expand-backdrop"></div>
+        <section class="chart-expand-dialog" role="dialog" aria-modal="true" aria-labelledby="chart-expand-title">
+            <header class="chart-expand-header">
+                <div>
+                    <p class="chart-expand-eyebrow">มุมมองแบบขยาย</p>
+                    <h2 id="chart-expand-title">กราฟสรุปข้อมูล</h2>
+                </div>
+                <button type="button" class="chart-expand-close" id="chart-expand-close" aria-label="ปิดหน้าต่างกราฟ">
+                    <i data-lucide="x"></i>
+                </button>
+            </header>
+            <div class="chart-expand-body" id="chart-expand-body">
+                <canvas id="chart-expanded-canvas"></canvas>
+            </div>
+        </section>
+    </div>
+
     <!-- Print Layout (Hidden by default, used only when printing) -->
     <div id="print-layout" style="display: none;"></div>
     <!-- Modal for Editing Address -->
 
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=123"></script>
+    <script defer src="app.js?v=127"></script>
 </body>
 </html>
