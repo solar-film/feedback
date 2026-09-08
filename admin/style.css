@@ -555,6 +555,16 @@ body {
     padding: 20px 24px 24px;
 }
 
+.chart-expand-body > #chart-expanded-content,
+.chart-expand-body .chart-container {
+    width: 100%;
+    height: 100%;
+}
+
+.chart-expand-body .chart-container {
+    min-height: 0;
+}
+
 .chart-expand-body canvas {
     width: 100% !important;
     height: 100% !important;
@@ -2879,6 +2889,59 @@ body.chart-modal-open {
     box-shadow: none !important;
 }
 
+/* Read-only public view: /admin/?presentation=public */
+body.public-presentation {
+    background: #f7fbff;
+}
+
+body.public-presentation .login-overlay,
+body.public-presentation .sidebar,
+body.public-presentation .top-navbar,
+body.public-presentation .content-body > .tab-pane:not(#tab-presentation),
+body.public-presentation .presentation-overrides-modal {
+    display: none !important;
+}
+
+body.public-presentation .admin-layout {
+    display: block !important;
+    min-height: 100vh;
+}
+
+body.public-presentation .main-content {
+    display: block;
+    margin-left: 0;
+    min-height: 100vh;
+}
+
+body.public-presentation .content-body {
+    padding: 0;
+}
+
+body.public-presentation #tab-presentation {
+    display: block;
+}
+
+body.public-presentation #presentation-container {
+    height: 100vh !important;
+    border-radius: 0 !important;
+}
+
+.public-presentation-loading,
+.public-presentation-error {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 24px;
+    color: #0a3275;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.public-presentation-error {
+    color: #b42318;
+}
+
 .slide-container-main {
     padding: 22px 20px 28px;
     gap: 20px;
@@ -3514,6 +3577,43 @@ body.chart-modal-open {
     border-color: #f6d584;
 }
 
+.pp-benefits-card {
+    padding: 26px 32px 28px;
+    border: 1px solid #c7dfff;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
+    box-shadow: 0 8px 18px rgba(17, 72, 153, 0.08);
+}
+
+.pp-benefits-card h4 {
+    margin: 0;
+    color: #09245f;
+    font-size: clamp(1.12rem, 1.25vw, 1.45rem);
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.pp-benefits-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.pp-benefit-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 8px 17px;
+    color: #0d4ca9;
+    background: #eaf3ff;
+    border: 1px solid #d9eaff;
+    border-radius: 999px;
+    font-size: clamp(0.95rem, 1.08vw, 1.2rem);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
 @media (max-width: 1500px) {
     .pp-header-card {
         grid-template-columns: minmax(260px, 1fr) minmax(250px, 0.78fr) 190px;
@@ -3534,6 +3634,7 @@ body.chart-modal-open {
     .pp-team-card { min-height: 420px; padding: 24px 20px 50px; }
     .pp-tc-icon { width: 70px; height: 70px; flex-basis: 70px; }
     .pp-tc-icon i, .pp-tc-icon svg { width: 35px; height: 35px; }
+    .pp-benefits-card { padding: 22px 26px 24px; }
 }
 
 @media (max-width: 1180px) {
@@ -3554,6 +3655,9 @@ body.chart-modal-open {
     .pp-score-right { justify-self: center; }
     .pp-team-grid { grid-template-columns: 1fr; }
     .pp-team-card { min-height: 0; }
+    .pp-benefits-card { padding: 20px; border-radius: 20px; }
+    .pp-benefits-list { gap: 9px; margin-top: 16px; }
+    .pp-benefit-tag { min-height: 38px; padding: 7px 14px; }
 }
 
 /* Presentation team-name modal */

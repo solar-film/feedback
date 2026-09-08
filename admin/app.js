@@ -134,36 +134,94 @@ document.addEventListener('DOMContentLoaded', () => {
     // Attach Sidebar switch events
     setupSidebarTabEvents();
     setupChartExpansion();
-    
+
+    if (isPublicPresentationMode()) {
+        startPublicPresentation();
+        return;
+    }
+
     // Check login status first
     checkLoginStatus();
 });
 
+function isPublicPresentationMode() {
+    return new URLSearchParams(window.location.search).get('presentation') === 'public';
+}
+
+async function startPublicPresentation() {
+    document.body.classList.add('public-presentation');
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('app-container').style.display = 'flex';
+    state.presentationOverridesEnabled = false;
+    switchTab('presentation');
+
+    const presentationContent = document.getElementById('presentation-content');
+    presentationContent.innerHTML = '<div class="public-presentation-loading">กำลังโหลดข้อมูลสำหรับนำเสนอ…</div>';
+
+    try {
+        const url = new URL(state.googleSheetsUrl);
+        url.searchParams.set('action', 'getPresentationData');
+        url.searchParams.set('_request', Date.now().toString());
+        const response = await fetch(url.toString(), { cache: 'no-store' });
+        if (!response.ok) throw new Error('HTTP error ' + response.status);
+
+        const payload = await response.json();
+        if (payload.status !== 'success' || !Array.isArray(payload.data)) {
+            throw new Error(payload.message || 'ไม่สามารถโหลดข้อมูลสำหรับนำเสนอได้');
+        }
+
+        state.allCustomers = payload.data.map(item => ({
+            id: item.id,
+            company: item.company || '-',
+            name: item.name || '',
+            installDate: formatInstallDate(item.installDate),
+            sales: item.sales || '-',
+            tech: item.tech || '-',
+            adminName: item.adminName || '-',
+            jobType: getDataWorksiteType(item),
+            feedback: item.feedback || null,
+            presentationOverrides: item.presentationOverrides || null,
+            addressFromData: item.addressFromData || ''
+        }));
+        state.customers = state.allCustomers;
+
+        const monthFilter = document.getElementById('global-filter-month');
+        const companyFilter = document.getElementById('global-filter-company');
+        if (monthFilter) monthFilter.value = 'all';
+        if (companyFilter) companyFilter.value = 'all';
+        document.getElementById('global-filter-start').value = '';
+        document.getElementById('global-filter-end').value = '';
+
+        initPresentation();
+    } catch (error) {
+        console.error('Failed to load public presentation:', error);
+        presentationContent.innerHTML = '<div class="public-presentation-error">ไม่สามารถโหลดข้อมูลสำหรับนำเสนอได้ กรุณาลองใหม่อีกครั้ง</div>';
+    }
+}
+
 // Dashboard chart modal ---------------------------------------------------
-// Each chart is copied into the modal so its original card stays intact in the
-// dashboard and is ready to resize normally once the modal is closed.
-let expandedChart = null;
+// The existing chart container is moved into the modal, retaining every
+// Chart.js interaction and guaranteeing the expanded view matches the card.
+let expandedChartContainer = null;
+let expandedChartPlaceholder = null;
 let expandedChartTrigger = null;
 
-function cloneChartConfig(value) {
-    if (Array.isArray(value)) return value.map(cloneChartConfig);
-    if (value && Object.prototype.toString.call(value) === '[object Object]') {
-        return Object.keys(value).reduce((copy, key) => {
-            copy[key] = cloneChartConfig(value[key]);
-            return copy;
-        }, {});
-    }
-    return value;
+function resizeChartInContainer(container) {
+    const canvas = container?.querySelector('canvas');
+    const chart = canvas && typeof Chart !== 'undefined' && Chart.getChart ? Chart.getChart(canvas) : null;
+    chart?.resize();
 }
 
 function closeChartExpansion() {
     const modal = document.getElementById('chart-expand-modal');
     if (!modal || !modal.classList.contains('is-open')) return;
 
-    if (expandedChart) {
-        expandedChart.destroy();
-        expandedChart = null;
+    if (expandedChartContainer && expandedChartPlaceholder?.parentNode) {
+        expandedChartPlaceholder.parentNode.replaceChild(expandedChartContainer, expandedChartPlaceholder);
+        requestAnimationFrame(() => resizeChartInContainer(expandedChartContainer));
     }
+    expandedChartContainer = null;
+    expandedChartPlaceholder = null;
 
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
@@ -176,32 +234,26 @@ function closeChartExpansion() {
 }
 
 function openChartExpansion(card) {
-    const sourceCanvas = card.querySelector('canvas');
-    const sourceChart = sourceCanvas && typeof Chart !== 'undefined' ? Chart.getChart(sourceCanvas) : null;
+    const sourceContainer = card.querySelector('.chart-container');
     const modal = document.getElementById('chart-expand-modal');
-    const modalCanvas = document.getElementById('chart-expanded-canvas');
+    const modalContent = document.getElementById('chart-expanded-content');
     const modalTitle = document.getElementById('chart-expand-title');
 
-    if (!sourceChart || !modal || !modalCanvas || !modalTitle) return;
+    if (!sourceContainer || !modal || !modalContent || !modalTitle) return;
 
     closeChartExpansion();
     expandedChartTrigger = card;
     modalTitle.textContent = card.querySelector('.chart-card-title')?.textContent?.trim() || 'กราฟสรุปข้อมูล';
+    expandedChartPlaceholder = document.createComment('Expanded chart location');
+    sourceContainer.parentNode.insertBefore(expandedChartPlaceholder, sourceContainer);
+    modalContent.appendChild(sourceContainer);
+    expandedChartContainer = sourceContainer;
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('chart-modal-open');
 
-    try {
-        const sourceConfig = sourceChart.config?._config || sourceChart.config;
-        expandedChart = new Chart(modalCanvas, cloneChartConfig(sourceConfig));
-    } catch (error) {
-        console.error('Unable to open expanded chart:', error);
-        closeChartExpansion();
-        return;
-    }
-
     requestAnimationFrame(() => {
-        expandedChart?.resize();
+        resizeChartInContainer(expandedChartContainer);
         document.getElementById('chart-expand-close')?.focus();
     });
 }
@@ -2781,6 +2833,10 @@ function renderPresentationSlide() {
     const presentationWorksiteType = getPresentationWorksiteType(c);
     // feedback.timestamp is supplied from GFS_Care_Quest column B by the Apps Script API.
     const assessmentDate = formatPresentationAssessmentDate(fb.timestamp, true);
+    const presentationEditTool = isPublicPresentationMode() ? '' : `
+                        <button class="pp-mini-tool" type="button" data-customer-id="${escapePresentationHtml(c.id)}" onclick="openPresentationOverrideModal(this.dataset.customerId)" title="แก้ไขชื่อทีมที่แสดงในสไลด์" aria-label="แก้ไขชื่อทีมที่แสดงในสไลด์">
+                            <i data-lucide="pencil-line"></i>
+                        </button>`;
     
     // Tag generation helper
     const makeTags = (tagsData) => {
@@ -2796,6 +2852,14 @@ function renderPresentationSlide() {
     const adminTagsHtml = makeTags(fb.details?.admin);
     const salesTagsHtml = makeTags(fb.details?.sales);
     const techTagsHtml = makeTags(fb.details?.tech);
+    const benefitsList = Array.isArray(fb.benefits)
+        ? fb.benefits
+        : String(fb.benefits || '').split(',');
+    const benefitsHtml = benefitsList
+        .map(benefit => String(benefit || '').trim())
+        .filter(Boolean)
+        .map(benefit => `<span class="pp-benefit-tag">${escapePresentationHtml(benefit)}</span>`)
+        .join('');
 
     // Score helpers
     const getScoreStr = (score) => score ? score : '-';
@@ -2856,9 +2920,7 @@ function renderPresentationSlide() {
 
                 <div class="pp-card pp-slide-navigation-card">
                     <div class="pp-slide-tools">
-                        <button class="pp-mini-tool" type="button" data-customer-id="${escapePresentationHtml(c.id)}" onclick="openPresentationOverrideModal(this.dataset.customerId)" title="แก้ไขชื่อทีมที่แสดงในสไลด์" aria-label="แก้ไขชื่อทีมที่แสดงในสไลด์">
-                            <i data-lucide="pencil-line"></i>
-                        </button>
+                        ${presentationEditTool}
                         <button class="pp-mini-tool" type="button" onclick="toggleFullScreen()" title="ขยายเต็มหน้าจอ" aria-label="ขยายเต็มหน้าจอ">
                             <i data-lucide="maximize"></i>
                         </button>
@@ -2984,6 +3046,13 @@ function renderPresentationSlide() {
                     ` : ''}
                 </div>
             </div>
+
+            ${benefitsHtml ? `
+            <section class="pp-benefits-card" aria-label="ฟิล์มช่วยเรื่องไหนได้บ้าง">
+                <h4>ฟิล์มช่วยเรื่องไหนได้บ้าง</h4>
+                <div class="pp-benefits-list">${benefitsHtml}</div>
+            </section>
+            ` : ''}
             
             ${fb.supportDetails ? `
             <div class="pp-support-details">
