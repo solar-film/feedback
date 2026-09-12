@@ -2914,6 +2914,9 @@ body.public-presentation .public-presentation-filters {
     color: #0a3275;
 }
 .public-presentation-filters button { cursor: pointer; background: #0a57ba; color: #fff; }
+.public-presentation-filters button:disabled { opacity: .55; cursor: wait; }
+body.public-presentation .public-presentation-loading,
+body.public-presentation .public-presentation-error { min-height: 180px; }
 .public-presentation-filters .public-range-reset { background: #eef5ff; color: #0a3275; }
 .public-presentation-filters :focus-visible { outline: 3px solid #78b8ff; outline-offset: 2px; }
 #public-presentation-range-status { font-size: 13px; }

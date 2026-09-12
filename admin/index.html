@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFS Care Admin รายงานลูกค้ารีวิว - ระบบบริหารแบบสอบถามหลังการขาย</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
-    <link rel="stylesheet" href="style.css?v=66">
+    <link rel="stylesheet" href="style.css?v=67">
     
     <!-- Lucide Icons & Chart.js (Optimized CDNs) -->
     <script defer src="https://unpkg.com/lucide@0.400.0/dist/umd/lucide.min.js"></script>
@@ -484,6 +484,7 @@
                         <label for="public-presentation-end">ถึง <input type="date" id="public-presentation-end"></label>
                         <button type="submit">แสดงข้อมูล</button>
                         <button type="button" class="public-range-reset" onclick="resetPublicPresentationRange()">แสดงทั้งหมด</button>
+                        <button type="button" id="public-presentation-reload" class="public-range-reset" onclick="startPublicPresentation()">โหลดข้อมูลใหม่</button>
                         <span id="public-presentation-range-status" role="status" aria-live="polite"></span>
                     </form>
                     <div id="presentation-content" style="flex: 1; overflow-y: auto; padding: 0; display: block;">
@@ -818,6 +819,6 @@
 
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=131"></script>
+    <script defer src="app.js?v=132"></script>
 </body>
 </html>

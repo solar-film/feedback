@@ -149,6 +149,33 @@ function isPublicPresentationMode() {
 }
 
 let publicPresentationRange = { start: '', end: '' };
+let publicPresentationReady = false;
+let publicPresentationLoading = false;
+
+async function fetchPublicPresentationData(onAttempt) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        onAttempt(attempt);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000);
+        try {
+            const url = new URL(state.googleSheetsUrl);
+            url.searchParams.set('action', 'getPresentationData');
+            url.searchParams.set('_request', Date.now().toString());
+            const response = await fetch(url.toString(), { cache: 'no-store', signal: controller.signal });
+            if (!response.ok) throw new Error('HTTP error ' + response.status);
+            const payload = await response.json();
+            if (payload.status !== 'success' || !Array.isArray(payload.data)) {
+                throw new Error(payload.message || 'Invalid presentation response');
+            }
+            return payload;
+        } catch (error) {
+            if (attempt === 3) throw error;
+        } finally {
+            clearTimeout(timeout);
+        }
+        await new Promise(resolve => setTimeout(resolve, attempt * 1500));
+    }
+}
 
 function applyPublicPresentationRange(event) {
     event.preventDefault();
@@ -172,6 +199,10 @@ function resetPublicPresentationRange() {
 }
 
 async function startPublicPresentation() {
+    if (publicPresentationLoading) return;
+    publicPresentationLoading = true;
+    const reloadButton = document.getElementById('public-presentation-reload');
+    if (reloadButton) reloadButton.disabled = true;
     document.body.classList.add('public-presentation');
     document.getElementById('login-overlay').style.display = 'none';
     document.getElementById('app-container').style.display = 'flex';
@@ -179,12 +210,17 @@ async function startPublicPresentation() {
     switchTab('presentation');
 
     const presentationContent = document.getElementById('presentation-content');
-    presentationContent.innerHTML = '<div class="public-presentation-loading">กำลังโหลดข้อมูลสำหรับนำเสนอ…</div>';
+    if (!publicPresentationReady) {
+        presentationContent.innerHTML = '<div class="public-presentation-loading">กำลังโหลดข้อมูลสำหรับนำเสนอ…</div>';
+        document.getElementById('public-presentation-range-status').textContent = 'กำลังโหลดข้อมูล…';
+    }
 
     const cacheKey = 'public-presentation-v1:' + state.googleSheetsUrl;
-    let showingCached = false;
+    let showingCached = publicPresentationReady;
     let cachedPayload = null;
     const notice = document.createElement('div');
+    document.getElementById('public-presentation-load-notice')?.remove();
+    notice.id = 'public-presentation-load-notice';
     notice.className = 'public-presentation-loading';
     notice.setAttribute('role', 'status');
     notice.style.cssText = 'padding:6px 12px;font-size:13px;flex:none;min-height:0;';
@@ -192,7 +228,7 @@ async function startPublicPresentation() {
     try {
         const saved = JSON.parse(sessionStorage.getItem(cacheKey));
         const age = Date.now() - saved?.savedAt;
-        if (age >= 0 && age < 10 * 60 * 1000 && saved.payload?.status === 'success' && Array.isArray(saved.payload.data)) {
+        if (!publicPresentationReady && age >= 0 && age < 10 * 60 * 1000 && saved.payload?.status === 'success' && Array.isArray(saved.payload.data)) {
             cachedPayload = saved.payload;
             displayPayload(cachedPayload);
             showingCached = true;
@@ -203,18 +239,12 @@ async function startPublicPresentation() {
     }
 
     try {
-        const url = new URL(state.googleSheetsUrl);
-        url.searchParams.set('action', 'getPresentationData');
-        url.searchParams.set('_request', Date.now().toString());
-        const response = await fetch(url.toString(), { cache: 'no-store' });
-        if (!response.ok) throw new Error('HTTP error ' + response.status);
+        const payload = await fetchPublicPresentationData(attempt => {
+            notice.textContent = (showingCached ? 'แสดงข้อมูลที่บันทึกไว้ · ' : '') +
+                (attempt === 1 ? 'กำลังเชื่อมต่อ Google Sheets…' : `กำลังลองเชื่อมต่อใหม่ ครั้งที่ ${attempt}/3…`);
+        });
 
-        const payload = await response.json();
-        if (payload.status !== 'success' || !Array.isArray(payload.data)) {
-            throw new Error(payload.message || 'ไม่สามารถโหลดข้อมูลสำหรับนำเสนอได้');
-        }
-
-        if (!showingCached || JSON.stringify(payload.data) !== JSON.stringify(cachedPayload.data)) {
+        if (!showingCached || !cachedPayload || JSON.stringify(payload.data) !== JSON.stringify(cachedPayload.data)) {
             displayPayload(payload);
         }
         try {
@@ -227,8 +257,12 @@ async function startPublicPresentation() {
             notice.textContent = 'แสดงข้อมูลที่บันทึกไว้ — อัปเดตข้อมูลล่าสุดไม่สำเร็จ กรุณารีเฟรชเพื่อลองอีกครั้ง';
         } else {
             notice.remove();
-            presentationContent.innerHTML = '<div class="public-presentation-error">ไม่สามารถโหลดข้อมูลสำหรับนำเสนอได้ กรุณาลองใหม่อีกครั้ง</div>';
+            document.getElementById('public-presentation-range-status').textContent = 'เชื่อมต่อข้อมูลไม่สำเร็จ';
+            presentationContent.innerHTML = '<div class="public-presentation-error">เชื่อมต่อ Google Sheets ไม่สำเร็จหลังลอง 3 ครั้ง กรุณากด “โหลดข้อมูลใหม่” ด้านบน</div>';
         }
+    } finally {
+        publicPresentationLoading = false;
+        if (reloadButton) reloadButton.disabled = false;
     }
 
     function displayPayload(payload) {
@@ -248,6 +282,7 @@ async function startPublicPresentation() {
             addressFromData: item.addressFromData || ''
         }));
         state.customers = state.allCustomers;
+        publicPresentationReady = true;
 
         const monthFilter = document.getElementById('global-filter-month');
         const companyFilter = document.getElementById('global-filter-company');
@@ -2775,6 +2810,8 @@ async function savePresentationOverrideField(field) {
 
 function initPresentation() {
     const publicMode = isPublicPresentationMode();
+    // A delayed tab refresh or filter click must not replace loading/error with zero results.
+    if (publicMode && !publicPresentationReady) return;
     const monthVal = publicMode ? 'all' : document.getElementById('global-filter-month')?.value || 'all';
     const companyVal = publicMode ? 'all' : document.getElementById('global-filter-company')?.value || 'all';
     const startVal = publicMode ? publicPresentationRange.start : document.getElementById('global-filter-start')?.value;
