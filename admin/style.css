@@ -2930,7 +2930,6 @@ body.public-presentation {
 }
 
 body.public-presentation .login-overlay,
-body.public-presentation .sidebar,
 body.public-presentation .top-navbar,
 body.public-presentation .content-body > .tab-pane:not(#tab-presentation),
 body.public-presentation .presentation-overrides-modal {
@@ -2944,8 +2943,36 @@ body.public-presentation .admin-layout {
 
 body.public-presentation .main-content {
     display: block;
-    margin-left: 0;
+    margin-left: 260px;
     min-height: 100vh;
+}
+
+.public-admin-login { display: none; }
+body.public-presentation .sidebar-footer > button { display: none; }
+body.public-presentation .public-admin-login {
+    display: block;
+    margin-bottom: 16px;
+    padding: 10px;
+    color: white;
+    border: 1px solid #7295c3;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+}
+body.public-presentation .sidebar { display: flex; overflow-y: auto; }
+@media (max-width: 768px) {
+    body.public-presentation .sidebar {
+        position: static;
+        transform: none;
+        width: 100%;
+        height: auto;
+        padding: 12px;
+    }
+    body.public-presentation .sidebar-brand { padding-bottom: 12px; margin-bottom: 12px; }
+    body.public-presentation .sidebar-menu { display: flex; overflow-x: auto; gap: 6px; }
+    body.public-presentation .sidebar-menu .menu-item { flex-shrink: 0; margin: 0; }
+    body.public-presentation .sidebar-footer { display: none; }
+    body.public-presentation .main-content { margin-left: 0; }
 }
 
 body.public-presentation .content-body {

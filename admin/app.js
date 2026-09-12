@@ -404,6 +404,13 @@ function setupChartExpansion() {
 function setupSidebarTabEvents() {
     const menuItems = document.querySelectorAll('.sidebar-menu .menu-item');
     menuItems.forEach(item => {
+        if (isPublicPresentationMode()) {
+            const tabId = item.getAttribute('data-tab');
+            const link = item.querySelector('a');
+            link.href = tabId === 'presentation' ? '?presentation=public' : '?tab=' + encodeURIComponent(tabId);
+            if (tabId !== 'presentation') link.title = 'เข้าสู่ระบบเพื่อเปิดเมนูนี้';
+            return;
+        }
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const tabId = item.getAttribute('data-tab');
@@ -413,6 +420,10 @@ function setupSidebarTabEvents() {
 }
 
 function switchTab(tabId) {
+    if (isPublicPresentationMode() && tabId !== 'presentation') {
+        window.location.assign('?tab=' + encodeURIComponent(tabId));
+        return;
+    }
     state.currentTab = tabId;
 
     // The month list follows the date basis of the active page. In particular,
@@ -3734,6 +3745,10 @@ window.checkLoginStatus = function() {
     if (pwd) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app-container').style.display = 'flex';
+        const requestedTab = new URLSearchParams(window.location.search).get('tab');
+        if (['dashboard', 'database', 'kanban', 'gifts', 'presentation'].includes(requestedTab)) {
+            switchTab(requestedTab);
+        }
         loadData();
     } else {
         document.getElementById('login-overlay').style.display = 'flex';
