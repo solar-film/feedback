@@ -2890,6 +2890,38 @@ body.chart-modal-open {
 }
 
 /* Read-only public view: /admin/?presentation=public */
+.public-presentation-filters { display: none; }
+body.public-presentation .public-presentation-filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    padding: 12px 20px;
+    background: #fff;
+    border-bottom: 1px solid #dce7f3;
+    color: #0a3275;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+.public-presentation-filters label { display: flex; align-items: center; gap: 8px; }
+.public-presentation-filters input,
+.public-presentation-filters button {
+    font: inherit;
+    padding: 8px 12px;
+    border: 1px solid #b5cbe3;
+    border-radius: 8px;
+    background: #fff;
+    color: #0a3275;
+}
+.public-presentation-filters button { cursor: pointer; background: #0a57ba; color: #fff; }
+.public-presentation-filters .public-range-reset { background: #eef5ff; color: #0a3275; }
+.public-presentation-filters :focus-visible { outline: 3px solid #78b8ff; outline-offset: 2px; }
+#public-presentation-range-status { font-size: 13px; }
+@media (max-width: 600px) {
+    body.public-presentation .public-presentation-filters { padding: 10px; gap: 8px; }
+    .public-presentation-filters strong { width: 100%; }
+    .public-presentation-filters input { min-width: 0; max-width: 145px; }
+}
 body.public-presentation {
     background: #f7fbff;
 }

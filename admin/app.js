@@ -148,6 +148,29 @@ function isPublicPresentationMode() {
     return new URLSearchParams(window.location.search).get('presentation') === 'public';
 }
 
+let publicPresentationRange = { start: '', end: '' };
+
+function applyPublicPresentationRange(event) {
+    event.preventDefault();
+    if (!isPublicPresentationMode()) return;
+    const start = document.getElementById('public-presentation-start').value;
+    const end = document.getElementById('public-presentation-end').value;
+    if (start && end && start > end) {
+        document.getElementById('public-presentation-range-status').textContent = 'วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด';
+        return;
+    }
+    publicPresentationRange = { start, end };
+    initPresentation();
+}
+
+function resetPublicPresentationRange() {
+    if (!isPublicPresentationMode()) return;
+    document.getElementById('public-presentation-start').value = '';
+    document.getElementById('public-presentation-end').value = '';
+    publicPresentationRange = { start: '', end: '' };
+    initPresentation();
+}
+
 async function startPublicPresentation() {
     document.body.classList.add('public-presentation');
     document.getElementById('login-overlay').style.display = 'none';
@@ -157,6 +180,27 @@ async function startPublicPresentation() {
 
     const presentationContent = document.getElementById('presentation-content');
     presentationContent.innerHTML = '<div class="public-presentation-loading">กำลังโหลดข้อมูลสำหรับนำเสนอ…</div>';
+
+    const cacheKey = 'public-presentation-v1:' + state.googleSheetsUrl;
+    let showingCached = false;
+    let cachedPayload = null;
+    const notice = document.createElement('div');
+    notice.className = 'public-presentation-loading';
+    notice.setAttribute('role', 'status');
+    notice.style.cssText = 'padding:6px 12px;font-size:13px;flex:none;min-height:0;';
+    presentationContent.before(notice);
+    try {
+        const saved = JSON.parse(sessionStorage.getItem(cacheKey));
+        const age = Date.now() - saved?.savedAt;
+        if (age >= 0 && age < 10 * 60 * 1000 && saved.payload?.status === 'success' && Array.isArray(saved.payload.data)) {
+            cachedPayload = saved.payload;
+            displayPayload(cachedPayload);
+            showingCached = true;
+            notice.textContent = 'แสดงข้อมูลที่บันทึกไว้ กำลังตรวจสอบข้อมูลล่าสุด…';
+        }
+    } catch (error) {
+        // Storage can be unavailable or full; live loading still works.
+    }
 
     try {
         const url = new URL(state.googleSheetsUrl);
@@ -170,6 +214,25 @@ async function startPublicPresentation() {
             throw new Error(payload.message || 'ไม่สามารถโหลดข้อมูลสำหรับนำเสนอได้');
         }
 
+        if (!showingCached || JSON.stringify(payload.data) !== JSON.stringify(cachedPayload.data)) {
+            displayPayload(payload);
+        }
+        try {
+            sessionStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), payload }));
+        } catch (error) { /* Storage is optional. */ }
+        notice.remove();
+    } catch (error) {
+        console.error('Failed to load public presentation:', error);
+        if (showingCached) {
+            notice.textContent = 'แสดงข้อมูลที่บันทึกไว้ — อัปเดตข้อมูลล่าสุดไม่สำเร็จ กรุณารีเฟรชเพื่อลองอีกครั้ง';
+        } else {
+            notice.remove();
+            presentationContent.innerHTML = '<div class="public-presentation-error">ไม่สามารถโหลดข้อมูลสำหรับนำเสนอได้ กรุณาลองใหม่อีกครั้ง</div>';
+        }
+    }
+
+    function displayPayload(payload) {
+        const previousId = showingCached ? presentationSlides[currentSlideIndex]?.id : null;
         state.allCustomers = payload.data.map(item => ({
             id: item.id,
             company: item.company || '-',
@@ -180,6 +243,7 @@ async function startPublicPresentation() {
             adminName: item.adminName || '-',
             jobType: getDataWorksiteType(item),
             feedback: item.feedback || null,
+            status: item.feedback ? 'Completed' : 'Unsent',
             presentationOverrides: item.presentationOverrides || null,
             addressFromData: item.addressFromData || ''
         }));
@@ -193,9 +257,13 @@ async function startPublicPresentation() {
         document.getElementById('global-filter-end').value = '';
 
         initPresentation();
-    } catch (error) {
-        console.error('Failed to load public presentation:', error);
-        presentationContent.innerHTML = '<div class="public-presentation-error">ไม่สามารถโหลดข้อมูลสำหรับนำเสนอได้ กรุณาลองใหม่อีกครั้ง</div>';
+        if (previousId) {
+            const index = presentationSlides.findIndex(item => item.id === previousId);
+            if (index >= 0) {
+                currentSlideIndex = index;
+                renderPresentationSlide();
+            }
+        }
     }
 }
 
@@ -2706,10 +2774,11 @@ async function savePresentationOverrideField(field) {
 }
 
 function initPresentation() {
-    const monthVal = document.getElementById('global-filter-month')?.value || 'all';
-    const companyVal = document.getElementById('global-filter-company')?.value || 'all';
-    const startVal = document.getElementById('global-filter-start')?.value;
-    const endVal = document.getElementById('global-filter-end')?.value;
+    const publicMode = isPublicPresentationMode();
+    const monthVal = publicMode ? 'all' : document.getElementById('global-filter-month')?.value || 'all';
+    const companyVal = publicMode ? 'all' : document.getElementById('global-filter-company')?.value || 'all';
+    const startVal = publicMode ? publicPresentationRange.start : document.getElementById('global-filter-start')?.value;
+    const endVal = publicMode ? publicPresentationRange.end : document.getElementById('global-filter-end')?.value;
 
     // Filter customers who have feedback data, using fb.timestamp instead of installDate
     presentationSlides = state.allCustomers.filter(c => {
@@ -2724,12 +2793,12 @@ function initPresentation() {
             if (monthVal !== 'all' && rowMonthYear !== monthVal) return false;
 
             if (startVal) {
-                const sDate = new Date(startVal);
+                const sDate = new Date(publicMode ? startVal + 'T00:00:00' : startVal);
                 sDate.setHours(0,0,0,0);
                 if (rowDateObj < sDate) return false;
             }
             if (endVal) {
-                const eDate = new Date(endVal);
+                const eDate = new Date(publicMode ? endVal + 'T00:00:00' : endVal);
                 eDate.setHours(23,59,59,999);
                 if (rowDateObj > eDate) return false;
             }
@@ -2751,7 +2820,10 @@ function initPresentation() {
     });
 
     currentSlideIndex = 0;
-    
+    if (publicMode) {
+        document.getElementById('public-presentation-range-status').textContent =
+            `พบ ${presentationSlides.length} รายการ${startVal || endVal ? ' ในช่วงวันที่ที่เลือก' : ' ทั้งหมด'}`;
+    }
     renderPresentationSlide();
 }
 
