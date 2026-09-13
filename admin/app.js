@@ -518,6 +518,9 @@ async function fetchDashboardData(password) {
         cache: 'no-store',
         body: JSON.stringify({ action: 'getAllCustomersDetailed', password })
     });
+    if (response.status === 404) {
+        throw new Error('HTTP 404: ไม่พบปลายทาง Apps Script กรุณาตรวจสอบ Web app URL ใน Deploy → Manage deployments และใช้ลิงก์ /exec ของ deployment ที่ยังเปิดใช้งาน');
+    }
     if (!response.ok) throw new Error('HTTP error ' + response.status);
     const payload = await response.json();
     if (payload?.status === 'success' && !Array.isArray(payload.data)) {
@@ -632,7 +635,7 @@ function loadData(initialData = null) {
         })
         .catch(err => {
             console.error("API error:", err);
-            updateApiBadge('error', 'ข้อผิดพลาดการดึงข้อมูล Google Sheet');
+            updateApiBadge('error', 'โหลดข้อมูลไม่สำเร็จ: ' + err.message);
             // Only show toast if we didn't have cached data to show
             if (!cachedData) {
                 showToast('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + err.message, 'error');
@@ -749,7 +752,7 @@ function forceRefreshData() {
         })
         .catch(err => {
             console.error("API error:", err);
-            updateApiBadge('error', 'ข้อผิดพลาดการดึงข้อมูล');
+            updateApiBadge('error', 'โหลดข้อมูลไม่สำเร็จ: ' + err.message);
             showToast('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + err.message, 'error');
         })
         .finally(() => {
