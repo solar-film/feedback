@@ -519,10 +519,17 @@ async function fetchDashboardData(password) {
         body: JSON.stringify({ action: 'getAllCustomersDetailed', password })
     });
     if (!response.ok) throw new Error('HTTP error ' + response.status);
-    return response.json();
+    const payload = await response.json();
+    if (payload?.status === 'success' && !Array.isArray(payload.data)) {
+        throw new Error('API ตอบกลับมาเป็นสถานะเซิร์ฟเวอร์ แต่ไม่มีข้อมูลลูกค้า กรุณาอัปเดต Apps Script ด้วย Code.gs ล่าสุดผ่าน Deploy → Manage deployments → Edit → New version → Deploy และตรวจสอบ Web App URL ให้ตรงกับหน้าเว็บ');
+    }
+    if (!payload || typeof payload !== 'object') {
+        throw new Error('รูปแบบข้อมูลจาก API ไม่ถูกต้อง');
+    }
+    return payload;
 }
 
-function loadData() {
+function loadData(initialData = null) {
     const cachedUrl = localStorage.getItem('google_sheets_apps_script_url');
     if (cachedUrl === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec' ||
         cachedUrl === 'https://script.google.com/macros/s/AKfycbxnEtoNpkucS_9L2NPide8tRPF66xK4PKWz0hkzLvbJ8tXyfEsl_nVBiDOOX1bu-qj5qg/exec' ||
@@ -540,7 +547,9 @@ function loadData() {
 
     // --- 1. Optimistic UI (Stale-While-Revalidate) ---
     // Check if we have cached data in LocalStorage to render immediately
-    const cachedData = localStorage.getItem('admin_dashboard_cache');
+    // A successful login already returned fresh dashboard data.
+    const hasInitialData = initialData?.status === 'success' && Array.isArray(initialData.data);
+    const cachedData = hasInitialData ? null : localStorage.getItem('admin_dashboard_cache');
     if (cachedData) {
         try {
             updateDataAndRender(JSON.parse(cachedData));
@@ -557,7 +566,8 @@ function loadData() {
     const pwd = localStorage.getItem('admin_password');
     if (!pwd) return;
 
-    fetchDashboardData(pwd)
+    const dataRequest = hasInitialData ? Promise.resolve(initialData) : fetchDashboardData(pwd);
+    return dataRequest
         .then(data => {
             if (data.status === 'success' && data.data) {
                 state.presentationOverridesEnabled = data.presentationOverridesEnabled === true;
@@ -3740,7 +3750,7 @@ window.enableAddressEdit = function(id) {
 // -----------------------------------------
 // Login & Authentication System
 // -----------------------------------------
-window.checkLoginStatus = function() {
+window.checkLoginStatus = function(initialData = null) {
     const pwd = localStorage.getItem('admin_password');
     if (pwd) {
         document.getElementById('login-overlay').style.display = 'none';
@@ -3749,7 +3759,7 @@ window.checkLoginStatus = function() {
         if (['dashboard', 'database', 'kanban', 'gifts', 'presentation'].includes(requestedTab)) {
             switchTab(requestedTab);
         }
-        loadData();
+        return loadData(initialData);
     } else {
         document.getElementById('login-overlay').style.display = 'flex';
         document.getElementById('app-container').style.display = 'none';
@@ -3766,11 +3776,11 @@ window.handleLogin = function(e) {
     btn.disabled = true;
     err.style.display = 'none';
     
-    fetchDashboardData(pwd)
+    return fetchDashboardData(pwd)
     .then(data => {
         if (data.status === 'success') {
             localStorage.setItem('admin_password', pwd);
-            checkLoginStatus();
+            return checkLoginStatus(data);
         } else {
             err.style.display = 'block';
             err.innerText = "รหัสผ่านไม่ถูกต้อง";
@@ -3778,7 +3788,7 @@ window.handleLogin = function(e) {
     })
     .catch(error => {
         err.style.display = 'block';
-        err.innerText = "การเชื่อมต่อล้มเหลว กรุณาลองใหม่";
+        err.innerText = error.message || "การเชื่อมต่อล้มเหลว กรุณาลองใหม่";
     })
     .finally(() => {
         btn.innerHTML = 'เข้าสู่ระบบ <i data-lucide="arrow-right"></i>';
