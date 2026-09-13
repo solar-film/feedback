@@ -29,8 +29,13 @@ function doGet(e) {
   var action = params.action || '';
 
   try {
+    if (action === 'getPresentationData') return handleGetPublicPresentationData();
     if (action === 'getCustomer') return handleGetCustomer(params.id);
     if (action === 'getAllCustomers') return handleGetAllCustomers();
+
+    if (action) {
+      return jsonResponse({ status: 'error', message: 'Unsupported GET action: ' + action + '. Admin requests require POST.' });
+    }
 
     return jsonResponse({
       status: 'success',
@@ -71,6 +76,8 @@ function doPost(e) {
     if (action === 'saveRemark') return saveRemark(data);
     if (action === 'logLinkCopy') return logLinkCopy(data);
     if (action === 'updateReviewStatus') return updateReviewStatus(data.id);
+
+    if (action) return jsonResponse({ status: 'error', message: 'Unsupported POST action: ' + action });
 
     // ไม่มี action คือการส่งแบบประเมินจากหน้าลูกค้า
     return saveFeedback(data);
@@ -366,9 +373,9 @@ function savePresentationOverride(data) {
   return jsonResponse({ status: 'success', message: 'Presentation override saved successfully' });
 }
 
-function getPresentationOverridesById() {
-  // Run the lightweight schema upgrade before reading values from this sheet.
-  ensurePresentationOverridesSheet();
+function getPresentationOverridesById(ensureSchema) {
+  // The admin route may upgrade the schema. Public viewing remains read-only.
+  if (ensureSchema !== false) ensurePresentationOverridesSheet();
   var rows = getSheetData(PRESENTATION_OVERRIDES_SHEET);
   var result = {};
   if (!rows) return result;
@@ -604,6 +611,61 @@ function handleGetAllCustomersDetailed() {
     presentationOverridesEnabled: true,
     data: customers
   });
+}
+
+// Public, read-only endpoint for the presentation screen. It intentionally
+// returns only the fields rendered by a slide, never phone, gift, status-log,
+// remarks, or other admin-only customer data.
+function handleGetPublicPresentationData() {
+  // Cache only the public payload; admin reads and writes remain live.
+  var cacheKey = 'public-presentation-v1';
+  var cache;
+  try {
+    cache = CacheService.getScriptCache();
+    var cached = cache.get(cacheKey);
+    if (cached) return ContentService.createTextOutput(cached).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    // Cache availability must never prevent a live read.
+  }
+  var dataRows = getSheetData('Data');
+  if (!dataRows) return jsonResponse({ status: 'error', message: 'ไม่พบชีต Data' });
+
+  var feedbackById = buildFeedbackById(getSheetData(FEEDBACK_SHEET));
+  var overridesById = getPresentationOverridesById(false);
+  var customers = [];
+
+  for (var index = 0; index < dataRows.length; index++) {
+    var row = dataRows[index];
+    var id = getCustomerId(row);
+    var feedback = feedbackById[id];
+    if (!feedback) continue;
+
+    customers.push({
+      id: id,
+      company: getFirstText([row['Company'], row['บริษัท'], row['_col_9']]) || '-',
+      name: getFirstText([row['Name'], row['ชื่อผู้ติดต่อ'], row['ชื่อลูกค้า']]),
+      installDate: getFirstText([row['InstallDate'], row['วันที่ติดตั้ง']]),
+      sales: getFirstText([row['Sales'], row['เซลล์ผู้ดูแล'], row['ฝ่ายขาย']]) || '-',
+      tech: getFirstText([row['Tech'], row['ช่างติดตั้ง'], row['ทีมช่าง']]) || '-',
+      adminName: getFirstText([row['_col_17'], row['Admin'], row['แอดมิน']]) || '-',
+      jobType: getFirstText([row['_col_14'], row['ประเภทหน้างาน'], row['JobType'], row['ประเภทงาน']]) || '-',
+      addressFromData: getFirstText([row['_col_16'], row['Address'], row['ที่อยู่']]),
+      feedback: feedback,
+      presentationOverrides: overridesById[id] || null
+    });
+  }
+
+  var payload = { status: 'success', data: customers, generatedAt: Date.now() };
+  try {
+    var serialized = JSON.stringify(payload);
+    // Apps Script limits each cache value to 100 KB, including UTF-8 Thai text.
+    if (cache && Utilities.newBlob(serialized).getBytes().length < 90000) {
+      cache.put(cacheKey, serialized, 60);
+    }
+  } catch (error) {
+    // Large responses or cache errors fall back to the normal response.
+  }
+  return jsonResponse(payload);
 }
 
 function handleGetCustomer(id) {
