@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFS Care Admin รายงานลูกค้ารีวิว - ระบบบริหารแบบสอบถามหลังการขาย</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
-    <link rel="stylesheet" href="style.css?v=68">
+    <link rel="stylesheet" href="style.css?v=76">
     
     <!-- Lucide Icons & Chart.js (Optimized CDNs) -->
     <script defer src="https://unpkg.com/lucide@0.400.0/dist/umd/lucide.min.js"></script>
@@ -742,8 +742,32 @@
 
             <div id="presentation-overrides-form">
                 <input type="hidden" id="presentation-override-customer-id">
-                <p class="presentation-overrides-note"><i data-lucide="circle-info"></i><span>แก้ไขแต่ละช่องแล้วกดบันทึกได้ทันที หากต้องการกลับไปใช้ข้อมูลต้นทาง ให้กดปุ่มรีเซ็ตในช่องนั้น</span></p>
+                <p class="presentation-overrides-note"><i data-lucide="circle-info"></i><span>บันทึกแต่ละช่องเพื่อใช้แสดงในโหมดนำเสนอ หากต้องการกลับไปใช้ข้อมูลจากชีต ให้กดรีเซ็ตในช่องนั้น</span></p>
 
+
+                <div class="form-group presentation-override-field film">
+                    <label class="form-label" for="presentation-override-filmBrand"><span class="presentation-team-icon"><i data-lucide="tag"></i></span>ยี่ห้อฟิล์ม</label>
+                    <div class="presentation-field-input-actions">
+                        <input type="text" id="presentation-override-filmBrand" class="form-control" autocomplete="off">
+                        <div class="presentation-field-action-group">
+                            <button type="button" class="presentation-field-save" data-presentation-save="filmBrand" onclick="savePresentationOverrideField('filmBrand')" title="บันทึกยี่ห้อฟิล์ม" aria-label="บันทึกยี่ห้อฟิล์ม"><i data-lucide="save"></i></button>
+                            <button type="button" class="presentation-field-reset" onclick="useSourcePresentationField('filmBrand')" title="ใช้ข้อมูลต้นทาง" aria-label="ใช้ข้อมูลต้นทางยี่ห้อฟิล์ม"><i data-lucide="rotate-ccw"></i></button>
+                        </div>
+                    </div>
+                    <small id="presentation-source-filmBrand"></small>
+                </div>
+
+                <div class="form-group presentation-override-field film">
+                    <label class="form-label" for="presentation-override-filmModel"><span class="presentation-team-icon"><i data-lucide="layers"></i></span>รุ่นฟิล์มที่ติดตั้ง</label>
+                    <div class="presentation-field-input-actions">
+                        <textarea id="presentation-override-filmModel" class="form-control" rows="3"></textarea>
+                        <div class="presentation-field-action-group">
+                            <button type="button" class="presentation-field-save" data-presentation-save="filmModel" onclick="savePresentationOverrideField('filmModel')" title="บันทึกรุ่นฟิล์มที่ติดตั้ง" aria-label="บันทึกรุ่นฟิล์มที่ติดตั้ง"><i data-lucide="save"></i></button>
+                            <button type="button" class="presentation-field-reset" onclick="useSourcePresentationField('filmModel')" title="ใช้ข้อมูลต้นทาง" aria-label="ใช้ข้อมูลต้นทางรุ่นฟิล์มที่ติดตั้ง"><i data-lucide="rotate-ccw"></i></button>
+                        </div>
+                    </div>
+                    <small id="presentation-source-filmModel"></small>
+                </div>
                 <div class="form-group presentation-override-field admin">
                     <label class="form-label" for="presentation-override-admin"><span class="presentation-team-icon"><i data-lucide="headphones"></i></span>แอดมิน</label>
                     <div class="presentation-field-input-actions">
@@ -820,6 +844,6 @@
 
 
     <!-- Core Admin App Logic -->
-    <script defer src="app.js?v=135"></script>
+    <script defer src="app.js?v=143"></script>
 </body>
 </html>

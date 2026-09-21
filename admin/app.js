@@ -5,6 +5,7 @@ const state = {
     currentTab: 'dashboard',
     googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbx6KYO_vGxUN11eZO7u-QU7OFcZr_VMfAodv2mvj2YXlSdGSV83J6IDYwp4nYH5DHhYyA/exec',
     presentationOverridesEnabled: false,
+    presentationFilmOverridesEnabled: false,
     allCustomers: [],
     customers: [],
     charts: {
@@ -215,7 +216,7 @@ async function startPublicPresentation() {
         document.getElementById('public-presentation-range-status').textContent = 'กำลังโหลดข้อมูล…';
     }
 
-    const cacheKey = 'public-presentation-v1:' + state.googleSheetsUrl;
+    const cacheKey = 'public-presentation-v2:' + state.googleSheetsUrl;
     let showingCached = publicPresentationReady;
     let cachedPayload = null;
     const notice = document.createElement('div');
@@ -272,6 +273,8 @@ async function startPublicPresentation() {
             company: item.company || '-',
             name: item.name || '',
             installDate: formatInstallDate(item.installDate),
+            filmBrand: item.filmBrand || '-',
+            filmModel: item.filmModel || '-',
             sales: item.sales || '-',
             tech: item.tech || '-',
             adminName: item.adminName || '-',
@@ -574,6 +577,7 @@ function loadData(initialData = null) {
         .then(data => {
             if (data.status === 'success' && data.data) {
                 state.presentationOverridesEnabled = data.presentationOverridesEnabled === true;
+                state.presentationFilmOverridesEnabled = data.presentationFilmOverridesEnabled === true;
                 // Parse returned joined rows
                 const freshCustomers = data.data.map(item => {
                     let status = item.status || 'Unsent';
@@ -605,6 +609,7 @@ function loadData(initialData = null) {
                         siteType: item.siteType || '-',
                         installDate: formatInstallDate(item.installDate),
                         filterDate: formatInstallDate(item.filterDate || item.installDate),
+                        filmBrand: item.filmBrand || '-',
                         filmModel: item.filmModel || '-',
                         sales: item.sales || '-',
                         tech: item.tech || '-',
@@ -692,6 +697,7 @@ function forceRefreshData() {
         .then(data => {
             if (data.status === 'success' && data.data) {
                 state.presentationOverridesEnabled = data.presentationOverridesEnabled === true;
+                state.presentationFilmOverridesEnabled = data.presentationFilmOverridesEnabled === true;
                 const freshCustomers = data.data.map(item => {
                     let status = item.status || 'Unsent';
                     
@@ -722,6 +728,7 @@ function forceRefreshData() {
                         siteType: item._col_16 || item.siteType || item.company || '-',
                         installDate: formatInstallDate(item.installDate),
                         filterDate: formatInstallDate(item.filterDate || item.installDate),
+                        filmBrand: item.filmBrand || '-',
                         filmModel: item.filmModel || '-',
                         sales: item.sales || '-',
                         tech: item.tech || '-',
@@ -2707,7 +2714,15 @@ function escapePresentationHtml(value) {
         .replace(/'/g, '&#039;');
 }
 
-function openPresentationOverrideModal(customerId) {
+function getPresentationFilmValue(customer, field) {
+    const override = customer.presentationOverrides?.[field];
+    return String(override || '').trim() || String(customer[field] || '').trim() || '-';
+}
+
+let presentationOverrideSaving = false;
+
+function openPresentationOverrideModal(customerId, focusField) {
+    if (isPublicPresentationMode()) return;
     if (!state.presentationOverridesEnabled) {
         showToast('กรุณาปรับใช้ Apps Script เวอร์ชันที่รองรับ Presentation Overrides ก่อนบันทึกชื่อทีม', 'warning');
         return;
@@ -2735,7 +2750,18 @@ function openPresentationOverrideModal(customerId) {
     worksiteTypeInput.placeholder = getSourcePresentationWorksiteType(customer);
     worksiteTypeSource.innerText = `ข้อมูลจากชีต Col O: ${getSourcePresentationWorksiteType(customer)}`;
 
+    ['filmBrand', 'filmModel'].forEach(field => {
+        const input = getPresentationOverrideInput(field);
+        input.value = overrides[field] || '';
+        input.placeholder = String(customer[field] || '').trim() || '-';
+        input.disabled = !state.presentationFilmOverridesEnabled;
+        document.getElementById('presentation-source-' + field).textContent = state.presentationFilmOverridesEnabled
+            ? 'ข้อมูลต้นทาง: ' + input.placeholder
+            : 'กรุณาอัปเดต Apps Script เวอร์ชันล่าสุดเพื่อเปิดใช้การแก้ไขฟิล์ม';
+        input.closest('.presentation-override-field').querySelectorAll('button').forEach(button => { button.disabled = input.disabled; });
+    });
     document.getElementById('presentation-overrides-modal').style.display = 'flex';
+    if (focusField) getPresentationOverrideInput(focusField)?.focus();
     lucide.createIcons();
 }
 
@@ -2767,24 +2793,32 @@ function getPresentationOverrideFieldLabel(field) {
         admin: 'แอดมิน',
         sales: 'ฝ่ายขาย',
         tech: 'ทีมช่าง',
-        worksiteType: 'ประเภทหน้างาน'
+        worksiteType: 'ประเภทหน้างาน',
+        filmBrand: 'ยี่ห้อฟิล์ม',
+        filmModel: 'รุ่นฟิล์มที่ติดตั้ง'
     }[field] || 'ข้อมูล';
 }
 
 function useSourcePresentationField(field) {
     const input = getPresentationOverrideInput(field);
-    if (!input) return;
+    if (!input || presentationOverrideSaving) return;
     input.value = '';
     savePresentationOverrideField(field);
 }
 
 async function savePresentationOverrideField(field) {
+    if (isPublicPresentationMode() || presentationOverrideSaving) return;
     if (!state.presentationOverridesEnabled) {
         showToast('Apps Script ยังไม่รองรับการบันทึกข้อมูลสำหรับโหมดนำเสนอ', 'warning');
         return;
     }
 
-    if (!['admin', 'sales', 'tech', 'worksiteType'].includes(field)) return;
+    if (!['admin', 'sales', 'tech', 'worksiteType', 'filmBrand', 'filmModel'].includes(field)) return;
+    const isFilm = field === 'filmBrand' || field === 'filmModel';
+    if (isFilm && !state.presentationFilmOverridesEnabled) {
+        showToast('กรุณาอัปเดต Apps Script เวอร์ชันล่าสุดก่อนบันทึกข้อมูลฟิล์ม', 'warning');
+        return;
+    }
 
     const id = document.getElementById('presentation-override-customer-id').value;
     const customer = state.allCustomers.find(item => item.id === id);
@@ -2793,13 +2827,15 @@ async function savePresentationOverrideField(field) {
     const input = getPresentationOverrideInput(field);
     if (!input) return;
 
-    const value = field === 'worksiteType'
-        ? normalisePresentationWorksiteType(input.value)
-        : normalisePresentationName(input.value);
+    const value = field === 'filmModel' ? String(input.value || '').trim()
+        : (field === 'worksiteType' || field === 'filmBrand')
+            ? normalisePresentationWorksiteType(input.value)
+            : normalisePresentationName(input.value);
     const overrides = { ...(customer.presentationOverrides || {}), [field]: value };
     const saveButton = document.querySelector(`[data-presentation-save="${field}"]`);
     if (!saveButton) return;
 
+    presentationOverrideSaving = true;
     const originalLabel = saveButton.innerHTML;
     saveButton.disabled = true;
     saveButton.innerHTML = '<i data-lucide="loader-2" class="spin-icon"></i>';
@@ -2819,13 +2855,20 @@ async function savePresentationOverrideField(field) {
             throw new Error(result.message || 'ไม่สามารถบันทึกข้อมูลได้');
         }
 
-        customer.presentationOverrides = Object.values(overrides).some(Boolean) ? overrides : null;
+        if (isFilm && result.presentationOverrides?.[field] !== value) {
+            throw new Error('ระบบยังไม่ยืนยันข้อมูลฟิล์ม กรุณาอัปเดต Apps Script เวอร์ชันล่าสุด');
+        }
+        const saved = result.presentationOverrides || overrides;
+        customer.presentationOverrides = Object.values(saved).some(Boolean) ? saved : null;
+        input.value = saved[field] || '';
+        try { localStorage.setItem('admin_dashboard_cache', JSON.stringify(state.allCustomers)); } catch (error) { /* Storage is optional. */ }
         renderPresentationSlide();
         showToast(`บันทึก${getPresentationOverrideFieldLabel(field)}แล้ว`, 'success');
     } catch (error) {
         console.error('Failed to save presentation overrides:', error);
         showToast(`บันทึก${getPresentationOverrideFieldLabel(field)}ไม่สำเร็จ: ${error.message}`, 'error');
     } finally {
+        presentationOverrideSaving = false;
         saveButton.disabled = false;
         saveButton.innerHTML = originalLabel;
         lucide.createIcons();
@@ -2967,7 +3010,7 @@ function renderPresentationSlide() {
     // feedback.timestamp is supplied from GFS_Care_Quest column B by the Apps Script API.
     const assessmentDate = formatPresentationAssessmentDate(fb.timestamp, true);
     const presentationEditTool = isPublicPresentationMode() ? '' : `
-                        <button class="pp-mini-tool" type="button" data-customer-id="${escapePresentationHtml(c.id)}" onclick="openPresentationOverrideModal(this.dataset.customerId)" title="แก้ไขชื่อทีมที่แสดงในสไลด์" aria-label="แก้ไขชื่อทีมที่แสดงในสไลด์">
+                        <button class="pp-mini-tool" type="button" data-customer-id="${escapePresentationHtml(c.id)}" onclick="openPresentationOverrideModal(this.dataset.customerId)" title="แก้ไขข้อมูลที่แสดงในสไลด์" aria-label="แก้ไขข้อมูลที่แสดงในสไลด์">
                             <i data-lucide="pencil-line"></i>
                         </button>`;
     
@@ -3009,23 +3052,26 @@ function renderPresentationSlide() {
                         </div>
                         <div class="pp-cust-info">
                             <h3>คุณ${(c.name || '').replace(/^คุณ/, '').split(' ')[0]}</h3>
+                            <p class="pp-worksite-address">${escapePresentationHtml(c.addressFromData || '-')}</p>
                             <div class="pp-customer-badges">
-                                <span class="pp-company-badge ${companyLabel.toLowerCase()}"><i data-lucide="building"></i>${companyLabel}</span>
-                                <span class="pp-customer-id"><i data-lucide="badge-check"></i>#${c.id || ''}</span>
+                                <span class="pp-worksite-badge"><i data-lucide="map-pin"></i>${escapePresentationHtml(presentationWorksiteType)}</span>
                             </div>
                         </div>
                     </div>
                     <div class="pp-cust-details">
                         <div class="pp-meta-row">
                             <div class="pp-meta-icon">
-                                <i data-lucide="map-pin"></i>
+                                <i data-lucide="building"></i>
                             </div>
                             <div class="pp-meta-content">
                                 <div class="pp-meta-location-heading">
-                                    <strong>สถานที่:</strong>
-                                    <span class="pp-worksite-type">${escapePresentationHtml(presentationWorksiteType)}</span>
+                                    <strong>บริษัท:</strong>
+                                    <span class="pp-company-name">${escapePresentationHtml(companyLabel)}</span>
                                 </div>
-                                <span class="pp-worksite-address">${escapePresentationHtml(c.addressFromData || '-')}</span>
+                                <div class="pp-film-details">
+                                    <div class="pp-film-detail"><strong>ยี่ห้อฟิล์ม:</strong><span class="pp-film-brand">${escapePresentationHtml(getPresentationFilmValue(c, 'filmBrand'))}</span></div>
+                                    <div class="pp-film-detail"><strong>รุ่นฟิล์มที่ติดตั้ง:</strong><span class="pp-film-model">${escapePresentationHtml(getPresentationFilmValue(c, 'filmModel'))}</span></div>
+                                </div>
                             </div>
                         </div>
                         <div class="pp-meta-row">
@@ -3085,7 +3131,7 @@ function renderPresentationSlide() {
                             <i data-lucide="headphones" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div class="pp-tc-info">
-                            <h4><span class="pp-team-title">แอดมิน</span><span class="pp-team-member">: ${escapePresentationHtml(teamDisplayNames.admin || '-')}</span></h4>
+                            <h4><span class="pp-team-title">แอดมิน</span><span class="pp-team-member">: ${escapePresentationHtml(teamDisplayNames.admin || '-').replace(/\+/g, '+<wbr>')}</span></h4>
                             <div class="pp-tc-score-row">
                                 <div class="pp-tc-score">${getScoreStr(fb.ratings?.admin)}<span> / 5</span></div>
                                 <div class="pp-progress-bar">
@@ -3111,7 +3157,7 @@ function renderPresentationSlide() {
                             <i data-lucide="briefcase" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div class="pp-tc-info">
-                            <h4><span class="pp-team-title">ฝ่ายขาย</span><span class="pp-team-member">: ${escapePresentationHtml(teamDisplayNames.sales || '-')}</span></h4>
+                            <h4><span class="pp-team-title">ฝ่ายขาย</span><span class="pp-team-member">: ${escapePresentationHtml(teamDisplayNames.sales || '-').replace(/\+/g, '+<wbr>')}</span></h4>
                             <div class="pp-tc-score-row">
                                 <div class="pp-tc-score">${getScoreStr(fb.ratings?.sales)}<span> / 5</span></div>
                                 <div class="pp-progress-bar">
@@ -3137,7 +3183,7 @@ function renderPresentationSlide() {
                             <i data-lucide="wrench" style="width: 24px; height: 24px;"></i>
                         </div>
                         <div class="pp-tc-info">
-                            <h4><span class="pp-team-title">ทีมช่าง</span><span class="pp-team-member">: ${escapePresentationHtml(teamDisplayNames.tech || '-')}</span></h4>
+                            <h4><span class="pp-team-title">ทีมช่าง</span><span class="pp-team-member">: ${escapePresentationHtml(teamDisplayNames.tech || '-').replace(/\+/g, '+<wbr>')}</span></h4>
                             <div class="pp-tc-score-row">
                                 <div class="pp-tc-score">${getScoreStr(fb.ratings?.tech)}<span> / 5</span></div>
                                 <div class="pp-progress-bar">
@@ -3165,7 +3211,7 @@ function renderPresentationSlide() {
                         <h4>ทีมที่ประทับใจ</h4>
                         <div class="pp-mvp-rule"><span>★</span></div>
                         ${showMvp ? `
-                        <div class="pp-mvp-team-name">${escapePresentationHtml(mvpText)} 🎉</div>
+                        <div class="pp-mvp-team-name">${escapePresentationHtml(mvpText).replace(/\+/g, '+<wbr>')} 🎉</div>
                         ` : `
                         <div class="pp-mvp-team-empty">ยังไม่มีข้อมูล</div>
                         `}

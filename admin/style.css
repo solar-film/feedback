@@ -3131,7 +3131,8 @@ body.public-presentation #presentation-container {
     stroke-width: 2.6;
 }
 
-.pp-company-badge {
+.pp-company-badge,
+.pp-worksite-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -3144,7 +3145,9 @@ body.public-presentation #presentation-container {
 }
 
 .pp-company-badge i,
-.pp-company-badge svg {
+.pp-company-badge svg,
+.pp-worksite-badge i,
+.pp-worksite-badge svg {
     width: 14px;
     height: 14px;
     stroke-width: 2.4;
@@ -3194,8 +3197,8 @@ body.public-presentation #presentation-container {
 
 .pp-meta-content strong {
     color: #0754cf;
-    font-size: 1.07em;
-    font-weight: 800;
+    font-size: 1em;
+    font-weight: 700;
 }
 
 .pp-meta-content span {
@@ -3513,10 +3516,14 @@ body.public-presentation #presentation-container {
 
 .pp-team-member {
     display: block;
+    min-width: 0;
+    max-width: 100%;
     color: #0b3e91;
     font-size: 1.38em;
     font-weight: 800;
-    line-height: 1.16;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .pp-tc-score-row {
@@ -3572,6 +3579,8 @@ body.public-presentation #presentation-container {
 }
 
 .pp-mvp-showcase {
+    min-width: 0;
+    width: 100%;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -3598,6 +3607,8 @@ body.public-presentation #presentation-container {
 }
 
 .pp-team-card.mvp h4 {
+    max-width: 100%;
+    overflow-wrap: anywhere;
     margin: 12px 0 8px;
     color: #4b2d0c;
     font-size: clamp(2rem, 2.55vw, 3.35rem);
@@ -3622,11 +3633,16 @@ body.public-presentation #presentation-container {
 }
 
 .pp-mvp-team-name {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
     margin-top: 16px;
     color: #d3560f;
     font-size: clamp(1.8rem, 2.3vw, 3rem);
     font-weight: 900;
-    line-height: 1.15;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .pp-mvp-team-empty {
@@ -3738,7 +3754,7 @@ body.public-presentation #presentation-container {
     height: auto;
     max-height: calc(100vh - 24px);
     padding: 0;
-    overflow: hidden;
+    overflow-y: auto;
     border: 1px solid rgba(193, 218, 255, 0.86);
     border-radius: 24px;
     background: #ffffff;
@@ -4079,7 +4095,7 @@ body.public-presentation #presentation-container {
 .pp-header-card {
     min-height: 300px;
     padding: 28px 34px;
-    grid-template-columns: minmax(400px, 0.96fr) minmax(390px, 1.04fr) 232px;
+    grid-template-columns: minmax(450px, 1.2fr) minmax(300px, 0.8fr) 232px;
     gap: 30px;
     background:
         radial-gradient(circle, rgba(65, 149, 246, 0.22) 1.1px, transparent 1.6px) calc(100% - 20px) 16px / 11px 11px no-repeat,
@@ -4180,7 +4196,8 @@ body.public-presentation #presentation-container {
     flex-direction: row;
     align-items: center;
     gap: 8px;
-    margin-top: 46px;
+    margin-top: 18px;
+    flex-wrap: wrap;
 }
 
 .pp-customer-id {
@@ -4199,7 +4216,8 @@ body.public-presentation #presentation-container {
     height: 17px;
 }
 
-.pp-company-badge {
+.pp-company-badge,
+.pp-worksite-badge {
     box-sizing: border-box;
     min-height: 35px;
     padding: 7px 13px;
@@ -4209,7 +4227,9 @@ body.public-presentation #presentation-container {
 }
 
 .pp-company-badge i,
-.pp-company-badge svg {
+.pp-company-badge svg,
+.pp-worksite-badge i,
+.pp-worksite-badge svg {
     width: 17px;
     height: 17px;
 }
@@ -4244,9 +4264,9 @@ body.public-presentation #presentation-container {
 }
 
 .pp-meta-content {
-    gap: 4px;
-    font-size: clamp(1.08rem, 1.35vw, 1.5rem);
-    line-height: 1.32;
+    gap: 6px;
+    font-size: clamp(1rem, 1.2vw, 1.375rem);
+    line-height: 1.5;
 }
 
 .pp-meta-location-heading {
@@ -4256,14 +4276,23 @@ body.public-presentation #presentation-container {
     gap: 0.45em;
 }
 
-.pp-meta-content .pp-meta-location-heading .pp-worksite-type {
+.pp-meta-content .pp-meta-location-heading .pp-company-name {
     color: #112b68;
-    font-weight: 800;
+    font-weight: 600;
 }
 
-.pp-meta-content .pp-worksite-address {
-    display: block;
+.pp-cust-info {
+    min-width: 0;
+}
+
+.pp-cust-info .pp-worksite-address {
+    margin: 18px 0 0;
     color: #112b68;
+    font-size: clamp(1rem, 1.25vw, 1.4rem);
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
 }
 
 .pp-score-right {
@@ -4325,7 +4354,7 @@ body.public-presentation #presentation-container {
 
 @media (max-width: 1500px) {
     .pp-header-card {
-        grid-template-columns: minmax(340px, 0.96fr) minmax(320px, 1.04fr) 212px;
+        grid-template-columns: minmax(380px, 1.2fr) minmax(260px, 0.8fr) 212px;
         gap: 24px;
         padding: 26px 30px;
     }
@@ -4348,3 +4377,55 @@ body.public-presentation #presentation-container {
     .pp-cust-info h3 { font-size: clamp(2rem, 9.5vw, 3.15rem); }
     .pp-cust-details { padding-left: 0; border-left: 0; }
 }
+
+/* Keep the customer address readable when the presentation narrows. */
+@media (max-width: 1280px) {
+    .pp-header-card { grid-template-columns: minmax(0, 1fr) 212px; }
+    .pp-cust-left { grid-column: 1 / -1; min-width: 0; }
+    .pp-cust-details { padding-left: 0; border-left: 0; }
+}
+
+@media (max-width: 760px) {
+    .pp-header-card { grid-template-columns: minmax(0, 1fr); }
+    .pp-cust-left { align-items: flex-start; }
+    .pp-customer-id { margin-top: 0; overflow-wrap: anywhere; min-width: 0; }
+}
+
+.pp-worksite-badge {
+    min-width: 0;
+    color: #0757cf;
+    background: #e9f3ff;
+    border: 1px solid #c5e0ff;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.pp-worksite-badge i,
+.pp-worksite-badge svg {
+    flex-shrink: 0;
+}
+
+/* Installed film details from Data columns AG (brand) and AH (model). */
+.pp-film-details {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.pp-film-detail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.4em;
+    min-width: 0;
+}
+
+.pp-film-detail span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.presentation-override-field.film textarea { resize: vertical; line-height: 1.5; }
