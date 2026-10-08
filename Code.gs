@@ -140,13 +140,14 @@ function getSheetData(sheetName) {
   return rows;
 }
 
-function findSheetRowById(sheet, id) {
+function findSheetRowById(sheet, id, latest) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) return 0;
 
   var values = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
   var targetId = getText(id);
-  for (var index = 0; index < values.length; index++) {
+  for (var offset = 0; offset < values.length; offset++) {
+    var index = latest ? values.length - 1 - offset : offset;
     if (getText(values[index][0]) === targetId) return index + 2;
   }
   return 0;
@@ -193,9 +194,24 @@ function updateReviewStatus(id) {
 }
 
 function updateStatus(data) {
-  var sheet = ensureSheet(STATUS_SHEET, ['ID', 'Status', 'Timestamp']);
-  sheet.appendRow([data.id || '', data.status || '', new Date()]);
-  return jsonResponse({ status: 'success', message: 'Status updated successfully' });
+  var id = getText(data.id);
+  var status = getText(data.status);
+  if (!id) return jsonResponse({ status: 'error', message: 'ไม่พบรหัสลูกค้า' });
+  if (status !== 'Sent' && status !== 'Unsent') {
+    return jsonResponse({ status: 'error', message: 'สถานะการส่งลิงก์ไม่ถูกต้อง' });
+  }
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var sheet = ensureSheet(STATUS_SHEET, ['ID', 'Status', 'Timestamp']);
+    sheet.appendRow([id, status, new Date()]);
+    SpreadsheetApp.flush();
+    var statusData = buildStatusDataById(getSheetData(STATUS_SHEET))[id];
+    return jsonResponse({ status: 'success', statusData: statusData, message: 'Status updated successfully' });
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function getNextCopyTimestampColumn(sheet, row) {
@@ -234,16 +250,14 @@ function logLinkCopy(data) {
   lock.waitLock(30000);
   try {
     var sheet = ensureSheet(STATUS_SHEET, ['ID', 'Status', 'Timestamp']);
-    var row = findSheetRowById(sheet, id);
+    var row = findSheetRowById(sheet, id, true);
     var copiedAt = new Date();
 
-    if (!row) {
-      // This is the first recorded copy for this customer.
+    if (!row || !isSurveyLinkSentStatus(sheet.getRange(row, 2).getValue())) {
+      // Start a new sent event after a manual reset. Preserve the reset row
+      // and its timestamp instead of treating it as a previous link copy.
       sheet.appendRow([id, 'Sent', copiedAt]);
     } else {
-      var status = getText(sheet.getRange(row, 2).getValue());
-      if (!status || status === 'Unsent') sheet.getRange(row, 2).setValue('Sent');
-
       var timestampColumn = getNextCopyTimestampColumn(sheet, row);
       sheet.getRange(row, timestampColumn).setValue(copiedAt);
     }
@@ -312,7 +326,7 @@ function findPresentationHeaderColumn(headers, aliases) {
 }
 
 function ensurePresentationOverridesSheet() {
-  var headers = ['Customer ID', 'Admin', 'Sales', 'Technician', 'Worksite Type', 'Updated At'];
+  var headers = ['Customer ID', 'Admin', 'Sales', 'Technician', 'Worksite Type', 'Updated At', 'Film Brand', 'Film Model'];
   var sheet = ensureSheet(PRESENTATION_OVERRIDES_SHEET, headers);
   var headerValues = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), headers.length)).getDisplayValues()[0];
   var worksiteTypeColumn = findPresentationHeaderColumn(headerValues, [
@@ -336,6 +350,12 @@ function ensurePresentationOverridesSheet() {
     }
   }
 
+  ['Film Brand', 'Film Model'].forEach(function (header) {
+    var currentHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0];
+    if (!findPresentationHeaderColumn(currentHeaders, [header.toLowerCase()])) {
+      sheet.getRange(1, sheet.getLastColumn() + 1).setValue(header).setFontWeight('bold').setBackground('#eef3f8');
+    }
+  });
   return sheet;
 }
 
@@ -348,20 +368,24 @@ function savePresentationOverride(data) {
   if (!id) return jsonResponse({ status: 'error', message: 'ไม่พบ Customer ID' });
 
   var input = data.presentationOverrides || {};
+  var existing = getPresentationOverridesById(false)[id] || {};
   var overrides = {
     admin: normalisePresentationOverride(input.admin),
     sales: normalisePresentationOverride(input.sales),
     tech: normalisePresentationOverride(input.tech),
-    worksiteType: normalisePresentationOverride(input.worksiteType)
+    worksiteType: normalisePresentationOverride(input.worksiteType),
+    filmBrand: normalisePresentationOverride(Object.prototype.hasOwnProperty.call(input, 'filmBrand') ? input.filmBrand : existing.filmBrand),
+    filmModel: getText(Object.prototype.hasOwnProperty.call(input, 'filmModel') ? input.filmModel : existing.filmModel)
   };
-  var hasOverride = overrides.admin || overrides.sales || overrides.tech || overrides.worksiteType;
+  var hasOverride = overrides.admin || overrides.sales || overrides.tech || overrides.worksiteType || overrides.filmBrand || overrides.filmModel;
   var sheet = ensurePresentationOverridesSheet();
   var row = findSheetRowById(sheet, id);
 
   // เมื่อรีเซ็ตครบทุกช่อง ลบแถว override เพื่อกลับไปใช้ข้อมูลจากชีต Data ทั้งหมด
   if (!hasOverride) {
     if (row) sheet.deleteRow(row);
-    return jsonResponse({ status: 'success', message: 'Presentation overrides reset successfully' });
+    try { CacheService.getScriptCache().remove('public-presentation-v2'); } catch (error) {}
+    return jsonResponse({ status: 'success', presentationOverrides: overrides, message: 'Presentation overrides reset successfully' });
   }
 
   var rowData = [id, overrides.admin, overrides.sales, overrides.tech, overrides.worksiteType, new Date()];
@@ -370,7 +394,12 @@ function savePresentationOverride(data) {
   } else {
     sheet.appendRow(rowData);
   }
-  return jsonResponse({ status: 'success', message: 'Presentation override saved successfully' });
+  var savedRow = row || sheet.getLastRow();
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0];
+  sheet.getRange(savedRow, findPresentationHeaderColumn(headers, ['film brand'])).setValue(overrides.filmBrand);
+  sheet.getRange(savedRow, findPresentationHeaderColumn(headers, ['film model'])).setValue(overrides.filmModel);
+  try { CacheService.getScriptCache().remove('public-presentation-v2'); } catch (error) {}
+  return jsonResponse({ status: 'success', presentationOverrides: overrides, message: 'Presentation override saved successfully' });
 }
 
 function getPresentationOverridesById(ensureSchema) {
@@ -385,7 +414,7 @@ function getPresentationOverridesById(ensureSchema) {
     var id = getFirstText([row['Customer ID'], row['ID'], row['รหัสลูกค้า']]);
     if (!id) continue;
 
-    // Presentation Overrides is always the first source for these four values.
+    // Presentation Overrides is the first source for the slide display values.
     // Support both the standard headers created by this script and Thai headers
     // when the sheet has been edited manually.
     var previous = result[id] || {};
@@ -400,7 +429,9 @@ function getPresentationOverridesById(ensureSchema) {
       admin: admin || previous.admin || '',
       sales: sales || previous.sales || '',
       tech: tech || previous.tech || '',
-      worksiteType: worksiteType || previous.worksiteType || ''
+      worksiteType: worksiteType || previous.worksiteType || '',
+      filmBrand: getFirstText([row['Film Brand'], row['ยี่ห้อฟิล์ม']]) || previous.filmBrand || '',
+      filmModel: getFirstText([row['Film Model'], row['รุ่นฟิล์มที่ติดตั้ง']]) || previous.filmModel || ''
     };
   }
   return result;
@@ -572,6 +603,7 @@ function mapCustomer(row, feedbackById, statusDataById, giftById, remarksById, o
     contactChannel: getText(row['_col_10']) || '-',
     siteType: getFirstText([row['_col_37'], row['พื้นที่ที่ติดตั้ง'], row['SiteType']]) || '-',
     installDate: getFirstText([row['InstallDate'], row['วันที่ติดตั้ง']]),
+    filmBrand: getFirstText([row['_col_32'], row['ยี่ห้อฟิล์ม'], row['FilmBrand']]) || '-',
     filmModel: getFirstText([row['_col_33'], row['รุ่นฟิล์มที่ติดตั้ง'], row['FilmModel']]) || '-',
     sales: getFirstText([row['Sales'], row['เซลล์ผู้ดูแล'], row['ฝ่ายขาย']]) || '-',
     tech: getFirstText([row['Tech'], row['ช่างติดตั้ง'], row['ทีมช่าง']]) || '-',
@@ -609,6 +641,7 @@ function handleGetAllCustomersDetailed() {
   return jsonResponse({
     status: 'success',
     presentationOverridesEnabled: true,
+    presentationFilmOverridesEnabled: true,
     data: customers
   });
 }
@@ -618,7 +651,7 @@ function handleGetAllCustomersDetailed() {
 // remarks, or other admin-only customer data.
 function handleGetPublicPresentationData() {
   // Cache only the public payload; admin reads and writes remain live.
-  var cacheKey = 'public-presentation-v1';
+  var cacheKey = 'public-presentation-v2';
   var cache;
   try {
     cache = CacheService.getScriptCache();
@@ -645,6 +678,8 @@ function handleGetPublicPresentationData() {
       company: getFirstText([row['Company'], row['บริษัท'], row['_col_9']]) || '-',
       name: getFirstText([row['Name'], row['ชื่อผู้ติดต่อ'], row['ชื่อลูกค้า']]),
       installDate: getFirstText([row['InstallDate'], row['วันที่ติดตั้ง']]),
+      filmBrand: getFirstText([row['_col_32'], row['ยี่ห้อฟิล์ม'], row['FilmBrand']]) || '-',
+      filmModel: getFirstText([row['_col_33'], row['รุ่นฟิล์มที่ติดตั้ง'], row['FilmModel']]) || '-',
       sales: getFirstText([row['Sales'], row['เซลล์ผู้ดูแล'], row['ฝ่ายขาย']]) || '-',
       tech: getFirstText([row['Tech'], row['ช่างติดตั้ง'], row['ทีมช่าง']]) || '-',
       adminName: getFirstText([row['_col_17'], row['Admin'], row['แอดมิน']]) || '-',
