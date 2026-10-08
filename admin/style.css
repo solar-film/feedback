@@ -881,6 +881,34 @@ body.chart-modal-open {
     min-width: 112px;
 }
 
+.customer-status-select {
+    border: 1px solid transparent;
+    font-family: inherit;
+    cursor: pointer;
+    padding-right: 6px;
+    max-width: 100%;
+}
+
+.customer-status-select:hover,
+.customer-status-select:focus-visible {
+    border-color: currentColor;
+}
+
+.customer-status-select:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+}
+
+.customer-status-select:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.customer-status-select option {
+    background: #ffffff;
+    color: var(--text-main);
+}
+
 .status-assessment-date {
     display: block;
     margin-top: 4px;

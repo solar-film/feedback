@@ -1007,6 +1007,8 @@ function renderKPIs() {
     document.getElementById('kpi-avg-desc').innerText = `จากคำตอบของลูกค้า ${scoreCount} คน`;
 }
 
+const customerLinkStatusSaving = new Set();
+
 function renderCustomerTable() {
     const tbody = document.getElementById('customer-table-body');
     tbody.innerHTML = '';
@@ -1039,6 +1041,16 @@ function renderCustomerTable() {
         if (c.status === 'Sent') { statusText = 'ส่งลิงก์แล้ว'; statusClass = 'sent'; }
         else if (c.status === 'Completed') { statusText = 'ประเมินสำเร็จ'; statusClass = 'completed'; }
         else if (c.status === 'Action Required') { statusText = 'ต้องการดูแลด่วน'; statusClass = 'action'; }
+        const canEditLinkStatus = !c.feedback && (c.status === 'Sent' || c.status === 'Unsent');
+        const statusContent = canEditLinkStatus
+            ? `<select class="status-badge customer-status-select ${statusClass}" data-customer-id="${escapePresentationHtml(c.id)}"
+                    aria-label="สถานะการส่งลิงก์ของ ${escapePresentationHtml(c.name || c.id)}" title="เลือกเพื่อแก้ไขสถานะการส่งลิงก์"
+                    onclick="event.stopPropagation()" onkeydown="event.stopPropagation()"
+                    onchange="changeCustomerLinkStatus(this.dataset.customerId, this.value, this)" ${customerLinkStatusSaving.has(c.id) ? 'disabled aria-busy="true"' : ''}>
+                    <option value="Unsent" ${c.status === 'Unsent' ? 'selected' : ''}>ยังไม่ส่ง</option>
+                    <option value="Sent" ${c.status === 'Sent' ? 'selected' : ''}>ส่งลิงก์แล้ว</option>
+                </select>`
+            : `<span class="status-badge ${statusClass}">${statusText}</span>`;
         const completedAssessmentDate = c.status === 'Completed'
             ? formatLinkSentDate(c.feedback?.timestamp)
             : '';
@@ -1059,7 +1071,7 @@ function renderCustomerTable() {
             <td>${c.sales || '-'}</td>
             <td>${c.tech || '-'}</td>
             <td class="status-cell">
-                <span class="status-badge ${statusClass}">${statusText}</span>
+                ${statusContent}
                 ${completedAssessmentDate && completedAssessmentDate !== '-' ? `<small class="status-assessment-date">${completedAssessmentDate}</small>` : ''}
             </td>
             <td class="link-sent-date-column">${formatLinkSentDate(c.linkSentAtHistory?.length ? c.linkSentAtHistory : c.linkSentAt)}</td>
@@ -1247,6 +1259,45 @@ function findCustomerRecord(customerId) {
         || state.customers.find(customer => customer.id === customerId);
 }
 
+async function changeCustomerLinkStatus(customerId, targetStatus, select) {
+    const customer = findCustomerRecord(customerId);
+    if (!customer || customer.feedback || !['Sent', 'Unsent'].includes(customer.status)
+        || !['Sent', 'Unsent'].includes(targetStatus) || customerLinkStatusSaving.has(customerId)) return;
+    if (customer.status === targetStatus) return;
+
+    customerLinkStatusSaving.add(customerId);
+    select.disabled = true;
+    select.setAttribute('aria-busy', 'true');
+
+    try {
+        if (!state.googleSheetsUrl) throw new Error('ไม่พบ URL สำหรับเชื่อมต่อฐานข้อมูล');
+        const response = await fetch(state.googleSheetsUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'updateStatus',
+                id: customerId,
+                status: targetStatus,
+                password: localStorage.getItem('admin_password')
+            })
+        });
+        const result = await response.json();
+        if (!response.ok || result.status !== 'success') {
+            throw new Error(result.message || 'ไม่สามารถบันทึกสถานะได้');
+        }
+
+        updateCustomerStatus(customerId, targetStatus, { skipBackend: true, statusData: result.statusData });
+        localStorage.setItem('admin_dashboard_cache', JSON.stringify(state.allCustomers));
+        showToast(`เปลี่ยนสถานะเป็น “${targetStatus === 'Sent' ? 'ส่งลิงก์แล้ว' : 'ยังไม่ส่ง'}” แล้ว`, 'success');
+    } catch (error) {
+        console.error('Failed to save customer link status:', error);
+        showToast(`บันทึกสถานะไม่สำเร็จ: ${error.message}`, 'error');
+    } finally {
+        customerLinkStatusSaving.delete(customerId);
+        renderCustomerTable();
+        filterCustomerTable();
+    }
+}
+
 function updateCustomerStatus(customerId, targetStatus, options = {}) {
     const customer = findCustomerRecord(customerId);
     if (!customer) return;
@@ -1254,11 +1305,18 @@ function updateCustomerStatus(customerId, targetStatus, options = {}) {
     if (customer.status === targetStatus) return;
 
     customer.status = targetStatus;
-    if (targetStatus === 'Sent') {
+    if (options.statusData) {
+        customer.linkSentAt = options.statusData.linkSentAt || '';
+        customer.linkSentAtHistory = options.statusData.linkSentAtHistory || [];
+    } else if (targetStatus === 'Sent') {
+        const previousTimestamps = customer.linkSentAtHistory?.length
+            ? customer.linkSentAtHistory : (customer.linkSentAt ? [customer.linkSentAt] : []);
         customer.linkSentAt = new Date().toLocaleString('en-GB', {
+            timeZone: 'Asia/Bangkok',
             day: '2-digit', month: '2-digit', year: 'numeric',
             hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
         }).replace(',', '');
+        customer.linkSentAtHistory = [...new Set([...previousTimestamps, customer.linkSentAt])];
     }
     localStorage.setItem('local_status_' + customerId, targetStatus);
 
@@ -1266,6 +1324,7 @@ function updateCustomerStatus(customerId, targetStatus, options = {}) {
     renderKanbanBoard();
     renderCustomerTable();
     renderKPIs();
+    filterCustomerTable();
 
     // Sync status to backend
     if (!options.skipBackend && state.googleSheetsUrl && (targetStatus === 'Sent' || targetStatus === 'Unsent')) {
