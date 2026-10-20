@@ -29,4 +29,4 @@ To measure where server time goes without deploying, append a temporary function
 
 9. Record the new version in `DESIGN.md` (ประวัติ) and in memory.
 
-Front-end files (index.html, app.js, admin/*) are served from GitHub `solar-film/feedback`; pushing there is a separate step that needs พี่ออย's OK.
+Front-end files (index.html, app.js, admin/*) are served from GitHub `solar-film/feedback`; pushing there is a separate step that needs พี่ออย's OK. GitHub Pages serves them with `Cache-Control: max-age=600`, so whenever `admin/app.js` or `admin/style.css` changes, bump `app.js?v=` / `style.css?v=` in `admin/index.html` in the same PR, or browsers keep running the old file for up to 10 minutes.
