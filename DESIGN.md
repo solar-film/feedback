@@ -23,10 +23,11 @@
 
 - GET `getCustomer`, `getAllCustomers`, `getPresentationData` (สาธารณะ)
 - POST ไม่มี action = ส่งแบบประเมิน, `updateReviewStatus` (สาธารณะ)
-- POST ต้องมี `password`: `getAllCustomersDetailed` (`fresh: true` = ข้ามแคช), `updateStatus`, `logLinkCopy`, `saveRemark`, `updateGiftStatus`, `deleteGiftStatus`, `savePresentationOverride`
+- POST ต้องมี `password`: `checkPassword` (เช็กรหัสอย่างเดียว ไม่อ่านชีต ใช้ตอน login บนเครื่องที่มีข้อมูลเก็บไว้แล้ว), `getAllCustomersDetailed` (`fresh: true` = ข้ามแคช), `updateStatus`, `logLinkCopy`, `saveRemark`, `updateGiftStatus`, `deleteGiftStatus`, `savePresentationOverride`
 - แคช: นำเสนอสาธารณะ 60 วินาที, ข้อมูลแอดมิน 30 วินาที ล้างทันทีเมื่อมีการบันทึกผ่าน API ค่าใหญ่แบ่งเป็นก้อนละ 30,000 ตัวอักษร
 - ชีต `Data` อ่านหลายช่องตามตำแหน่งคอลัมน์ (`_col_9` บริษัท, `_col_14` ประเภทงาน, `_col_16` ที่อยู่, `_col_17` แอดมิน, `_col_26` วันที่กรอง, `_col_30` บิล, `_col_32`/`_col_33` ยี่ห้อ/รุ่นฟิล์ม, `_col_37` พื้นที่ติดตั้ง) ห้ามแทรก/ย้ายคอลัมน์ในชีตนี้
 
 ## ประวัติ
 
+- 2026-10-20 Apps Script เวอร์ชัน 57 (deployment "V.17 - Quick password check at login"): login บนเครื่องที่เคยเข้าแล้วเช็กแค่รหัสผ่าน แล้วเปิดหน้าแอดมินด้วยข้อมูลที่เก็บไว้ทันที ข้อมูลล่าสุดโหลดตามมาเบื้องหลัง วัดจริงก่อนแก้: โหลดข้อมูลแอดมิน 10–17 วินาทีฝั่งเซิร์ฟเวอร์, ข้อมูลประมาณ 943,000 ตัวอักษร, ชีต Data 1,548×39 ผ่าน IMPORTRANGE
 - 2026-10-20 Apps Script เวอร์ชัน 56 (deployment "V.16 - Faster backend and admin cache"): ปรับความเร็วหลังบ้าน ผลลัพธ์เหมือนเดิมทุกจุด

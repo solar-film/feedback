@@ -54,6 +54,7 @@ function doPost(e) {
     var data = JSON.parse(body);
     var action = data.action || '';
     var protectedActions = [
+      'checkPassword',
       'updateStatus',
       'updateGiftStatus',
       'deleteGiftStatus',
@@ -68,6 +69,9 @@ function doPost(e) {
       return jsonResponse({ status: 'error', message: 'Unauthorized: Invalid Password' });
     }
 
+    // Login on a device with saved dashboard data only needs the password
+    // check above; the data then loads in the background.
+    if (action === 'checkPassword') return jsonResponse({ status: 'success' });
     if (action === 'getAllCustomersDetailed') return handleGetAllCustomersDetailed(data.fresh === true);
 
     // Every other POST may change a sheet, so the cached admin data is

@@ -22,9 +22,11 @@ Always edit that deployment with a new version; never create a new deployment, w
    ```
 4. Insert the new code with `javascript_tool`: embed the file as ``String.raw`...` `` (Code.gs must contain no backticks or `${`), check its SHA-256 against `node -e` on the local file, then `model.pushEditOperations([], [{range: model.getFullModelRange(), text: code}], () => null)`. Fetching from a localhost server is blocked by the page.
 5. Click the editor, press Ctrl+S, wait, re-hash to confirm the saved text.
-6. Deploy menu (การทำให้ใช้งานได้) → จัดการการทำให้ใช้งานได้ (click by coordinates; the menuitem ref does not open it). Wait for the dialog to load; if it spins for over ~15 s, cancel and reload the page.
+6. Deploy menu (การทำให้ใช้งานได้) → จัดการการทำให้ใช้งานได้ (click by coordinates; the menuitem ref does not open it, and if a click only highlights the item, press Enter). Wait for the dialog to load; if it spins for over ~15 s, cancel and reload the page.
 7. Check the URL in the dialog matches the one above. Click the pencil (แก้ไข), open the version combobox, choose the option found by `find("เวอร์ชันใหม่")`. Do not press Escape (it closes the whole dialog). Update the description to the next V number, then click การทำให้ใช้งานได้ and confirm "อัปเดตการทำให้ใช้งานได้เรียบร้อยแล้ว" with the new version number.
 8. Smoke-test only read-only GETs with curl: plain ping, `action=getPresentationData`, `action=getAllCustomers` (do not print names), `action=getCustomer&id=<real id>`. Write curl output to the scratchpad, not /tmp (Git Bash and Node disagree about /tmp). Ask พี่ออย to open the admin page to check login-protected parts.
+To measure where server time goes without deploying, append a temporary function to the editor, save, pick it in the function dropdown (scroll it into view with JS if the list is long), run it, read the execution log, then remove it so the editor hash matches the deployed code again. The Executions page (`.../executions`) lists the server duration of every web app call.
+
 9. Record the new version in `DESIGN.md` (ประวัติ) and in memory.
 
 Front-end files (index.html, app.js, admin/*) are served from GitHub `solar-film/feedback`; pushing there is a separate step that needs พี่ออย's OK.
