@@ -512,7 +512,21 @@ function getDataWorksiteType(item) {
 }
 
 // LOAD DATABASE
+// Apps Script sometimes answers with its echo page's 404 or with the plain
+// "API is running" GET reply instead of the data. Both pass on a second try,
+// so retry this read twice before reporting an error. Writes are not retried.
 async function fetchDashboardData(password, fresh = false) {
+    for (let attempt = 1; ; attempt++) {
+        try {
+            return await fetchDashboardDataOnce(password, fresh);
+        } catch (error) {
+            if (attempt >= 3) throw error;
+            await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+        }
+    }
+}
+
+async function fetchDashboardDataOnce(password, fresh) {
     // ContentService redirects to a one-time URL. Always request a fresh response.
     const url = new URL(state.googleSheetsUrl);
     url.searchParams.set('_request', Date.now().toString());
