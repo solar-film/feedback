@@ -35,6 +35,8 @@ function frontendSetup({ savedData, respond }) {
     const calls = [];
     const ctx = vm.createContext({
         URL,
+        crypto: globalThis.crypto,
+        TextEncoder,
         document: { addEventListener() {}, getElementById: element },
         console: { error() {}, warn() {} },
         lucide: { createIcons() {} },
@@ -89,4 +91,37 @@ test('an Apps Script deployment without checkPassword falls back to the full loa
     await login();
     assert.deepEqual(calls.map(call => call.action), ['checkPassword', 'getAllCustomersDetailed']);
     assert.equal(logins[0].data[0].id, 'A');
+});
+
+test('logging in again with the accepted password on this device needs no request', async () => {
+    const { ctx, calls, logins, stored, element, login } = frontendSetup({ savedData: true, respond: () => ({ status: 'success' }) });
+    await login();
+    assert.equal(calls.length, 1);
+    const verifier = stored.get('admin_login_verifier');
+    assert.ok(verifier && !verifier.includes('pw"') && !verifier.includes(':pw'), 'stores a salted hash, not the password');
+
+    stored.delete('admin_password');
+    await login();
+    assert.equal(calls.length, 1, 'second login made no request');
+    assert.deepEqual(logins, [null, null]);
+
+    // A different password is never accepted locally.
+    element('admin-password').value = 'other';
+    await login();
+    assert.equal(calls.length, 2);
+    assert.equal(calls[1].password, 'other');
+});
+
+test('a saved password the server rejects returns to the login screen', async () => {
+    const { ctx, stored, element } = frontendSetup({ savedData: true, respond: () => ({ status: 'error', message: 'Unauthorized: Invalid Password' }) });
+    stored.set('admin_password', 'old');
+    stored.set('admin_login_verifier', '{"salt":"s","hash":"h"}');
+    let returnedToLogin = 0;
+    ctx.checkLoginStatus = () => { returnedToLogin++; };
+    for (const name of ['updateDataAndRender', 'updateApiBadge', 'showToast']) ctx[name] = () => {};
+    await ctx.loadData();
+    assert.equal(stored.has('admin_password'), false);
+    assert.equal(stored.has('admin_login_verifier'), false);
+    assert.equal(returnedToLogin, 1);
+    assert.equal(element('login-error').innerText, 'รหัสผ่านไม่ถูกต้อง');
 });
