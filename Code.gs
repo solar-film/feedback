@@ -68,26 +68,44 @@ function doPost(e) {
       return jsonResponse({ status: 'error', message: 'Unauthorized: Invalid Password' });
     }
 
-    if (action === 'getAllCustomersDetailed') return handleGetAllCustomersDetailed();
-    if (action === 'updateStatus') return updateStatus(data);
-    if (action === 'updateGiftStatus') return updateGiftStatus(data);
-    if (action === 'deleteGiftStatus') return deleteGiftStatus(data.id);
-    if (action === 'savePresentationOverride') return savePresentationOverride(data);
-    if (action === 'saveRemark') return saveRemark(data);
-    if (action === 'logLinkCopy') return logLinkCopy(data);
-    if (action === 'updateReviewStatus') return updateReviewStatus(data.id);
+    if (action === 'getAllCustomersDetailed') return handleGetAllCustomersDetailed(data.fresh === true);
 
-    if (action) return jsonResponse({ status: 'error', message: 'Unsupported POST action: ' + action });
+    // Every other POST may change a sheet, so the cached admin data is
+    // retired once it finishes, whether it succeeded or not.
+    try {
+      if (action === 'updateStatus') return updateStatus(data);
+      if (action === 'updateGiftStatus') return updateGiftStatus(data);
+      if (action === 'deleteGiftStatus') return deleteGiftStatus(data.id);
+      if (action === 'savePresentationOverride') return savePresentationOverride(data);
+      if (action === 'saveRemark') return saveRemark(data);
+      if (action === 'logLinkCopy') return logLinkCopy(data);
+      if (action === 'updateReviewStatus') return updateReviewStatus(data.id);
 
-    // ไม่มี action คือการส่งแบบประเมินจากหน้าลูกค้า
-    return saveFeedback(data);
+      if (action) return jsonResponse({ status: 'error', message: 'Unsupported POST action: ' + action });
+
+      // ไม่มี action คือการส่งแบบประเมินจากหน้าลูกค้า
+      return saveFeedback(data);
+    } finally {
+      invalidateAdminData();
+    }
   } catch (error) {
     return jsonResponse({ status: 'error', message: error.toString() });
   }
 }
 
+// Each Spreadsheet service call is a round trip, so reuse the spreadsheet and
+// its time zone for the rest of the current request.
+var cachedSpreadsheet = null;
+var cachedTimezone = null;
+
 function getSpreadsheet() {
-  return SpreadsheetApp.getActiveSpreadsheet();
+  if (!cachedSpreadsheet) cachedSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  return cachedSpreadsheet;
+}
+
+function getSpreadsheetTimezone() {
+  if (!cachedTimezone) cachedTimezone = getSpreadsheet().getSpreadsheetTimeZone();
+  return cachedTimezone;
 }
 
 function ensureSheet(sheetName, headers) {
@@ -116,28 +134,72 @@ function getFirstText(values) {
   return '';
 }
 
+function formatCellValue(value, timezone) {
+  return value instanceof Date ? Utilities.formatDate(value, timezone, 'dd/MM/yyyy HH:mm:ss') : value;
+}
+
+function buildSheetRow(headers, values, timezone) {
+  var row = {};
+  for (var columnIndex = 0; columnIndex < headers.length; columnIndex++) {
+    var value = formatCellValue(values[columnIndex], timezone);
+    row[headers[columnIndex]] = value;
+    row['_col_' + columnIndex] = value;
+  }
+  return row;
+}
+
 function getSheetData(sheetName) {
   var sheet = getSpreadsheet().getSheetByName(sheetName);
-  if (!sheet || sheet.getLastRow() < 2) return sheet ? [] : null;
+  if (!sheet) return null;
 
   var values = sheet.getDataRange().getValues();
-  var headers = values[0];
-  var timezone = getSpreadsheet().getSpreadsheetTimeZone();
-  var rows = [];
+  if (values.length < 2) return [];
 
+  var headers = values[0];
+  var timezone = getSpreadsheetTimezone();
+  var rows = [];
   for (var rowIndex = 1; rowIndex < values.length; rowIndex++) {
-    var row = {};
-    for (var columnIndex = 0; columnIndex < headers.length; columnIndex++) {
-      var value = values[rowIndex][columnIndex];
-      if (value instanceof Date) {
-        value = Utilities.formatDate(value, timezone, 'dd/MM/yyyy HH:mm:ss');
-      }
-      row[headers[columnIndex]] = value;
-      row['_col_' + columnIndex] = value;
+    rows.push(buildSheetRow(headers, values[rowIndex], timezone));
+  }
+  return rows;
+}
+
+// Reads only the columns whose header is listed in names. Lookups that need a
+// couple of columns avoid transferring the whole, wide Data sheet. When a
+// header appears twice, the right-most column wins, as it does in getSheetData.
+function readSheetColumns(sheetName, names) {
+  var sheet = getSpreadsheet().getSheetByName(sheetName);
+  if (!sheet) return null;
+
+  var lastRow = sheet.getLastRow();
+  var lastColumn = sheet.getLastColumn();
+  if (lastRow < 2 || lastColumn < 1) return { sheet: sheet, headers: [], rows: [] };
+
+  var headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0];
+  var columns = {};
+  for (var column = 0; column < headers.length; column++) {
+    var key = String(headers[column]);
+    if (names.indexOf(key) !== -1) columns[key] = column;
+  }
+
+  // Read each wanted column on its own so columns far apart do not pull in
+  // everything between them.
+  var rowCount = lastRow - 1;
+  var columnValues = {};
+  for (var name in columns) {
+    columnValues[name] = sheet.getRange(2, columns[name] + 1, rowCount, 1).getValues();
+  }
+
+  var timezone = getSpreadsheetTimezone();
+  var rows = [];
+  for (var rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+    var row = { _rowNumber: rowIndex + 2 };
+    for (var columnName in columnValues) {
+      row[columnName] = formatCellValue(columnValues[columnName][rowIndex][0], timezone);
     }
     rows.push(row);
   }
-  return rows;
+  return { sheet: sheet, headers: headers, rows: rows };
 }
 
 function findSheetRowById(sheet, id, latest) {
@@ -214,9 +276,11 @@ function updateStatus(data) {
   }
 }
 
-function getNextCopyTimestampColumn(sheet, row) {
+function getNextCopyTimestampColumn(sheet, row, rowValues) {
   var lastColumn = Math.max(sheet.getLastColumn(), 3);
   var headers = sheet.getRange(1, 1, 1, lastColumn).getDisplayValues()[0];
+  // Read the customer's row once instead of one cell per Timestamp column.
+  if (!rowValues || rowValues.length < lastColumn) rowValues = sheet.getRange(row, 1, 1, lastColumn).getValues()[0];
   var largestTimestampNumber = 0;
 
   for (var column = 0; column < headers.length; column++) {
@@ -228,7 +292,7 @@ function getNextCopyTimestampColumn(sheet, row) {
 
     // Reuse the first empty timestamp cell. This starts with Timestamp, then
     // Timestamp2, Timestamp3, and so on for later copies of the same link.
-    if (!sheet.getRange(row, column + 1).getValue()) return column + 1;
+    if (!rowValues[column]) return column + 1;
   }
 
   var newColumn = lastColumn + 1;
@@ -252,13 +316,14 @@ function logLinkCopy(data) {
     var sheet = ensureSheet(STATUS_SHEET, ['ID', 'Status', 'Timestamp']);
     var row = findSheetRowById(sheet, id, true);
     var copiedAt = new Date();
+    var rowValues = row ? sheet.getRange(row, 1, 1, Math.max(sheet.getLastColumn(), 3)).getValues()[0] : null;
 
-    if (!row || !isSurveyLinkSentStatus(sheet.getRange(row, 2).getValue())) {
+    if (!row || !isSurveyLinkSentStatus(rowValues[1])) {
       // Start a new sent event after a manual reset. Preserve the reset row
       // and its timestamp instead of treating it as a previous link copy.
       sheet.appendRow([id, 'Sent', copiedAt]);
     } else {
-      var timestampColumn = getNextCopyTimestampColumn(sheet, row);
+      var timestampColumn = getNextCopyTimestampColumn(sheet, row, rowValues);
       sheet.getRange(row, timestampColumn).setValue(copiedAt);
     }
 
@@ -350,12 +415,18 @@ function ensurePresentationOverridesSheet() {
     }
   }
 
-  ['Film Brand', 'Film Model'].forEach(function (header) {
-    var currentHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0];
-    if (!findPresentationHeaderColumn(currentHeaders, [header.toLowerCase()])) {
-      sheet.getRange(1, sheet.getLastColumn() + 1).setValue(header).setFontWeight('bold').setBackground('#eef3f8');
-    }
+  // Film columns sit after every existing column. Their presence does not
+  // depend on the Worksite Type insertion above, so the first header read is
+  // enough and an up-to-date sheet needs no further reads.
+  var missingFilmHeaders = ['Film Brand', 'Film Model'].filter(function (header) {
+    return !findPresentationHeaderColumn(headerValues, [header.toLowerCase()]);
   });
+  if (missingFilmHeaders.length) {
+    var nextColumn = sheet.getLastColumn() + 1;
+    missingFilmHeaders.forEach(function (header, offset) {
+      sheet.getRange(1, nextColumn + offset).setValue(header).setFontWeight('bold').setBackground('#eef3f8');
+    });
+  }
   return sheet;
 }
 
@@ -623,7 +694,46 @@ function mapCustomer(row, feedbackById, statusDataById, giftById, remarksById, o
   };
 }
 
-function handleGetAllCustomersDetailed() {
+var ADMIN_DATA_CACHE_KEY = 'admin-detailed-v1';
+var ADMIN_DATA_CACHE_SECONDS = 30;
+var ADMIN_DATA_VERSION_KEY = 'admin-detailed-version';
+var CACHE_LONGEST_SECONDS = 21600;
+
+// Cached admin data is stored under the current version. A write replaces the
+// version, so a read that began before the write can never serve its result
+// afterwards, even if it finishes storing it later.
+function getAdminDataVersion(cache) {
+  var version = cache.get(ADMIN_DATA_VERSION_KEY);
+  if (!version) {
+    version = String(Date.now()) + '-' + Math.floor(Math.random() * 1e6);
+    cache.put(ADMIN_DATA_VERSION_KEY, version, CACHE_LONGEST_SECONDS);
+  }
+  return version;
+}
+
+function invalidateAdminData() {
+  try {
+    CacheService.getScriptCache().put(ADMIN_DATA_VERSION_KEY, String(Date.now()) + '-' + Math.floor(Math.random() * 1e6), CACHE_LONGEST_SECONDS);
+  } catch (error) {
+    // Without a cache the admin data is always read live.
+  }
+}
+
+function handleGetAllCustomersDetailed(fresh) {
+  // Writes made through this API appear at once. Edits typed directly into the
+  // sheet appear within ADMIN_DATA_CACHE_SECONDS, or at once with fresh=true
+  // (the refresh button).
+  var cache = null;
+  var cacheKey = '';
+  try {
+    cache = CacheService.getScriptCache();
+    cacheKey = ADMIN_DATA_CACHE_KEY + ':' + getAdminDataVersion(cache);
+    var cached = fresh ? null : readChunkedCache(cache, cacheKey);
+    if (cached) return ContentService.createTextOutput(cached).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    cache = null;
+  }
+
   var dataRows = getSheetData('Data');
   if (!dataRows) return jsonResponse({ status: 'error', message: 'ไม่พบชีต Data' });
 
@@ -638,24 +748,75 @@ function handleGetAllCustomersDetailed() {
     customers.push(mapCustomer(dataRows[index], feedbackById, statusDataById, giftById, remarksById, overridesById));
   }
 
-  return jsonResponse({
+  var serialized = JSON.stringify({
     status: 'success',
     presentationOverridesEnabled: true,
     presentationFilmOverridesEnabled: true,
     data: customers
   });
+  try {
+    if (cache) writeChunkedCache(cache, cacheKey, serialized, ADMIN_DATA_CACHE_SECONDS);
+  } catch (error) {
+    // Very large responses or cache errors fall back to the normal response.
+  }
+  return ContentService.createTextOutput(serialized).setMimeType(ContentService.MimeType.JSON);
+}
+
+var PUBLIC_PRESENTATION_CACHE_KEY = 'public-presentation-v2';
+var PUBLIC_PRESENTATION_CACHE_SECONDS = 60;
+// Apps Script limits each cache value to 100 KB. Thai text takes 3 bytes per
+// character in UTF-8, so 30,000 characters keeps every chunk below 90 KB.
+var CACHE_CHUNK_CHARACTERS = 30000;
+var CACHE_MAX_CHUNKS = 60;
+
+// The main key holds either a small payload directly or a pointer such as
+// "chunks:3:<stamp>" to its pieces. Removing the main key, as
+// savePresentationOverride does, therefore invalidates every chunk at once.
+function readChunkedCache(cache, key) {
+  var head = cache.get(key);
+  if (!head || head.indexOf('chunks:') !== 0) return head;
+
+  var parts = head.split(':');
+  var count = Number(parts[1]);
+  var keys = [];
+  for (var index = 0; index < count; index++) keys.push(key + ':' + parts[2] + ':' + index);
+  var chunks = cache.getAll(keys);
+  var text = '';
+  for (var chunkIndex = 0; chunkIndex < keys.length; chunkIndex++) {
+    if (typeof chunks[keys[chunkIndex]] !== 'string') return null;
+    text += chunks[keys[chunkIndex]];
+  }
+  return text;
+}
+
+function writeChunkedCache(cache, key, text, seconds) {
+  if (text.length <= CACHE_CHUNK_CHARACTERS) {
+    cache.put(key, text, seconds);
+    return;
+  }
+
+  var count = Math.ceil(text.length / CACHE_CHUNK_CHARACTERS);
+  if (count > CACHE_MAX_CHUNKS) return;
+  var stamp = String(Date.now());
+  var values = {};
+  for (var index = 0; index < count; index++) {
+    values[key + ':' + stamp + ':' + index] = text.substr(index * CACHE_CHUNK_CHARACTERS, CACHE_CHUNK_CHARACTERS);
+  }
+  // Chunks outlive the pointer slightly so a reader never sees the pointer
+  // after its chunks have expired.
+  cache.putAll(values, seconds + 30);
+  cache.put(key, 'chunks:' + count + ':' + stamp, seconds);
 }
 
 // Public, read-only endpoint for the presentation screen. It intentionally
 // returns only the fields rendered by a slide, never phone, gift, status-log,
 // remarks, or other admin-only customer data.
 function handleGetPublicPresentationData() {
-  // Cache only the public payload; admin reads and writes remain live.
-  var cacheKey = 'public-presentation-v2';
+  var cacheKey = PUBLIC_PRESENTATION_CACHE_KEY;
   var cache;
   try {
     cache = CacheService.getScriptCache();
-    var cached = cache.get(cacheKey);
+    var cached = readChunkedCache(cache, cacheKey);
     if (cached) return ContentService.createTextOutput(cached).setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
     // Cache availability must never prevent a live read.
@@ -691,27 +852,30 @@ function handleGetPublicPresentationData() {
   }
 
   var payload = { status: 'success', data: customers, generatedAt: Date.now() };
+  var serialized = JSON.stringify(payload);
   try {
-    var serialized = JSON.stringify(payload);
-    // Apps Script limits each cache value to 100 KB, including UTF-8 Thai text.
-    if (cache && Utilities.newBlob(serialized).getBytes().length < 90000) {
-      cache.put(cacheKey, serialized, 60);
-    }
+    if (cache) writeChunkedCache(cache, cacheKey, serialized, PUBLIC_PRESENTATION_CACHE_SECONDS);
   } catch (error) {
-    // Large responses or cache errors fall back to the normal response.
+    // Very large responses or cache errors fall back to the normal response.
   }
-  return jsonResponse(payload);
+  return ContentService.createTextOutput(serialized).setMimeType(ContentService.MimeType.JSON);
 }
 
+var CUSTOMER_ID_HEADERS = ['ID', 'รหัสลูกค้า', 'รหัส ID'];
+var CUSTOMER_NAME_HEADERS = ['Name', 'ชื่อผู้ติดต่อ', 'ชื่อลูกค้า'];
+
 function handleGetCustomer(id) {
-  var rows = getSheetData('Data');
-  if (!rows) return jsonResponse({ status: 'error', message: 'ไม่พบชีต Data' });
+  // The survey page opens with this lookup. Find the row from the ID columns
+  // first, then read only that row instead of the whole Data sheet.
+  var table = readSheetColumns('Data', CUSTOMER_ID_HEADERS);
+  if (!table) return jsonResponse({ status: 'error', message: 'ไม่พบชีต Data' });
 
   var requestedId = getText(id);
-  for (var index = 0; index < rows.length; index++) {
-    if (getCustomerId(rows[index]) !== requestedId) continue;
+  for (var index = 0; index < table.rows.length; index++) {
+    if (getCustomerId(table.rows[index]) !== requestedId) continue;
 
-    var row = rows[index];
+    var rowValues = table.sheet.getRange(table.rows[index]._rowNumber, 1, 1, table.headers.length).getValues()[0];
+    var row = buildSheetRow(table.headers, rowValues, getSpreadsheetTimezone());
     return jsonResponse({
       status: 'success',
       data: {
@@ -729,8 +893,9 @@ function handleGetCustomer(id) {
 }
 
 function handleGetAllCustomers() {
-  var rows = getSheetData('Data');
-  if (!rows) return jsonResponse({ status: 'error', message: 'ไม่พบชีต Data' });
+  var table = readSheetColumns('Data', CUSTOMER_ID_HEADERS.concat(CUSTOMER_NAME_HEADERS));
+  if (!table) return jsonResponse({ status: 'error', message: 'ไม่พบชีต Data' });
+  var rows = table.rows;
 
   var customers = [];
   for (var index = 0; index < rows.length; index++) {
