@@ -537,6 +537,25 @@ async function fetchDashboardData(password, fresh = false) {
     return payload;
 }
 
+// Checks only the password, without loading customer data, so a device that
+// already has saved dashboard data can open the dashboard at once.
+async function checkAdminPassword(password) {
+    const url = new URL(state.googleSheetsUrl);
+    url.searchParams.set('_request', Date.now().toString());
+    const response = await fetch(url.toString(), {
+        method: 'POST',
+        cache: 'no-store',
+        body: JSON.stringify({ action: 'checkPassword', password })
+    });
+    if (!response.ok) throw new Error('HTTP error ' + response.status);
+    const payload = await response.json();
+    // An Apps Script deployment without checkPassword falls back to the full load.
+    if (payload?.status === 'error' && /Unsupported POST action/.test(payload.message || '')) {
+        return fetchDashboardData(password);
+    }
+    return payload;
+}
+
 function loadData(initialData = null) {
     const cachedUrl = localStorage.getItem('google_sheets_apps_script_url');
     if (cachedUrl === 'https://script.google.com/macros/s/AKfycbzC9Os3IHKXZQ-epBWilu-k3gaAL8eqZamHN1IH-4svZ5TGxNwo8GeuXPykvV8h4SpNLQ/exec' ||
@@ -3886,11 +3905,17 @@ window.handleLogin = function(e) {
     btn.disabled = true;
     err.style.display = 'none';
     
-    return fetchDashboardData(pwd)
+    // With saved data, open the dashboard after the quick password check and
+    // refresh in the background. A first login waits for the data as before.
+    let hasSavedData = false;
+    try { hasSavedData = !!localStorage.getItem('admin_dashboard_cache'); } catch (error) { /* Storage is optional. */ }
+    const loginRequest = hasSavedData ? checkAdminPassword(pwd) : fetchDashboardData(pwd);
+
+    return loginRequest
     .then(data => {
         if (data.status === 'success') {
             localStorage.setItem('admin_password', pwd);
-            return checkLoginStatus(data);
+            return checkLoginStatus(Array.isArray(data.data) ? data : null);
         } else {
             err.style.display = 'block';
             err.innerText = "รหัสผ่านไม่ถูกต้อง";
