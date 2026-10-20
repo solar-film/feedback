@@ -512,14 +512,16 @@ function getDataWorksiteType(item) {
 }
 
 // LOAD DATABASE
-async function fetchDashboardData(password) {
+async function fetchDashboardData(password, fresh = false) {
     // ContentService redirects to a one-time URL. Always request a fresh response.
     const url = new URL(state.googleSheetsUrl);
     url.searchParams.set('_request', Date.now().toString());
+    // fresh skips the Apps Script cache so edits typed into the sheet show at once.
+    const body = fresh ? { action: 'getAllCustomersDetailed', password, fresh: true } : { action: 'getAllCustomersDetailed', password };
     const response = await fetch(url.toString(), {
         method: 'POST',
         cache: 'no-store',
-        body: JSON.stringify({ action: 'getAllCustomersDetailed', password })
+        body: JSON.stringify(body)
     });
     if (response.status === 404) {
         throw new Error('HTTP 404: ไม่พบปลายทาง Apps Script กรุณาตรวจสอบ Web app URL ใน Deploy → Manage deployments และใช้ลิงก์ /exec ของ deployment ที่ยังเปิดใช้งาน');
@@ -693,7 +695,7 @@ function forceRefreshData() {
     const pwd = localStorage.getItem('admin_password');
     if (!pwd) return;
 
-    fetchDashboardData(pwd)
+    fetchDashboardData(pwd, true)
         .then(data => {
             if (data.status === 'success' && data.data) {
                 state.presentationOverridesEnabled = data.presentationOverridesEnabled === true;
