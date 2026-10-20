@@ -512,7 +512,21 @@ function getDataWorksiteType(item) {
 }
 
 // LOAD DATABASE
+// Apps Script sometimes answers with its echo page's 404 or with the plain
+// "API is running" GET reply instead of the data. Both pass on a second try,
+// so retry this read twice before reporting an error. Writes are not retried.
 async function fetchDashboardData(password, fresh = false) {
+    for (let attempt = 1; ; attempt++) {
+        try {
+            return await fetchDashboardDataOnce(password, fresh);
+        } catch (error) {
+            if (attempt >= 3) throw error;
+            await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+        }
+    }
+}
+
+async function fetchDashboardDataOnce(password, fresh) {
     // ContentService redirects to a one-time URL. Always request a fresh response.
     const url = new URL(state.googleSheetsUrl);
     url.searchParams.set('_request', Date.now().toString());
@@ -535,6 +549,48 @@ async function fetchDashboardData(password, fresh = false) {
         throw new Error('รูปแบบข้อมูลจาก API ไม่ถูกต้อง');
     }
     return payload;
+}
+
+const LOGIN_VERIFIER_KEY = 'admin_login_verifier';
+
+async function hashAdminPassword(password, salt) {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + ':' + password));
+    return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// Keeps a salted hash, never the password, of the last password the server
+// accepted. Typing it again reopens this device's saved dashboard without
+// waiting several seconds for Apps Script; every API call still checks the
+// real password on the server.
+async function rememberAdminPassword(password) {
+    try {
+        const salt = Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
+        localStorage.setItem(LOGIN_VERIFIER_KEY, JSON.stringify({ salt, hash: await hashAdminPassword(password, salt) }));
+    } catch (error) { /* Storage and crypto are optional. */ }
+}
+
+async function matchesRememberedPassword(password) {
+    try {
+        const saved = JSON.parse(localStorage.getItem(LOGIN_VERIFIER_KEY) || 'null');
+        return !!saved && saved.hash === await hashAdminPassword(password, saved.salt);
+    } catch (error) {
+        return false;
+    }
+}
+
+// The server rejected the saved password, for example after it was changed.
+// Return to the login screen instead of showing saved data indefinitely.
+function handleSessionRejected() {
+    try {
+        localStorage.removeItem('admin_password');
+        localStorage.removeItem(LOGIN_VERIFIER_KEY);
+    } catch (error) { /* Storage is optional. */ }
+    checkLoginStatus();
+    const err = document.getElementById('login-error');
+    if (err) {
+        err.style.display = 'block';
+        err.innerText = 'รหัสผ่านไม่ถูกต้อง';
+    }
 }
 
 // Checks only the password, without loading customer data, so a device that
@@ -661,6 +717,10 @@ function loadData(initialData = null) {
         })
         .catch(err => {
             console.error("API error:", err);
+            if (/Unauthorized/.test(err.message || '')) {
+                handleSessionRejected();
+                return;
+            }
             updateApiBadge('error', 'โหลดข้อมูลไม่สำเร็จ: ' + err.message);
             // Only show toast if we didn't have cached data to show
             if (!cachedData) {
@@ -3909,12 +3969,17 @@ window.handleLogin = function(e) {
     // refresh in the background. A first login waits for the data as before.
     let hasSavedData = false;
     try { hasSavedData = !!localStorage.getItem('admin_dashboard_cache'); } catch (error) { /* Storage is optional. */ }
-    const loginRequest = hasSavedData ? checkAdminPassword(pwd) : fetchDashboardData(pwd);
+    const loginRequest = (async () => {
+        // The password this device last logged in with needs no server round trip.
+        if (hasSavedData && await matchesRememberedPassword(pwd)) return { status: 'success', verifiedLocally: true };
+        return hasSavedData ? checkAdminPassword(pwd) : fetchDashboardData(pwd);
+    })();
 
     return loginRequest
-    .then(data => {
+    .then(async data => {
         if (data.status === 'success') {
             localStorage.setItem('admin_password', pwd);
+            if (!data.verifiedLocally) await rememberAdminPassword(pwd);
             return checkLoginStatus(Array.isArray(data.data) ? data : null);
         } else {
             err.style.display = 'block';
