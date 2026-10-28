@@ -3225,7 +3225,7 @@ function renderPresentationSlide() {
                         </div>
                     </div>
                     <div class="pp-score-right">
-                        <div class="pp-score-crown"><img src="../images/premium-score-crown.png" alt="" aria-hidden="true"></div>
+                        <div class="pp-score-crown"><img src="../images/premium-score-crown.webp" alt="" aria-hidden="true"></div>
                         <div class="pp-circular-progress" style="--progress: ${avgScorePercent}%">
                             <div class="pp-circular-inner">
                                 <span class="title">คะแนนรวม</span>
@@ -3346,7 +3346,7 @@ function renderPresentationSlide() {
                 <div class="pp-team-card mvp">
                     <div class="pp-mvp-showcase">
                         <div class="pp-mvp-medallion">
-                            <img src="../images/mvp-award-emblem.png" alt="ตราทีมที่ประทับใจ">
+                            <img src="../images/mvp-award-emblem.webp" alt="ตราทีมที่ประทับใจ">
                         </div>
                         <h4>ทีมที่ประทับใจ</h4>
                         <div class="pp-mvp-rule"><span>★</span></div>
@@ -3712,9 +3712,9 @@ function printGiftLabel(id) {
     }
     
     // Determine Background Image by Company
-    let bgImage = '../images/GFS-A5.png';
+    let bgImage = '../images/GFS-A5.webp';
     if (c.company && c.company.toUpperCase().includes('MHL')) {
-        bgImage = '../images/MHL-A5.png';
+        bgImage = '../images/MHL-A5.webp';
     }
     
     // Use only Address field for printing as requested
