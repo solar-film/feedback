@@ -264,11 +264,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    // Date picker initial limit
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('install-date').setAttribute('max', today);
-    document.getElementById('install-date').value = today;
-
     // Add inputs validators
     attachFormValidators();
     setupSoundToggle();
@@ -283,6 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setupSoundToggle() {
     const btn = document.getElementById('sound-toggle');
+    // The page currently has no sound button; skip instead of stopping start-up.
+    if (!btn) return;
     btn.addEventListener('click', () => {
         SoundFX.enabled = !SoundFX.enabled;
         if (SoundFX.enabled) {
@@ -309,49 +306,12 @@ function parseUrlParameters() {
     const installDate = params.get('installDate');
     const filmModel = params.get('filmModel');
 
-    // Always store the ID from URL if provided
+    // A short link carries only the customer ID. The survey saves just that ID
+    // (the sheet joins the customer details from Data), and submitSurvey picks
+    // the GFS or MHL review link from it, so no lookup is needed here. A lookup
+    // would hold every customer on a loading screen for several seconds.
     if (id) {
         state.formData.id = id;
-    }
-
-    // Handle short URL by fetching customer details from Google Sheets tab 'Data'
-    if (id) {
-        const sheetsUrl = 'https://script.google.com/macros/s/AKfycbx6KYO_vGxUN11eZO7u-QU7OFcZr_VMfAodv2mvj2YXlSdGSV83J6IDYwp4nYH5DHhYyA/exec';
-
-        const loader = document.getElementById('loading-overlay');
-        loader.style.display = 'flex';
-
-        fetch(`${sheetsUrl}?action=getCustomer&id=${encodeURIComponent(id)}`)
-            .then(res => res.json())
-            .then(data => {
-                loader.style.display = 'none';
-                if (data.status === 'success' && data.data) {
-                    const c = data.data;
-                    state.formData.id = c.id || id;
-                    if (c.name) state.formData.name = c.name;
-                    if (c.phone) state.formData.phone = c.phone;
-                    if (c.siteType) state.formData.siteType = c.siteType;
-                    if (c.installDate) state.formData.installDate = c.installDate;
-                    if (c.filmModel) state.formData.filmModel = c.filmModel;
-                    
-                    const reviewGfs = document.getElementById('google-review-link-gfs');
-                    const reviewMhl = document.getElementById('google-review-link-mhl');
-                    if (reviewGfs && reviewMhl) {
-                        if (c.company === 'MHL' || window.location.href.includes('MHL')) {
-                            reviewMhl.style.display = 'block';
-                        } else {
-                            reviewGfs.style.display = 'block';
-                        }
-                    }
-                } else {
-                    alert('❌ ไม่พบรหัสลูกค้านี้ในฐานข้อมูลชีต Data ค่ะ');
-                }
-            })
-            .catch(err => {
-                loader.style.display = 'none';
-                console.error('Error fetching customer details:', err);
-                alert('❌ เกิดข้อผิดพลาดในการดึงข้อมูลจากระบบ Google Sheet: ' + err.message);
-            });
         return;
     }
 
