@@ -16,8 +16,10 @@ const Utilities = {
     ungzip: b => blob(zlib.gunzipSync(Buffer.from(b.getBytes()))),
     base64Encode: bytes => Buffer.from(bytes).toString('base64'),
     base64Decode: text => Array.from(Buffer.from(text, 'base64')),
-    formatDate: value => value.toISOString()
+    // 'H' gives the hour, which tests set through clock.hour.
+    formatDate: (value, timezone, format) => (format === 'H' ? String(clock.hour) : value.toISOString())
 };
+const clock = { hour: 10 };
 
 function setup() {
     const store = new Map();
@@ -49,6 +51,8 @@ function setup() {
     ctx.getSheetData = name => { if (name === 'Data') reads++; return sheets[name]; };
     ctx.getPresentationOverridesById = () => ({});
     ctx.getAdminPassword = () => 'pw';
+    ctx.getSpreadsheetTimezone = () => 'Asia/Bangkok';
+    clock.hour = 10;
     const load = fresh => JSON.parse(ctx.doPost({ postData: { contents: JSON.stringify({ action: 'getAllCustomersDetailed', password: 'pw', ...(fresh ? { fresh: true } : {}) }) } }).text);
     return { ctx, cache, store, triggers, load, sheets, reads: () => reads };
 }
@@ -100,4 +104,23 @@ test('installing the warm-up leaves exactly one 5-minute trigger and fills the c
     const before = reads();
     load();
     assert.equal(reads(), before);
+});
+
+test('the warm-up reads the sheets only from 07:00 to 17:59', () => {
+    const { ctx, reads } = setup();
+    for (const [hour, runs] of [[6, false], [7, true], [12, true], [17, true], [18, false], [23, false]]) {
+        clock.hour = hour;
+        const before = reads();
+        ctx.warmAdminDataCache();
+        assert.equal(reads() - before, runs ? 1 : 0, 'hour ' + hour);
+    }
+});
+
+test('installing the warm-up at night still fills the cache once', () => {
+    const { ctx, load, reads } = setup();
+    clock.hour = 22;
+    ctx.installAdminCacheTrigger();
+    assert.equal(reads(), 1);
+    load();
+    assert.equal(reads(), 1);
 });

@@ -703,6 +703,10 @@ var ADMIN_DATA_CACHE_KEY = 'admin-detailed-v1';
 // only needs to outlive one interval.
 var ADMIN_DATA_CACHE_SECONDS = 360;
 var ADMIN_CACHE_WARM_MINUTES = 5;
+// Warm only during working hours (spreadsheet time zone, 07:00-17:59). Each
+// warm-up takes 9-14 s, and the daily trigger quota is 90 minutes.
+var ADMIN_CACHE_WARM_START_HOUR = 7;
+var ADMIN_CACHE_WARM_END_HOUR = 18;
 var ADMIN_DATA_VERSION_KEY = 'admin-detailed-version';
 var CACHE_LONGEST_SECONDS = 21600;
 
@@ -729,6 +733,8 @@ function invalidateAdminData() {
 // Run by a time-driven trigger. Reading every sheet takes several seconds, so
 // the dashboard gets a copy built here instead of waiting for one at login.
 function warmAdminDataCache() {
+  var hour = Number(Utilities.formatDate(new Date(), getSpreadsheetTimezone(), 'H'));
+  if (hour < ADMIN_CACHE_WARM_START_HOUR || hour >= ADMIN_CACHE_WARM_END_HOUR) return;
   handleGetAllCustomersDetailed(true);
 }
 
@@ -739,7 +745,8 @@ function installAdminCacheTrigger() {
     if (trigger.getHandlerFunction() === 'warmAdminDataCache') ScriptApp.deleteTrigger(trigger);
   });
   ScriptApp.newTrigger('warmAdminDataCache').timeBased().everyMinutes(ADMIN_CACHE_WARM_MINUTES).create();
-  warmAdminDataCache();
+  // Fill the cache now, whatever the hour.
+  handleGetAllCustomersDetailed(true);
 }
 
 function handleGetAllCustomersDetailed(fresh) {
