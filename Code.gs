@@ -699,7 +699,14 @@ function mapCustomer(row, feedbackById, statusDataById, giftById, remarksById, o
 }
 
 var ADMIN_DATA_CACHE_KEY = 'admin-detailed-v1';
-var ADMIN_DATA_CACHE_SECONDS = 30;
+// warmAdminDataCache rebuilds the admin data every 5 minutes, so each copy
+// only needs to outlive one interval.
+var ADMIN_DATA_CACHE_SECONDS = 360;
+var ADMIN_CACHE_WARM_MINUTES = 5;
+// Warm only during working hours (spreadsheet time zone, 07:00-17:59). Each
+// warm-up takes 9-14 s, and the daily trigger quota is 90 minutes.
+var ADMIN_CACHE_WARM_START_HOUR = 7;
+var ADMIN_CACHE_WARM_END_HOUR = 18;
 var ADMIN_DATA_VERSION_KEY = 'admin-detailed-version';
 var CACHE_LONGEST_SECONDS = 21600;
 
@@ -723,10 +730,29 @@ function invalidateAdminData() {
   }
 }
 
+// Run by a time-driven trigger. Reading every sheet takes several seconds, so
+// the dashboard gets a copy built here instead of waiting for one at login.
+function warmAdminDataCache() {
+  var hour = Number(Utilities.formatDate(new Date(), getSpreadsheetTimezone(), 'H'));
+  if (hour < ADMIN_CACHE_WARM_START_HOUR || hour >= ADMIN_CACHE_WARM_END_HOUR) return;
+  handleGetAllCustomersDetailed(true);
+}
+
+// Run once from the Apps Script editor to start (or restart) the warm-up.
+// Removing any earlier copy first keeps exactly one trigger.
+function installAdminCacheTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function (trigger) {
+    if (trigger.getHandlerFunction() === 'warmAdminDataCache') ScriptApp.deleteTrigger(trigger);
+  });
+  ScriptApp.newTrigger('warmAdminDataCache').timeBased().everyMinutes(ADMIN_CACHE_WARM_MINUTES).create();
+  // Fill the cache now, whatever the hour.
+  handleGetAllCustomersDetailed(true);
+}
+
 function handleGetAllCustomersDetailed(fresh) {
   // Writes made through this API appear at once. Edits typed directly into the
-  // sheet appear within ADMIN_DATA_CACHE_SECONDS, or at once with fresh=true
-  // (the refresh button).
+  // sheet appear after the next warm-up (within about ADMIN_CACHE_WARM_MINUTES),
+  // or at once with fresh=true (the refresh button).
   var cache = null;
   var cacheKey = '';
   try {
@@ -770,15 +796,37 @@ var PUBLIC_PRESENTATION_CACHE_KEY = 'public-presentation-v2';
 var PUBLIC_PRESENTATION_CACHE_SECONDS = 60;
 // Apps Script limits each cache value to 100 KB. Thai text takes 3 bytes per
 // character in UTF-8, so 30,000 characters keeps every chunk below 90 KB.
+// Compressed values are base64, one byte per character, so they use 90,000.
 var CACHE_CHUNK_CHARACTERS = 30000;
+var CACHE_COMPRESSED_CHUNK_CHARACTERS = 90000;
 var CACHE_MAX_CHUNKS = 60;
+var CACHE_COMPRESSED_PREFIX = 'gz:';
+
+// The admin payload is about a million characters of mostly repeated JSON.
+// Gzip shrinks it several times over, so it needs a few cache entries instead
+// of dozens and keeps fitting the cache as the customer list grows.
+function compressCacheText(text) {
+  try {
+    var compressed = CACHE_COMPRESSED_PREFIX + Utilities.base64Encode(Utilities.gzip(Utilities.newBlob(text, 'application/json')).getBytes());
+    return compressed.length < text.length ? compressed : text;
+  } catch (error) {
+    return text;
+  }
+}
+
+function decompressCacheText(text) {
+  if (text.indexOf(CACHE_COMPRESSED_PREFIX) !== 0) return text;
+  var bytes = Utilities.base64Decode(text.slice(CACHE_COMPRESSED_PREFIX.length));
+  return Utilities.ungzip(Utilities.newBlob(bytes, 'application/x-gzip')).getDataAsString('UTF-8');
+}
 
 // The main key holds either a small payload directly or a pointer such as
 // "chunks:3:<stamp>" to its pieces. Removing the main key, as
 // savePresentationOverride does, therefore invalidates every chunk at once.
 function readChunkedCache(cache, key) {
   var head = cache.get(key);
-  if (!head || head.indexOf('chunks:') !== 0) return head;
+  if (!head) return head;
+  if (head.indexOf('chunks:') !== 0) return decompressCacheText(head);
 
   var parts = head.split(':');
   var count = Number(parts[1]);
@@ -790,21 +838,23 @@ function readChunkedCache(cache, key) {
     if (typeof chunks[keys[chunkIndex]] !== 'string') return null;
     text += chunks[keys[chunkIndex]];
   }
-  return text;
+  return decompressCacheText(text);
 }
 
 function writeChunkedCache(cache, key, text, seconds) {
-  if (text.length <= CACHE_CHUNK_CHARACTERS) {
-    cache.put(key, text, seconds);
+  var stored = compressCacheText(text);
+  var chunkCharacters = stored === text ? CACHE_CHUNK_CHARACTERS : CACHE_COMPRESSED_CHUNK_CHARACTERS;
+  if (stored.length <= chunkCharacters) {
+    cache.put(key, stored, seconds);
     return;
   }
 
-  var count = Math.ceil(text.length / CACHE_CHUNK_CHARACTERS);
+  var count = Math.ceil(stored.length / chunkCharacters);
   if (count > CACHE_MAX_CHUNKS) return;
   var stamp = String(Date.now());
   var values = {};
   for (var index = 0; index < count; index++) {
-    values[key + ':' + stamp + ':' + index] = text.substr(index * CACHE_CHUNK_CHARACTERS, CACHE_CHUNK_CHARACTERS);
+    values[key + ':' + stamp + ':' + index] = stored.substr(index * chunkCharacters, chunkCharacters);
   }
   // Chunks outlive the pointer slightly so a reader never sees the pointer
   // after its chunks have expired.
