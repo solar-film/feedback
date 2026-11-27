@@ -23,7 +23,7 @@ function stub() {
     });
 }
 
-function openSurvey(search) {
+function openSurvey(search, fetchImpl = () => new Promise(() => {})) {
     const missing = new Set(['install-date', 'sound-toggle', 'site-type', 'thankyou-review-banner']);
     const listeners = {};
     const requests = [];
@@ -33,13 +33,15 @@ function openSurvey(search) {
         console: { log() {}, warn() {}, error() {} },
         lucide: { createIcons() {} },
         alert: message => { throw new Error('unexpected alert: ' + message); },
-        fetch: url => { requests.push(String(url)); return new Promise(() => {}); },
+        fetch: (url, options) => { requests.push(String(url)); return fetchImpl(url, options); },
+        Blob,
         setTimeout: () => 0,
         localStorage: { getItem: key => stored.get(key) ?? null, setItem: (key, value) => stored.set(key, String(value)), removeItem: key => stored.delete(key) },
         window: {
             location: { search, href: 'https://solar-film.github.io/feedback/' + search },
             // Sound effects need an AudioContext, which browsers have and Node does not.
-            AudioContext: function () { return stub(); }
+            AudioContext: function () { return stub(); },
+            addEventListener: (type, fn) => { listeners['window:' + type] = fn; }
         },
         document: {
             addEventListener: (type, fn) => { listeners[type] = fn; },
@@ -69,4 +71,46 @@ test('a link with contact details but no ID still fills them in', () => {
     listeners.DOMContentLoaded();
     assert.equal(ctx.surveyState.formData.name, 'คุณเอ');
     assert.equal(ctx.surveyState.formData.phone, '0812345678');
+});
+
+test('submitting shows the thank-you screen at once and saves in the background', () => {
+    const calls = [];
+    const { ctx } = openSurvey('?id=K1', (url, options) => { calls.push(options); return new Promise(() => {}); });
+    const screens = [];
+    ctx.changeScreen = id => screens.push(id);
+    ctx.submitSurvey();
+    assert.deepEqual(screens, ['screen-thankyou'], 'thank-you shown without waiting for Apps Script');
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].keepalive, true);
+    assert.equal(JSON.parse(calls[0].body).id, 'K1');
+});
+
+test('the review click is recorded only after the survey save has finished', async () => {
+    let finishSave;
+    const calls = [];
+    const { ctx } = openSurvey('?id=K1', (url, options) => {
+        calls.push(JSON.parse(options.body));
+        return calls.length === 1 ? new Promise(resolve => { finishSave = resolve; }) : Promise.resolve();
+    });
+    ctx.changeScreen = () => {};
+    ctx.submitSurvey();
+    ctx.clickGoogleMaps();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(calls.length, 1, 'review update waits for the save');
+    finishSave();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(calls.length, 2);
+    assert.equal(calls[1].action, 'updateReviewStatus');
+    assert.equal(calls[1].id, 'K1');
+});
+
+test('later-screen images load after the page loads, or when their screen opens', () => {
+    const { ctx, listeners } = openSurvey('?id=K1');
+    const image = { attrs: { 'data-src': 'images/2-5.webp' }, src: '' };
+    image.getAttribute = name => image.attrs[name];
+    image.removeAttribute = name => { delete image.attrs[name]; };
+    ctx.loadDeferredImages({ querySelectorAll: selector => (selector === 'img[data-src]' && image.attrs['data-src'] ? [image] : []) });
+    assert.equal(image.src, 'images/2-5.webp');
+    assert.equal(image.attrs['data-src'], undefined);
+    assert.equal(typeof listeners['window:load'], 'function');
 });
