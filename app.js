@@ -364,9 +364,22 @@ function validateM1() {
 }
 
 // Manage Step Transitions
+// Images of later screens are written as data-src so opening the survey
+// downloads only what the first screen shows. They start loading once the
+// page has loaded, and a screen about to be shown loads its own at once.
+function loadDeferredImages(root) {
+    (root || document).querySelectorAll('img[data-src]').forEach(img => {
+        img.src = img.getAttribute('data-src');
+        img.removeAttribute('data-src');
+    });
+}
+
+window.addEventListener('load', () => setTimeout(() => loadDeferredImages(), 300));
+
 function changeScreen(screenId) {
+    loadDeferredImages(document.getElementById(screenId));
     SoundFX.playClick();
-    
+
     // Toggle active screen
     document.querySelectorAll('.game-screen').forEach(scr => scr.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
@@ -693,18 +706,20 @@ function clickGoogleMaps() {
     const currentId = state.formData.id || urlParams.get('id') || '';
     
     if (sheetsUrl && currentId) {
-        // Delay to ensure row is created by submitSurvey first
-        setTimeout(() => {
+        // updateReviewStatus marks the customer's answer row, so send it only
+        // after the survey save has finished creating that row.
+        Promise.resolve(state.submitRequest).then(() => {
             fetch(sheetsUrl, {
                 method: 'POST',
                 mode: 'no-cors',
+                keepalive: true,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'updateReviewStatus',
                     id: currentId
                 })
             }).catch(err => console.error('Error updating review status:', err));
-        }, 2500);
+        });
     }
     
     // Update localStorage for internal Dashboard
@@ -846,28 +861,25 @@ function submitSurvey() {
     
     if (sheetsUrl) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span style="display:inline-flex; align-items:center; gap:8px;"><i data-lucide="loader" class="spin-icon" style="animation: spin 1.2s linear infinite;"></i> กำลังบันทึกข้อมูล...</span>';
-        lucide.createIcons();
 
-        fetch(sheetsUrl, {
+        // Apps Script takes 1-13 s to answer, and a no-cors reply cannot be read
+        // anyway, so show the thank-you screen now and save in the background.
+        // keepalive lets the save finish even if the customer closes the page;
+        // browsers cap keepalive bodies at 64 KB, so a very long answer skips it.
+        const body = JSON.stringify(submission);
+        state.submitRequest = fetch(sheetsUrl, {
             method: 'POST',
             mode: 'no-cors',
+            keepalive: new Blob([body]).size < 60000,
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(submission)
+            body
         })
-        .then(() => {
-            console.log('Submitted to Google Sheets successfully');
-            changeScreen('screen-thankyou');
-        })
-        .catch(err => {
-            console.error('Error submitting to Google Sheets:', err);
-            changeScreen('screen-thankyou');
-        });
-    } else {
-        changeScreen('screen-thankyou');
+        .then(() => console.log('Submitted to Google Sheets successfully'))
+        .catch(err => console.error('Error submitting to Google Sheets:', err));
     }
+    changeScreen('screen-thankyou');
 }
 
 // DASHBOARD MODALS
